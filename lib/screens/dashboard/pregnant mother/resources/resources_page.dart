@@ -347,7 +347,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
 
   Widget _buildFeaturedResources() {
     return SizedBox(
-      height: 200,
+      height: 240,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: 3,
@@ -356,83 +356,195 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
             {
               'title': 'Your Complete Pregnancy Guide',
               'subtitle': 'Everything you need to know',
-              'image': Icons.book,
-              'color': const Color(0xFFF8BBD9),
+              'imagePath': 'assets/images/pregnancy_guide.jpg', // Replace with your actual image path
+              'overlayColor': const Color(0xFFF59297),
             },
             {
               'title': 'Healthy Pregnancy Diet',
               'subtitle': 'Nutrition for you and baby',
-              'image': Icons.restaurant,
-              'color': const Color(0xFF81C784),
+              'imagePath': 'assets/images/healthy_diet.jpg', // Replace with your actual image path
+              'overlayColor': const Color(0xFF81C784),
             },
             {
               'title': 'Prenatal Exercise Plan',
               'subtitle': 'Safe workouts during pregnancy',
-              'image': Icons.fitness_center,
-              'color': const Color(0xFF64B5F6),
+              'imagePath': 'assets/images/prenatal_exercise.jpg', // Replace with your actual image path
+              'overlayColor': const Color(0xFF64B5F6),
             },
           ];
           
           final resource = resources[index];
           
           return Container(
-            width: 280,
+            width: 300,
             margin: EdgeInsets.only(right: index < 2 ? 16 : 0),
             decoration: BoxDecoration(
-              color: resource['color'] as Color,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  spreadRadius: 2,
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Stack(
                 children: [
-                  Icon(
-                    resource['image'] as IconData,
-                    color: Colors.white,
-                    size: 40,
+                  // Background Image
+                  Positioned.fill(
+                    child: Image.asset(
+                      resource['imagePath'].toString(),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Fallback gradient background if image doesn't load
+                        return Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                (resource['overlayColor'] as Color).withOpacity(0.8),
+                                (resource['overlayColor'] as Color),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        resource['title'].toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                  
+                  // Gradient Overlay for Text Visibility
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.3),
+                            Colors.black.withOpacity(0.7),
+                          ],
+                          stops: const [0.0, 0.5, 1.0],
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        resource['subtitle'].toString(),
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
+                    ),
+                  ),
+                  
+                  // Color Overlay for Theme Consistency
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            (resource['overlayColor'] as Color).withOpacity(0.2),
+                            (resource['overlayColor'] as Color).withOpacity(0.4),
+                          ],
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Text(
-                          'Read More',
-                          style: TextStyle(
+                    ),
+                  ),
+                  
+                  // Content
+                  Positioned(
+                    left: 20,
+                    right: 20,
+                    bottom: 20,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Small icon indicator
+                        Container(
+                          width: 45,
+                          height: 45,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(22.5),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Icon(
+                            index == 0 ? Icons.menu_book_rounded :
+                            index == 1 ? Icons.restaurant_menu :
+                            Icons.fitness_center,
                             color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                            size: 22,
                           ),
                         ),
-                      ),
-                    ],
+                        
+                        const SizedBox(height: 12),
+                        
+                        // Title and Subtitle
+                        Text(
+                          resource['title'].toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            height: 1.2,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          resource['subtitle'].toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            height: 1.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 12),
+                        
+                        // Read More Button
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                spreadRadius: 0,
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Read More',
+                                style: TextStyle(
+                                  color: resource['overlayColor'] as Color,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Icon(
+                                Icons.arrow_forward,
+                                size: 14,
+                                color: resource['overlayColor'] as Color,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -446,122 +558,279 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
   Widget _buildArticlesList() {
     final articles = [
       {
-        'title': 'Understanding Your First Trimester',
+        'title': 'First Trimester Changes: What to Expect',
         'category': 'Pregnancy',
-        'readTime': '5 min read',
-        'description': 'Learn about the changes happening in your body during the first trimester.',
+        'readTime': '8 min read',
+        'description': 'Understanding your body\'s changes, morning sickness, and essential prenatal care during weeks 1-12.',
+        'author': 'Dr. Sarah Mitchell',
+        'publishDate': '2 days ago',
+        'likes': '324',
+        'isBookmarked': false,
+        'categoryColor': const Color(0xFFF59297),
       },
       {
-        'title': 'Essential Vitamins for Pregnancy',
+        'title': 'Folic Acid and Iron: Essential Nutrients',
         'category': 'Nutrition',
-        'readTime': '7 min read',
-        'description': 'Discover the key vitamins and minerals you need during pregnancy.',
+        'readTime': '5 min read',
+        'description': 'Why these vitamins are crucial for your baby\'s development and the best food sources.',
+        'author': 'Nutritionist Jane Adams',
+        'publishDate': '1 week ago',
+        'likes': '156',
+        'isBookmarked': true,
+        'categoryColor': const Color(0xFF81C784),
       },
       {
-        'title': 'Managing Pregnancy Anxiety',
+        'title': 'Coping with Pregnancy Anxiety and Stress',
         'category': 'Mental Health',
-        'readTime': '6 min read',
-        'description': 'Tips and techniques for managing stress and anxiety during pregnancy.',
+        'readTime': '10 min read',
+        'description': 'Practical strategies for managing worries and maintaining emotional wellness during pregnancy.',
+        'author': 'Dr. Michael Chen',
+        'publishDate': '3 days ago',
+        'likes': '89',
+        'isBookmarked': false,
+        'categoryColor': const Color(0xFF64B5F6),
       },
       {
-        'title': 'Preparing for Labor and Delivery',
+        'title': 'Birth Plan Essentials: What You Need to Know',
         'category': 'Pregnancy',
-        'readTime': '10 min read',
-        'description': 'Everything you need to know about preparing for your baby\'s arrival.',
+        'readTime': '12 min read',
+        'description': 'Creating a flexible birth plan that covers pain management, delivery preferences, and postpartum care.',
+        'author': 'Midwife Emma Thompson',
+        'publishDate': '5 days ago',
+        'likes': '278',
+        'isBookmarked': true,
+        'categoryColor': const Color(0xFFF59297),
+      },
+      {
+        'title': 'Safe Exercise During Each Trimester',
+        'category': 'Exercise',
+        'readTime': '7 min read',
+        'description': 'Modified workouts and activities that are safe and beneficial throughout your pregnancy journey.',
+        'author': 'Fitness Coach Lisa Park',
+        'publishDate': '1 week ago',
+        'likes': '201',
+        'isBookmarked': false,
+        'categoryColor': const Color(0xFFFFB74D),
+      },
+      {
+        'title': 'Preparing Your Home for Baby\'s Arrival',
+        'category': 'Baby Care',
+        'readTime': '6 min read',
+        'description': 'Essential baby-proofing tips and must-have items for your newborn\'s safety and comfort.',
+        'author': 'Pediatric Nurse Amy Wilson',
+        'publishDate': '4 days ago',
+        'likes': '145',
+        'isBookmarked': false,
+        'categoryColor': const Color(0xFFBA68C8),
       },
     ];
 
+    // Filter articles based on selected category
+    final filteredArticles = selectedCategory == 'All' 
+        ? articles 
+        : articles.where((article) => article['category'] == selectedCategory).toList();
+
     return Column(
-      children: articles.map((article) {
+      children: filteredArticles.map((article) {
         return Container(
           margin: const EdgeInsets.only(bottom: 16),
-          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 6,
-                offset: const Offset(0, 2),
+                color: Colors.grey.withOpacity(0.08),
+                spreadRadius: 0,
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: Row(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8BBD9).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.article,
-                  color: Color(0xFFF8BBD9),
-                  size: 30,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () {
+                // Handle article tap
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Opening: ${article['title']}'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Header with category and bookmark
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: (article['categoryColor'] as Color).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: (article['categoryColor'] as Color).withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Text(
+                            article['category'].toString(),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: article['categoryColor'] as Color,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            // Handle bookmark toggle
+                            setState(() {
+                              article['isBookmarked'] = !(article['isBookmarked'] as bool);
+                            });
+                          },
+                          child: Icon(
+                            (article['isBookmarked'] as bool) 
+                              ? Icons.bookmark 
+                              : Icons.bookmark_border,
+                            color: (article['isBookmarked'] as bool) 
+                              ? const Color(0xFFF59297) 
+                              : Colors.grey[400],
+                            size: 22,
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    const SizedBox(height: 12),
+                    
+                    // Article title
                     Text(
                       article['title'].toString(),
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 17,
                         fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      article['description'].toString(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
+                        color: Colors.black87,
+                        height: 1.3,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    
                     const SizedBox(height: 8),
+                    
+                    // Article description
+                    Text(
+                      article['description'].toString(),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        height: 1.4,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Author and article info
                     Row(
                       children: [
+                        // Author avatar
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          width: 32,
+                          height: 32,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8BBD9).withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
+                            color: (article['categoryColor'] as Color).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          child: Text(
-                            article['category'].toString(),
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Color(0xFFF8BBD9),
-                              fontWeight: FontWeight.w500,
-                            ),
+                          child: Icon(
+                            Icons.person,
+                            color: article['categoryColor'] as Color,
+                            size: 18,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          article['readTime'].toString(),
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.grey[500],
+                        const SizedBox(width: 10),
+                        
+                        // Author and publish info
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                article['author'].toString(),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              Text(
+                                article['publishDate'].toString(),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ],
                           ),
+                        ),
+                        
+                        // Read time and likes
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.access_time,
+                                  size: 14,
+                                  color: Colors.grey[500],
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  article['readTime'].toString(),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[500],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.favorite_border,
+                                  size: 14,
+                                  color: Colors.grey[500],
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  article['likes'].toString(),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[500],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
-              const Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.grey,
-                size: 16,
-              ),
-            ],
+            ),
           ),
         );
       }).toList(),
