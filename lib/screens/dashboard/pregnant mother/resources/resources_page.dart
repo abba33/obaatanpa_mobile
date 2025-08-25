@@ -261,10 +261,11 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
 
   Widget _buildCategoryFilter() {
     return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      height: 70,
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
@@ -276,21 +277,54 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                 selectedCategory = category;
               });
             },
-            child: Container(
-              margin: EdgeInsets.only(
-                left: index == 0 ? 16 : 8,
-                right: index == categories.length - 1 ? 16 : 0,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFFF8BBD9) : Colors.grey[100],
-                borderRadius: BorderRadius.circular(20),
+                gradient: isSelected 
+                  ? const LinearGradient(
+                      colors: [Color(0xFFF59297), Color(0xFFF8BBD9)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : null,
+                color: isSelected ? null : Colors.grey[50],
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(
+                  color: isSelected 
+                    ? Colors.transparent 
+                    : Colors.grey[300]!,
+                  width: 1.5,
+                ),
+                boxShadow: isSelected 
+                  ? [
+                      BoxShadow(
+                        color: const Color(0xFFF59297).withOpacity(0.3),
+                        spreadRadius: 0,
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 0,
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
               ),
-              child: Text(
-                category,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black,
-                  fontWeight: FontWeight.w500,
+              child: Center(
+                child: Text(
+                  category,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : Colors.grey[700],
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    fontSize: 14,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ),
             ),

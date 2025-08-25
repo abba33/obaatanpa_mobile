@@ -1,0 +1,8 @@
+{
+  "name": "flutter-web-app",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "flutter build web --release"
+  },
+  "devDependencies": {}
+}
