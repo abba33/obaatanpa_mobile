@@ -356,19 +356,19 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
             {
               'title': 'Your Complete Pregnancy Guide',
               'subtitle': 'Everything you need to know',
-              'imagePath': 'assets/images/resources/pregnancy_guide.jpg', // Replace with your actual image path
+              'imagePath': 'assets/images/resources/pregnancy_guide.png', // Replace with your actual image path
               'overlayColor': const Color(0xFFF59297),
             },
             {
               'title': 'Healthy Pregnancy Diet',
               'subtitle': 'Nutrition for you and baby',
-              'imagePath': 'assets/images/healthy_diet.jpg', // Replace with your actual image path
+              'imagePath': 'assets/images/resources/healthy_diet.png', // Replace with your actual image path
               'overlayColor': const Color(0xFF81C784),
             },
             {
               'title': 'Prenatal Exercise Plan',
               'subtitle': 'Safe workouts during pregnancy',
-              'imagePath': 'assets/images/prenatal_exercise.jpg', // Replace with your actual image path
+              'imagePath': 'assets/images/resources/prenatal_exercise.png', // Replace with your actual image path
               'overlayColor': const Color(0xFF64B5F6),
             },
           ];
