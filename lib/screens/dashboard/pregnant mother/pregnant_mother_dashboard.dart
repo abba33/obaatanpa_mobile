@@ -12,6 +12,7 @@ import 'components/custom_app_bar.dart';
 import 'components/your_care_toolbox_card.dart';
 import '../../../widgets/navigation/navigation_menu.dart';
 import '../../../providers/pregnancy_data_provider.dart';
+import 'package:flutter/services.dart';
 
 // Main Dashboard Page
 class DashboardPage extends StatefulWidget {
@@ -117,6 +118,16 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Force the status bar to be white
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: Colors.white,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+    );
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -659,6 +670,11 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
         child: Column(
           children: [
+            // Status bar area - to cover any background color from app bar
+            Container(
+              height: MediaQuery.of(context).padding.top,
+              color: Colors.white,
+            ),
             // App Bar in Menu - UPDATED: Removed extra space
             Container(
               padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),

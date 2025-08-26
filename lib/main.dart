@@ -18,10 +18,10 @@ import 'routes/app_router.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set system UI overlay style to match app theme - UPDATED: Set status bar to white
+  // Set system UI overlay style to match app theme
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Colors.white, // Changed from transparent to white
+      statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
       systemNavigationBarColor: AppColors.white,
       systemNavigationBarIconBrightness: Brightness.dark,
