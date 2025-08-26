@@ -356,7 +356,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
             {
               'title': 'Your Complete Pregnancy Guide',
               'subtitle': 'Everything you need to know',
-              'imagePath': 'assets/images/pregnancy_guide.jpg', // Replace with your actual image path
+              'imagePath': 'assets/images/resources/pregnancy_guide.jpg', // Replace with your actual image path
               'overlayColor': const Color(0xFFF59297),
             },
             {
