@@ -205,8 +205,6 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-
-
   Widget _buildFloatingButtons() {
     return Positioned(
       right: 16,
@@ -661,10 +659,9 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
         child: Column(
           children: [
-            // App Bar in Menu
+            // App Bar in Menu - UPDATED: Removed extra space
             Container(
-              height: 120,
-              padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
+              padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
               child: Row(
                 children: [
                   Container(
