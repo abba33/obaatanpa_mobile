@@ -4,7 +4,6 @@
       "FLUTTER_WEB": "true"
     }
   },
-  "installCommand": "curl -fsSL https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.27.0-stable.tar.xz | tar -xJ && git config --global --add safe.directory $PWD/flutter && export PATH=\"$PWD/flutter/bin:$PATH\" && flutter config --no-analytics && flutter pub get",
-  "buildCommand": "export PATH=\"$PWD/flutter/bin:$PATH\" && flutter build web --release",
+  "buildCommand": "chmod +x build.sh && ./build.sh",
   "outputDirectory": "build/web"
 }
