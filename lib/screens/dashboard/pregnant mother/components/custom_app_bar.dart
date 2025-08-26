@@ -359,20 +359,10 @@ class CustomAppBar extends StatelessWidget {
                         ),
                       );
                     },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      padding: const EdgeInsets.all(6), // Back to original padding
-                      decoration: BoxDecoration(
-                        color: isDark 
-                          ? const Color(0xFFF8BBD9).withOpacity(0.2)
-                          : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        isDark ? Icons.light_mode : Icons.dark_mode_outlined,
-                        color: isDark ? const Color(0xFFF8BBD9) : textColor,
-                        size: 20, // Back to original size
-                      ),
+                    child: Icon(
+                      isDark ? Icons.light_mode : Icons.dark_mode_outlined,
+                      color: isDark ? const Color(0xFFF8BBD9) : textColor,
+                      size: 20,
                     ),
                   ),
                 ],
