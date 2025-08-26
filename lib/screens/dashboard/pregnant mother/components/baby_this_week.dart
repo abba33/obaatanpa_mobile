@@ -22,7 +22,7 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             Colors.white,
-            const Color(0xFFF8BBD9).withOpacity(0.05),
+            const Color(0xFFF59297).withOpacity(0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -48,7 +48,7 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
                 height: 40,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFFF8BBD9), Color(0xFFF59297)],
+                    colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -87,20 +87,20 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           
-          // Size comparison section
+          // Size comparison section with real images
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: sizeComparison['color'].withOpacity(0.1),
+              color: const Color(0xFFF59297).withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: sizeComparison['color'].withOpacity(0.3),
+                color: const Color(0xFFF59297).withOpacity(0.3),
                 width: 1,
               ),
             ),
             child: Row(
               children: [
-                // Fruit/vegetable image
+                // Real fruit/vegetable image
                 Container(
                   width: 80,
                   height: 80,
@@ -117,15 +117,38 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      sizeComparison['imagePath'],
+                    child: Image.network(
+                      sizeComparison['imageUrl'],
                       fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded / 
+                                  loadingProgress.expectedTotalBytes!
+                                : null,
+                            color: const Color(0xFFF59297),
+                          ),
+                        );
+                      },
                       errorBuilder: (context, error, stackTrace) {
                         // Fallback with emoji if image not found
-                        return Center(
-                          child: Text(
-                            sizeComparison['emoji'],
-                            style: const TextStyle(fontSize: 40),
+                        return Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                const Color(0xFFF59297).withOpacity(0.2),
+                                const Color(0xFF7DA8E6).withOpacity(0.2),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Text(
+                              sizeComparison['emoji'],
+                              style: const TextStyle(fontSize: 40),
+                            ),
                           ),
                         );
                       },
@@ -150,10 +173,10 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         sizeComparison['measurement'],
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: sizeComparison['color'],
+                          color: Color(0xFFF59297),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -179,6 +202,10 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF7DA8E6).withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFF7DA8E6).withOpacity(0.3),
+                width: 1,
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,8 +246,12 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFA5D6A7).withOpacity(0.1),
+              color: const Color(0xFFF59297).withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFFF59297).withOpacity(0.3),
+                width: 1,
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,7 +260,7 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.pregnant_woman,
-                      color: const Color(0xFFA5D6A7),
+                      color: const Color(0xFFF59297),
                       size: 18,
                     ),
                     const SizedBox(width: 8),
@@ -259,41 +290,47 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
           
           // Action button
           Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFF8BBD9), Color(0xFFF59297)],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFF8BBD9).withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+            child: GestureDetector(
+              onTap: () {
+                // Handle learn more action
+                print('Learn more about week $currentWeek');
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
                   ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.info_outline,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Learn More About Week $currentWeek',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFF59297).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.info_outline,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Learn More About Week $currentWeek',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -308,8 +345,7 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
         'name': 'a Poppy Seed',
         'measurement': '2mm',
         'emoji': '•',
-        'imagePath': 'assets/images/sizes/poppy_seed.jpg',
-        'color': const Color(0xFF8B4513),
+        'imageUrl': 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400&h=400&fit=crop&crop=center',
         'description': 'Tiny but already forming!'
       };
     } else if (week <= 6) {
@@ -317,17 +353,15 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
         'name': 'a Sweet Pea',
         'measurement': '4mm',
         'emoji': '🌱',
-        'imagePath': 'assets/images/sizes/sweet_pea.jpg',
-        'color': const Color(0xFF90EE90),
+        'imageUrl': 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&h=400&fit=crop&crop=center',
         'description': 'Heart is beginning to beat!'
       };
     } else if (week <= 8) {
       return {
         'name': 'a Raspberry',
         'measurement': '1.6cm',
-        'emoji': '🍇',
-        'imagePath': 'assets/images/sizes/raspberry.jpg',
-        'color': const Color(0xFF8B008B),
+        'emoji': '🫐',
+        'imageUrl': 'https://images.unsplash.com/photo-1577003833619-76bfe1a81b75?w=400&h=400&fit=crop&crop=center',
         'description': 'Arms and legs are developing!'
       };
     } else if (week <= 10) {
@@ -335,8 +369,7 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
         'name': 'a Strawberry',
         'measurement': '3.1cm',
         'emoji': '🍓',
-        'imagePath': 'assets/images/sizes/strawberry.jpg',
-        'color': const Color(0xFFFF69B4),
+        'imageUrl': 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=400&h=400&fit=crop&crop=center',
         'description': 'Vital organs are forming!'
       };
     } else if (week <= 12) {
@@ -344,8 +377,7 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
         'name': 'a Lime',
         'measurement': '5.4cm',
         'emoji': '🟢',
-        'imagePath': 'assets/images/sizes/lime.jpg',
-        'color': const Color(0xFF32CD32),
+        'imageUrl': 'https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=400&h=400&fit=crop&crop=center',
         'description': 'Reflexes are developing!'
       };
     } else if (week <= 16) {
@@ -353,8 +385,7 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
         'name': 'an Avocado',
         'measurement': '11.6cm',
         'emoji': '🥑',
-        'imagePath': 'assets/images/sizes/avocado.jpg',
-        'color': const Color(0xFF9ACD32),
+        'imageUrl': 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=400&h=400&fit=crop&crop=center',
         'description': 'Can hear your voice!'
       };
     } else if (week <= 20) {
@@ -362,8 +393,7 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
         'name': 'a Banana',
         'measurement': '16.4cm',
         'emoji': '🍌',
-        'imagePath': 'assets/images/sizes/banana.jpg',
-        'color': const Color(0xFFFFD700),
+        'imageUrl': 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&h=400&fit=crop&crop=center',
         'description': 'You might feel kicks now!'
       };
     } else if (week <= 24) {
@@ -371,8 +401,7 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
         'name': 'an Ear of Corn',
         'measurement': '21.3cm',
         'emoji': '🌽',
-        'imagePath': 'assets/images/sizes/corn.jpg',
-        'color': const Color(0xFFFFA500),
+        'imageUrl': 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400&h=400&fit=crop&crop=center',
         'description': 'Hearing is fully developed!'
       };
     } else if (week <= 28) {
@@ -380,8 +409,7 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
         'name': 'an Eggplant',
         'measurement': '25.4cm',
         'emoji': '🍆',
-        'imagePath': 'assets/images/sizes/eggplant.jpg',
-        'color': const Color(0xFF9370DB),
+        'imageUrl': 'https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=400&h=400&fit=crop&crop=center',
         'description': 'Eyes are opening!'
       };
     } else if (week <= 32) {
@@ -389,8 +417,7 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
         'name': 'a Coconut',
         'measurement': '28.9cm',
         'emoji': '🥥',
-        'imagePath': 'assets/images/sizes/coconut.jpg',
-        'color': const Color(0xD2691E),
+        'imageUrl': 'https://images.unsplash.com/photo-1605027990121-cbae9d0b26ab?w=400&h=400&fit=crop&crop=center',
         'description': 'Bones are hardening!'
       };
     } else if (week <= 36) {
@@ -398,8 +425,7 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
         'name': 'a Pineapple',
         'measurement': '32.4cm',
         'emoji': '🍍',
-        'imagePath': 'assets/images/sizes/pineapple.jpg',
-        'color': const Color(0xFFDAA520),
+        'imageUrl': 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=400&h=400&fit=crop&crop=center',
         'description': 'Lungs are maturing!'
       };
     } else {
@@ -407,8 +433,7 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
         'name': 'a Watermelon',
         'measurement': '36.2cm',
         'emoji': '🍉',
-        'imagePath': 'assets/images/sizes/watermelon.jpg',
-        'color': const Color(0xFF32CD32),
+        'imageUrl': 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop&crop=center',
         'description': 'Ready to meet you soon!'
       };
     }
