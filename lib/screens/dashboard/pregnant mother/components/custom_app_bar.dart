@@ -336,23 +336,14 @@ class CustomAppBar extends StatelessWidget {
                   // Menu icon
                   GestureDetector(
                     onTap: onMenuTap,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: isDark 
-                          ? Colors.grey[800]!.withOpacity(0.3)
-                          : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        isMenuOpen ? Icons.close : Icons.menu,
-                        color: textColor,
-                        size: 28, // Increased size
-                      ),
+                    child: Icon(
+                      isMenuOpen ? Icons.close : Icons.menu,
+                      color: textColor,
+                      size: 24, // Back to original size
                     ),
                   ),
                   
-                  const SizedBox(width: 20), // Increased spacing
+                  const SizedBox(width: 16), // Back to original spacing
                   
                   // Dark mode toggle button
                   GestureDetector(
@@ -370,17 +361,17 @@ class CustomAppBar extends StatelessWidget {
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
-                      padding: const EdgeInsets.all(10), // Increased padding
+                      padding: const EdgeInsets.all(6), // Back to original padding
                       decoration: BoxDecoration(
                         color: isDark 
                           ? const Color(0xFFF8BBD9).withOpacity(0.2)
                           : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         isDark ? Icons.light_mode : Icons.dark_mode_outlined,
                         color: isDark ? const Color(0xFFF8BBD9) : textColor,
-                        size: 24, // Increased size
+                        size: 20, // Back to original size
                       ),
                     ),
                   ),
@@ -423,23 +414,14 @@ class CustomAppBar extends StatelessWidget {
                   // Notification icon - Updated with tap functionality
                   GestureDetector(
                     onTap: () => _navigateToNotifications(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: isDark 
-                          ? Colors.grey[800]!.withOpacity(0.3)
-                          : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        Icons.notifications_outlined,
-                        color: textColor,
-                        size: 28, // Increased size
-                      ),
+                    child: Icon(
+                      Icons.notifications_outlined,
+                      color: textColor,
+                      size: 24, // Back to original size
                     ),
                   ),
                   
-                  const SizedBox(width: 20), // Increased spacing
+                  const SizedBox(width: 16), // Back to original spacing
                   
                   // Profile section with dropdown
                   GestureDetector(
