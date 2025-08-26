@@ -340,23 +340,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
             ),
           ),
           
-          // Navigation Menu Overlay with better handling
+          // Navigation Menu - Removed background overlay
           if (isMenuOpen)
-            Stack(
-              children: [
-                // Semi-transparent background overlay
-                GestureDetector(
-                  onTap: _closeMenu,
-                  child: Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    color: Colors.black.withOpacity(0.5),
-                  ),
-                ),
-                // Navigation Menu
-                _buildNavigationMenu(),
-              ],
-            ),
+            _buildNavigationMenu(),
         ],
       ),
     );

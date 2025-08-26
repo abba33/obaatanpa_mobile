@@ -254,18 +254,18 @@ class CustomAppBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 32,
-                height: 32,
+                width: 48, // Increased from 32
+                height: 48, // Increased from 32
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(24), // Updated border radius
                   child: Image.asset(
                     'assets/images/navbar/maternity-logo.png', // Replace with your logo path
                     fit: BoxFit.cover,
-                    width: 32,
-                    height: 32,
+                    width: 48,
+                    height: 48,
                     errorBuilder: (context, error, stackTrace) {
                       // Fallback to the original design if image fails to load
                       return Container(
@@ -276,7 +276,7 @@ class CustomAppBar extends StatelessWidget {
                         child: const Icon(
                           Icons.favorite,
                           color: Colors.white,
-                          size: 18,
+                          size: 24, // Increased icon size
                         ),
                       );
                     },
@@ -284,18 +284,33 @@ class CustomAppBar extends StatelessWidget {
                 ),
               ),
               
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Obaatanpa',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
+                  // Updated OBAATANPA text with special coloring
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'OBAA',
+                          style: TextStyle(
+                            fontSize: 20, // Increased font size
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'TANPA',
+                          style: TextStyle(
+                            fontSize: 20, // Increased font size
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFFF59297), // Your specified color
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Text(
