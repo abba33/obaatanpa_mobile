@@ -41,7 +41,7 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
       weeklyTasks = [
         TaskItem(
           id: 'prenatal_vitamin',
-          title: 'Take your daily prenatal vitamin',
+          title: 'Take prenatal vitamin',
           emoji: '💊',
           backgroundColor: const Color(0xFF4CAF50),
           isCompleted: false,
@@ -55,7 +55,7 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
         ),
         TaskItem(
           id: 'morning_sickness',
-          title: 'Track morning sickness symptoms',
+          title: 'Track symptoms',
           emoji: '📝',
           backgroundColor: const Color(0xFFFF9800),
           isCompleted: false,
@@ -65,14 +65,14 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
       weeklyTasks = [
         TaskItem(
           id: 'prenatal_vitamin',
-          title: 'Take your daily prenatal vitamin',
+          title: 'Take prenatal vitamin',
           emoji: '💊',
           backgroundColor: const Color(0xFF4CAF50),
           isCompleted: false,
         ),
         TaskItem(
           id: 'exercise',
-          title: 'Do 30 minutes of gentle exercise',
+          title: '30min gentle exercise',
           emoji: '🏃‍♀️',
           backgroundColor: primaryColor,
           isCompleted: false,
@@ -90,7 +90,7 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
       weeklyTasks = [
         TaskItem(
           id: 'prenatal_vitamin',
-          title: 'Take your daily prenatal vitamin',
+          title: 'Take prenatal vitamin',
           emoji: '💊',
           backgroundColor: const Color(0xFF4CAF50),
           isCompleted: false,
@@ -104,7 +104,7 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
         ),
         TaskItem(
           id: 'hospital_bag',
-          title: 'Prepare hospital bag checklist',
+          title: 'Prepare hospital bag',
           emoji: '👜',
           backgroundColor: const Color(0xFFFF5722),
           isCompleted: false,
@@ -124,7 +124,7 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
     } else if (week >= 24 && week <= 28) {
       weeklyTasks.add(TaskItem(
         id: 'glucose_test',
-        title: 'Schedule glucose screening test',
+        title: 'Schedule glucose test',
         emoji: '🩸',
         backgroundColor: const Color(0xFFF44336),
         isCompleted: false,
@@ -139,7 +139,7 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
       ));
     }
 
-    return weeklyTasks.take(3).toList(); // Return only 3 tasks
+    return weeklyTasks.take(4).toList(); // Return up to 4 tasks
   }
 
   void _toggleTask(String taskId) {
@@ -155,15 +155,15 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16), // Reduced from 20 to 16
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withOpacity(0.06),
             blurRadius: 15,
-            spreadRadius: 2,
+            spreadRadius: 1,
             offset: const Offset(0, 4),
           ),
         ],
@@ -172,16 +172,9 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(),
-          const SizedBox(height: 24),
-          ...tasks.asMap().entries.map((entry) {
-            int index = entry.key;
-            TaskItem task = entry.value;
-            return Container(
-              margin: EdgeInsets.only(bottom: index < tasks.length - 1 ? 16 : 0),
-              child: _buildTaskItem(task),
-            );
-          }).toList(),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12), // Reduced from 16 to 12
+          _buildTasksList(),
+          const SizedBox(height: 12), // Reduced from 16 to 12
           _buildProgressBar(),
         ],
       ),
@@ -189,21 +182,30 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
   }
 
   Widget _buildHeader() {
+    final completedCount = _getCompletedCount();
+    
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(8), // Reduced from 10 to 8
           decoration: BoxDecoration(
-            color: lightPrimary,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: primaryColor.withOpacity(0.2), width: 1),
+            color: primaryColor,
+            borderRadius: BorderRadius.circular(10), // Reduced from 12 to 10
+            boxShadow: [
+              BoxShadow(
+                color: primaryColor.withOpacity(0.3),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          child: const Text(
-            '📋',
-            style: TextStyle(fontSize: 24),
+          child: const Icon(
+            Icons.task_alt,
+            color: Colors.white,
+            size: 18, // Reduced from 20 to 18
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 10), // Reduced from 12 to 10
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,36 +213,44 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
               const Text(
                 'Today\'s Tasks',
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 17, // Reduced from 18 to 17
                   fontWeight: FontWeight.w700,
                   color: Colors.black87,
                 ),
               ),
-              const SizedBox(height: 4),
               Text(
                 'Week ${widget.currentWeek} • ${widget.trimester} Trimester',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 11, // Reduced from 12 to 11
                   fontWeight: FontWeight.w500,
-                  color: primaryColor,
+                  color: Colors.grey[600],
                 ),
               ),
             ],
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), // Reduced horizontal from 12 to 10
           decoration: BoxDecoration(
-            color: secondaryColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: secondaryColor.withOpacity(0.3), width: 1),
+            color: completedCount == tasks.length 
+              ? primaryColor.withOpacity(0.1)
+              : secondaryColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(14), // Reduced from 16 to 14
+            border: Border.all(
+              color: completedCount == tasks.length 
+                ? primaryColor.withOpacity(0.3)
+                : secondaryColor.withOpacity(0.3), 
+              width: 1
+            ),
           ),
           child: Text(
-            '${_getCompletedCount()}/${tasks.length}',
+            '$completedCount/${tasks.length}',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12, // Reduced from 13 to 12
               fontWeight: FontWeight.w600,
-              color: secondaryColor,
+              color: completedCount == tasks.length 
+                ? primaryColor
+                : secondaryColor,
             ),
           ),
         ),
@@ -248,38 +258,32 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
     );
   }
 
+  Widget _buildTasksList() {
+    return Column(
+      children: tasks.asMap().entries.map((entry) {
+        int index = entry.key;
+        TaskItem task = entry.value;
+        return Container(
+          margin: EdgeInsets.only(bottom: index < tasks.length - 1 ? 8 : 0), // Reduced from 10 to 8
+          child: _buildTaskItem(task),
+        );
+      }).toList(),
+    );
+  }
+
   Widget _buildTaskItem(TaskItem task) {
     return GestureDetector(
       onTap: () => _toggleTask(task.id),
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: task.isCompleted 
-            ? lightPrimary
-            : Colors.grey[50],
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: task.isCompleted 
-              ? primaryColor.withOpacity(0.3)
-              : Colors.grey[200]!,
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: task.isCompleted 
-                ? primaryColor.withOpacity(0.1)
-                : Colors.grey.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8), // Reduced vertical from 12 to 8
         child: Row(
           children: [
-            // Enhanced Checkbox
-            Container(
-              width: 28,
-              height: 28,
+            // Compact Checkbox
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 22, // Reduced from 24 to 22
+              height: 22, // Reduced from 24 to 22
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
@@ -290,72 +294,31 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
                 ),
                 color: task.isCompleted 
                   ? primaryColor
-                  : Colors.white,
+                  : Colors.transparent,
                 boxShadow: task.isCompleted ? [
                   BoxShadow(
                     color: primaryColor.withOpacity(0.3),
                     blurRadius: 4,
-                    offset: const Offset(0, 2),
+                    offset: const Offset(0, 1),
                   ),
                 ] : null,
               ),
               child: task.isCompleted
-                ? const Center(
-                    child: Text(
-                      '✓',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                ? const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 14, // Reduced from 16 to 14
                   )
                 : null,
             ),
-            const SizedBox(width: 18),
+            const SizedBox(width: 12), // Reduced from 16 to 12
             
-            // Task content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    task.title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: task.isCompleted 
-                        ? Colors.grey.shade600 
-                        : Colors.black87,
-                      decoration: task.isCompleted 
-                        ? TextDecoration.lineThrough 
-                        : null,
-                      height: 1.3,
-                    ),
-                  ),
-                  if (task.isCompleted) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      'Completed! Great job 👏',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: primaryColor,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            
-            // Enhanced Icon with background
+            // Emoji icon
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(6), // Reduced from 8 to 6
               decoration: BoxDecoration(
-                color: task.isCompleted 
-                  ? task.backgroundColor.withOpacity(0.15)
-                  : task.backgroundColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+                color: task.backgroundColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8), // Reduced from 10 to 8
                 border: Border.all(
                   color: task.backgroundColor.withOpacity(0.3),
                   width: 1,
@@ -363,11 +326,54 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
               ),
               child: Text(
                 task.emoji,
-                style: const TextStyle(
-                  fontSize: 24,
+                style: const TextStyle(fontSize: 16), // Reduced from 18 to 16
+              ),
+            ),
+            const SizedBox(width: 12), // Reduced from 14 to 12
+            
+            // Task content
+            Expanded(
+              child: Text(
+                task.title,
+                style: TextStyle(
+                  fontSize: 14, // Reduced from 15 to 14
+                  fontWeight: FontWeight.w600,
+                  color: task.isCompleted 
+                    ? Colors.grey.shade600 
+                    : Colors.black87,
+                  decoration: task.isCompleted 
+                    ? TextDecoration.lineThrough 
+                    : null,
                 ),
               ),
             ),
+            
+            // Completion indicator
+            if (task.isCompleted)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), // Reduced padding
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      primaryColor.withOpacity(0.15),
+                      secondaryColor.withOpacity(0.15),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10), // Reduced from 12 to 10
+                  border: Border.all(
+                    color: primaryColor.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  '✓ Done',
+                  style: TextStyle(
+                    fontSize: 10, // Reduced from 11 to 10
+                    fontWeight: FontWeight.w600,
+                    color: primaryColor,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -377,57 +383,55 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
   Widget _buildProgressBar() {
     final completedCount = _getCompletedCount();
     final progress = tasks.isNotEmpty ? completedCount / tasks.length : 0.0;
+    final isComplete = progress == 1.0;
     
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Daily Progress',
+              'Progress',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12, // Reduced from 13 to 12
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
+                color: Colors.grey[600],
               ),
             ),
             Text(
               '${(progress * 100).toInt()}% Complete',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12, // Reduced from 13 to 12
                 fontWeight: FontWeight.w600,
-                color: progress == 1.0 ? primaryColor : secondaryColor,
+                color: isComplete ? primaryColor : secondaryColor,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 6), // Reduced from 8 to 6
         Container(
-          height: 8,
+          height: 5, // Reduced from 6 to 5
           decoration: BoxDecoration(
             color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(2.5),
           ),
           child: Stack(
             children: [
-              Container(
-                height: 8,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
               FractionallySizedBox(
                 widthFactor: progress,
-                child: Container(
-                  height: 8,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  height: 5, // Reduced from 6 to 5
                   decoration: BoxDecoration(
-                    color: progress == 1.0 ? primaryColor : secondaryColor,
-                    borderRadius: BorderRadius.circular(4),
+                    gradient: LinearGradient(
+                      colors: isComplete 
+                        ? [primaryColor, primaryColor.withOpacity(0.8)]
+                        : [secondaryColor, secondaryColor.withOpacity(0.8)],
+                    ),
+                    borderRadius: BorderRadius.circular(2.5),
                     boxShadow: [
                       BoxShadow(
-                        color: (progress == 1.0 ? primaryColor : secondaryColor).withOpacity(0.3),
+                        color: (isComplete ? primaryColor : secondaryColor).withOpacity(0.3),
                         blurRadius: 4,
                         offset: const Offset(0, 1),
                       ),
@@ -438,24 +442,29 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
             ],
           ),
         ),
-        if (progress == 1.0) ...[
-          const SizedBox(height: 12),
+        if (isComplete) ...[
+          const SizedBox(height: 10), // Reduced from 12 to 10
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), // Reduced padding
             decoration: BoxDecoration(
-              color: lightPrimary,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: primaryColor.withOpacity(0.3), width: 1),
+              gradient: LinearGradient(
+                colors: [
+                  primaryColor.withOpacity(0.1),
+                  secondaryColor.withOpacity(0.1),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(14), // Reduced from 16 to 14
+              border: Border.all(color: primaryColor.withOpacity(0.2), width: 1),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('🎉', style: TextStyle(fontSize: 16)),
-                const SizedBox(width: 8),
+                const Text('🎉', style: TextStyle(fontSize: 12)), // Reduced from 14 to 12
+                const SizedBox(width: 5), // Reduced from 6 to 5
                 Text(
-                  'All tasks completed for today!',
+                  'All done! Great job today!',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 11, // Reduced from 12 to 11
                     fontWeight: FontWeight.w600,
                     color: primaryColor,
                   ),
