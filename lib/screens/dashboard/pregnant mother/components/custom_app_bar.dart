@@ -246,7 +246,7 @@ class CustomAppBar extends StatelessWidget {
     
     return Container(
       color: backgroundColor,
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 20), // Increased bottom padding
       child: Column(
         children: [
           // Top row - Logo and title centered
@@ -254,18 +254,18 @@ class CustomAppBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 60, // Increased further
-                height: 60, // Increased further
+                width: 70, // Increased logo size
+                height: 70, // Increased logo size
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(30), // Updated border radius
+                  borderRadius: BorderRadius.circular(35), // Updated border radius
                   child: Image.asset(
                     'assets/images/navbar/maternity-logo.png', // Replace with your logo path
                     fit: BoxFit.cover,
-                    width: 60,
-                    height: 60,
+                    width: 70,
+                    height: 70,
                     errorBuilder: (context, error, stackTrace) {
                       // Fallback to the original design if image fails to load
                       return Container(
@@ -276,7 +276,7 @@ class CustomAppBar extends StatelessWidget {
                         child: const Icon(
                           Icons.favorite,
                           color: Colors.white,
-                          size: 30, // Increased icon size
+                          size: 35, // Increased icon size
                         ),
                       );
                     },
@@ -284,7 +284,7 @@ class CustomAppBar extends StatelessWidget {
                 ),
               ),
               
-              const SizedBox(width: 16),
+              const SizedBox(width: 20), // Increased spacing
               
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -297,7 +297,7 @@ class CustomAppBar extends StatelessWidget {
                         TextSpan(
                           text: 'OBAA',
                           style: TextStyle(
-                            fontSize: 24, // Increased font size further
+                            fontSize: 28, // Increased font size
                             fontWeight: FontWeight.bold,
                             color: textColor,
                           ),
@@ -305,7 +305,7 @@ class CustomAppBar extends StatelessWidget {
                         TextSpan(
                           text: 'TANPA',
                           style: TextStyle(
-                            fontSize: 24, // Increased font size further
+                            fontSize: 28, // Increased font size
                             fontWeight: FontWeight.bold,
                             color: const Color(0xFFF59297), // Your specified color
                           ),
@@ -316,7 +316,7 @@ class CustomAppBar extends StatelessWidget {
                   Text(
                     'Your Pregnancy Dashboard',
                     style: TextStyle(
-                      fontSize: 14, // Increased subtitle size
+                      fontSize: 16, // Increased subtitle size
                       color: isDark ? Colors.grey[400] : Colors.grey[600],
                     ),
                   ),
@@ -325,7 +325,7 @@ class CustomAppBar extends StatelessWidget {
             ],
           ),
           
-          const SizedBox(height: 12),
+          const SizedBox(height: 18), // Increased spacing
           
           // Bottom row - Controls and user info
           Row(
@@ -333,37 +333,23 @@ class CustomAppBar extends StatelessWidget {
               // Left side - Menu and dark mode toggle
               Row(
                 children: [
-                  // Menu icon
+                  // Menu icon - Bigger size
                   GestureDetector(
                     onTap: onMenuTap,
                     child: Icon(
                       isMenuOpen ? Icons.close : Icons.menu,
                       color: textColor,
-                      size: 24, // Back to original size
+                      size: 32, // Increased size significantly
                     ),
                   ),
                   
-                  const SizedBox(width: 16), // Back to original spacing
+                  const SizedBox(width: 20), // Increased spacing
                   
-                  // Dark mode toggle button
-                  GestureDetector(
-                    onTap: () {
-                      themeProvider.toggleTheme();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            isDark ? 'Switched to Light Mode' : 'Switched to Dark Mode',
-                          ),
-                          duration: const Duration(milliseconds: 800),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    },
-                    child: Icon(
-                      isDark ? Icons.light_mode : Icons.dark_mode_outlined,
-                      color: isDark ? const Color(0xFFF8BBD9) : textColor,
-                      size: 20,
-                    ),
+                  // Dark mode toggle button (keep icon but remove functionality)
+                  Icon(
+                    isDark ? Icons.light_mode : Icons.dark_mode_outlined,
+                    color: isDark ? const Color(0xFFF8BBD9) : textColor,
+                    size: 24,
                   ),
                 ],
               ),
@@ -371,7 +357,7 @@ class CustomAppBar extends StatelessWidget {
               // Spacer to center the greeting
               const Spacer(),
               
-              // Center - Greeting
+              // Center - Greeting - Much bigger text
               RichText(
                 text: TextSpan(
                   children: [
@@ -379,15 +365,15 @@ class CustomAppBar extends StatelessWidget {
                       text: 'Hello, ',
                       style: TextStyle(
                         color: textColor,
-                        fontSize: 20, // Increased size
+                        fontSize: 28, // Significantly increased size
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     TextSpan(
                       text: 'Abba',
                       style: TextStyle(
-                        color: const Color(0xFFF8BBD9),
-                        fontSize: 20, // Increased size
+                        color: const Color(0xFFF59297), // Changed to requested color
+                        fontSize: 28, // Significantly increased size
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -407,11 +393,11 @@ class CustomAppBar extends StatelessWidget {
                     child: Icon(
                       Icons.notifications_outlined,
                       color: textColor,
-                      size: 24, // Back to original size
+                      size: 28, // Increased size
                     ),
                   ),
                   
-                  const SizedBox(width: 16), // Back to original spacing
+                  const SizedBox(width: 20), // Increased spacing
                   
                   // Profile section with dropdown
                   GestureDetector(
@@ -420,31 +406,31 @@ class CustomAppBar extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         CircleAvatar(
-                          radius: 22, // Increased from 16 to 22
+                          radius: 26, // Increased from 22 to 26
                           backgroundColor: isDark ? Colors.grey[700] : Colors.grey[300],
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(22), // Updated radius
+                            borderRadius: BorderRadius.circular(26), // Updated radius
                             child: Image.asset(
                               'assets/images/navbar/profile-1.png', // Replace with your profile image path
                               fit: BoxFit.cover,
-                              width: 44, // Increased size
-                              height: 44, // Increased size
+                              width: 52, // Increased size
+                              height: 52, // Increased size
                               errorBuilder: (context, error, stackTrace) {
                                 // Fallback to default person icon if image fails to load
                                 return Icon(
                                   Icons.person,
                                   color: isDark ? Colors.white : Colors.grey[600],
-                                  size: 24, // Increased icon size
+                                  size: 28, // Increased icon size
                                 );
                               },
                             ),
                           ),
                         ),
-                        const SizedBox(width: 6), // Slightly increased spacing
+                        const SizedBox(width: 8), // Increased spacing
                         Icon(
                           Icons.keyboard_arrow_down,
                           color: textColor,
-                          size: 24, // Increased size
+                          size: 28, // Increased size
                         ),
                       ],
                     ),
