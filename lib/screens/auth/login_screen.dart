@@ -78,7 +78,11 @@ class _LoginScreenState extends State<LoginScreen>
             height: double.infinity,
             clipBehavior: Clip.antiAlias,
             decoration: const BoxDecoration(
-              color: Colors.white,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFFFCD7DA), Color(0xFFE7EDFA)],
+              ),
             ),
             child: SingleChildScrollView(
               child: Stack(
