@@ -64,13 +64,21 @@ class PersonalizedPregnancyWeekCard extends StatelessWidget {
           
           // Main week number
           Text(
-            '$currentWeek Weeks',
-            style: const TextStyle(
-              color: Color(0xFFF59297), // Changed to F59297
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+  '$currentWeek Weeks',
+  style: const TextStyle(
+    color: Color(0xFFF59297), // Changed to F59297
+    fontSize: 36, // Increased from 32
+    fontWeight: FontWeight.w800, // Changed from bold to extra bold
+    letterSpacing: 0.5, // Added letter spacing for better readability
+    shadows: [
+      Shadow(
+        color: Color(0xFFF59297),
+        blurRadius: 0.5,
+        offset: Offset(0, 0),
+      ),
+    ],
+  ),
+),
           
           // Days until due
           Text(
@@ -147,48 +155,43 @@ class PersonalizedPregnancyWeekCard extends StatelessWidget {
           const SizedBox(height: 16),
           
           // Journal Entry button - UPDATED
-          GestureDetector(
-            onTap: onJournalTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFF8BBD9), Color(0xFFF59297)],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFF8BBD9).withOpacity(0.3),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.book_outlined,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    "Add Week $currentWeek Entry",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+GestureDetector(
+  onTap: onJournalTap,
+  child: Container(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    decoration: BoxDecoration(
+      color: const Color(0xFFF59297), // Solid coral-pink color
+      borderRadius: BorderRadius.circular(20),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFFF59297).withOpacity(0.25),
+          blurRadius: 8,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(
+          Icons.book_outlined,
+          color: Colors.white,
+          size: 16,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          "Add Week $currentWeek Entry",
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
           ),
-          const SizedBox(height: 20),
-          
+        ),
+      ],
+    ),
+  ),
+),
+const SizedBox(height: 20),
           // Bottom section with fetus image and info circles
           Row(
             children: [

@@ -15,22 +15,41 @@ class PregnancyInfoPopup extends StatefulWidget {
   State<PregnancyInfoPopup> createState() => _PregnancyInfoPopupState();
 }
 
-class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
+class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProviderStateMixin {
   String selectedTab = 'due_date';
   DateTime? selectedDate;
   int? selectedWeek;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
 
   final TextEditingController dueDateController = TextEditingController();
   final TextEditingController lastPeriodController = TextEditingController();
 
-  // Updated color scheme
+  // Enhanced color scheme
   static const Color primaryColor = Color(0xFFF59297);
   static const Color secondaryColor = Color(0xFF7DA8E6);
-  static const Color lightPrimary = Color(0xFFFFF2F3);
-  static const Color lightSecondary = Color(0xFFF0F6FF);
+  static const Color lightPrimary = Color(0xFFFFF8F9);
+  static const Color lightSecondary = Color(0xFFF5F9FF);
+  static const Color accentGradientStart = Color(0xFFF59297);
+  static const Color accentGradientEnd = Color(0xFF7DA8E6);
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _scaleAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutBack,
+    );
+    _animationController.forward();
+  }
 
   @override
   void dispose() {
+    _animationController.dispose();
     dueDateController.dispose();
     lastPeriodController.dispose();
     super.dispose();
@@ -40,57 +59,82 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.92,
-        height: MediaQuery.of(context).size.height * 0.75,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 20,
-              spreadRadius: 5,
-              offset: const Offset(0, 10),
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.92,
+              height: MediaQuery.of(context).size.height * 0.78,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: primaryColor.withOpacity(0.2),
+                    blurRadius: 30,
+                    spreadRadius: 0,
+                    offset: const Offset(0, 15),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 15,
+                    spreadRadius: 0,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  _buildEnhancedHeader(),
+                  _buildEnhancedTabBar(),
+                  Expanded(child: _buildTabContent()),
+                  _buildEnhancedActionButtons(),
+                ],
+              ),
             ),
-          ],
-        ),
-        child: Column(
-          children: [
-            _buildHeader(),
-            _buildTabBar(),
-            Expanded(child: _buildTabContent()),
-            _buildActionButtons(),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildEnhancedHeader() {
     return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: primaryColor,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
+      padding: const EdgeInsets.fromLTRB(28, 28, 28, 24),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [accentGradientStart, accentGradientEnd],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(28),
+          topRight: Radius.circular(28),
         ),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(16),
+              color: Colors.white.withOpacity(0.25),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.white.withOpacity(0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: const Text(
               '🤰',
-              style: TextStyle(fontSize: 28),
+              style: TextStyle(fontSize: 32),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 20),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,17 +143,19 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
                   'Pregnancy Journey',
                   style: GoogleFonts.poppins(
                     color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
-                  'Let\'s personalize your experience with the right information',
+                  'Let\'s personalize your beautiful journey',
                   style: GoogleFonts.poppins(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
+                    color: Colors.white.withOpacity(0.95),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 1.3,
                   ),
                 ),
               ],
@@ -118,14 +164,19 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
           GestureDetector(
             onTap: widget.onClose,
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
+                color: Colors.white.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.3),
+                  width: 1,
+                ),
               ),
-              child: const Text(
-                '✖️',
-                style: TextStyle(fontSize: 20),
+              child: const Icon(
+                Icons.close,
+                color: Colors.white,
+                size: 22,
               ),
             ),
           ),
@@ -134,28 +185,35 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
     );
   }
 
-  Widget _buildTabBar() {
+  Widget _buildEnhancedTabBar() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.grey[50],
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[200]!),
+          color: lightPrimary,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: primaryColor.withOpacity(0.1), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: primaryColor.withOpacity(0.1),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(6),
         child: Row(
           children: [
-            _buildTab('due_date', 'Due Date', '📅'),
-            _buildTab('last_period', 'Last Period', '🗓️'),
-            _buildTab('current_week', 'Current Week', '📊'),
+            _buildEnhancedTab('due_date', 'Due Date', Icons.event, primaryColor),
+            _buildEnhancedTab('last_period', 'Last Period', Icons.calendar_month, secondaryColor),
+            _buildEnhancedTab('current_week', 'Current Week', Icons.timeline, primaryColor),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTab(String tabId, String title, String emoji) {
+  Widget _buildEnhancedTab(String tabId, String title, IconData icon, Color tabColor) {
     final isSelected = selectedTab == tabId;
     return Expanded(
       child: GestureDetector(
@@ -164,37 +222,42 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
           selectedDate = null;
           selectedWeek = null;
         }),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
           decoration: BoxDecoration(
-            color: isSelected ? primaryColor : null,
-            borderRadius: BorderRadius.circular(12),
+            gradient: isSelected ? LinearGradient(
+              colors: [tabColor, tabColor.withOpacity(0.8)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ) : null,
+            color: isSelected ? null : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
             boxShadow: isSelected ? [
               BoxShadow(
-                color: primaryColor.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+                color: tabColor.withOpacity(0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
             ] : null,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                emoji,
-                style: TextStyle(
-                  fontSize: 18,
-                  color: isSelected ? Colors.white : null,
-                ),
+              Icon(
+                icon,
+                size: 24,
+                color: isSelected ? Colors.white : tabColor.withOpacity(0.7),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Text(
                 title,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
-                  color: isSelected ? Colors.white : Colors.grey[700],
-                  fontSize: 11,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected ? Colors.white : tabColor.withOpacity(0.8),
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                 ),
               ),
             ],
@@ -205,102 +268,169 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
   }
 
   Widget _buildTabContent() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (selectedTab == 'due_date') _buildDueDateContent(),
-          if (selectedTab == 'last_period') _buildLastPeriodContent(),
-          if (selectedTab == 'current_week') _buildCurrentWeekContent(),
-        ],
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.white, lightPrimary.withOpacity(0.3)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (selectedTab == 'due_date') _buildDueDateContent(),
+            if (selectedTab == 'last_period') _buildLastPeriodContent(),
+            if (selectedTab == 'current_week') _buildCurrentWeekContent(),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildDueDateContent() {
-    return _buildDateInputSection(
+    return _buildEnhancedDateInputSection(
       title: 'Expected Due Date',
       subtitle: 'When is your baby expected to arrive?',
       description: 'Select the date your healthcare provider gave you as your expected delivery date.',
+      icon: Icons.baby_changing_station,
+      color: primaryColor,
       onTap: () => _selectDate(context, 'due_date'),
     );
   }
 
   Widget _buildLastPeriodContent() {
-    return _buildDateInputSection(
+    return _buildEnhancedDateInputSection(
       title: 'Last Menstrual Period',
       subtitle: 'First day of your last period',
       description: 'This helps us calculate your pregnancy timeline and due date accurately.',
+      icon: Icons.calendar_today,
+      color: secondaryColor,
       onTap: () => _selectDate(context, 'last_period'),
     );
   }
 
-  Widget _buildDateInputSection({
+  Widget _buildEnhancedDateInputSection({
     required String title,
     required String subtitle,
     required String description,
+    required IconData icon,
+    required Color color,
     required VoidCallback onTap,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 8),
-        Text(
-          title,
-          style: GoogleFonts.poppins(
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          subtitle,
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: primaryColor,
-          ),
-        ),
         const SizedBox(height: 12),
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [color, color.withOpacity(0.7)],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Icon(icon, color: Colors.white, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: color,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
         Text(
           description,
           style: GoogleFonts.poppins(
             fontSize: 14,
             color: Colors.grey[600],
-            height: 1.4,
+            height: 1.5,
+            fontWeight: FontWeight.w400,
           ),
         ),
         const SizedBox(height: 24),
         GestureDetector(
           onTap: onTap,
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: selectedDate != null ? lightPrimary : Colors.grey[50],
-              borderRadius: BorderRadius.circular(16),
+              gradient: selectedDate != null ? LinearGradient(
+                colors: [color.withOpacity(0.1), Colors.white],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ) : null,
+              color: selectedDate != null ? null : lightPrimary,
+              borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: selectedDate != null ? primaryColor.withOpacity(0.3) : Colors.grey[300]!,
+                color: selectedDate != null ? color.withOpacity(0.4) : Colors.grey[300]!,
                 width: 2,
               ),
+              boxShadow: selectedDate != null ? [
+                BoxShadow(
+                  color: color.withOpacity(0.2),
+                  blurRadius: 15,
+                  offset: const Offset(0, 6),
+                ),
+              ] : [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: selectedDate != null ? primaryColor.withOpacity(0.1) : Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
+                    gradient: selectedDate != null ? LinearGradient(
+                      colors: [color, color.withOpacity(0.8)],
+                    ) : null,
+                    color: selectedDate != null ? null : Colors.grey[300],
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(
                     Icons.calendar_today,
-                    color: selectedDate != null ? primaryColor : Colors.grey[500],
-                    size: 22,
+                    color: selectedDate != null ? Colors.white : Colors.grey[500],
+                    size: 20,
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 20),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,38 +438,37 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
                       Text(
                         selectedDate != null 
                             ? _formatDate(selectedDate!)
-                            : 'Select Date',
+                            : 'Tap to select date',
                         style: GoogleFonts.poppins(
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                           color: selectedDate != null ? Colors.black87 : Colors.grey[500],
                         ),
                       ),
                       if (selectedDate != null) ...[
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 4),
                         Text(
                           _getDateDescription(),
                           style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            color: primaryColor,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            color: color,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ],
                   ),
                 ),
-                Text(
-                  '▶️',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: selectedDate != null ? primaryColor : Colors.grey[400],
-                  ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 18,
+                  color: selectedDate != null ? color : Colors.grey[400],
                 ),
               ],
             ),
           ),
         ),
+        const SizedBox(height: 20),
       ],
     );
   }
@@ -348,97 +477,164 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 8),
-        Text(
-          'Current Pregnancy Week',
-          style: GoogleFonts.poppins(
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'How many weeks pregnant are you?',
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: primaryColor,
-          ),
-        ),
         const SizedBox(height: 12),
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [primaryColor, secondaryColor],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: primaryColor.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.timeline, color: Colors.white, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Current Week',
+                    style: GoogleFonts.poppins(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'How many weeks pregnant are you?',
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
         Text(
-          'Select your current week of pregnancy. This will help us provide you with relevant information.',
+          'Select your current week of pregnancy for personalized information.',
           style: GoogleFonts.poppins(
             fontSize: 14,
             color: Colors.grey[600],
-            height: 1.4,
+            height: 1.5,
+            fontWeight: FontWeight.w400,
           ),
         ),
         const SizedBox(height: 24),
         Container(
-          height: 200,
+          height: 220,
           decoration: BoxDecoration(
-            color: lightPrimary,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: primaryColor.withOpacity(0.3), width: 2),
+            gradient: LinearGradient(
+              colors: [lightPrimary, lightSecondary],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: primaryColor.withOpacity(0.2), width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: primaryColor.withOpacity(0.1),
+                blurRadius: 15,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
           child: ListView.builder(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(12),
             itemCount: 42,
             itemBuilder: (context, index) {
               final week = index + 1;
               final isSelected = selectedWeek == week;
               return GestureDetector(
                 onTap: () => setState(() => selectedWeek = week),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 2),
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin: const EdgeInsets.symmetric(vertical: 3),
+                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                   decoration: BoxDecoration(
-                    color: isSelected ? primaryColor : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12),
+                    gradient: isSelected ? LinearGradient(
+                      colors: [primaryColor, secondaryColor],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ) : null,
+                    color: isSelected ? null : Colors.white.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(16),
                     boxShadow: isSelected ? [
                       BoxShadow(
-                        color: primaryColor.withOpacity(0.3),
-                        blurRadius: 6,
+                        color: primaryColor.withOpacity(0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ] : [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 5,
                         offset: const Offset(0, 2),
                       ),
-                    ] : null,
+                    ],
                   ),
                   child: Row(
                     children: [
                       Container(
-                        width: 32,
-                        height: 32,
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
-                          color: isSelected ? Colors.white.withOpacity(0.2) : primaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
+                          color: isSelected ? Colors.white.withOpacity(0.3) : primaryColor.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(12),
+                          border: isSelected ? Border.all(
+                            color: Colors.white.withOpacity(0.5),
+                            width: 2,
+                          ) : null,
                         ),
-                        child: Text(
-                          '$week',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: isSelected ? Colors.white : primaryColor,
+                        child: Center(
+                          child: Text(
+                            '$week',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: isSelected ? Colors.white : primaryColor,
+                            ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Week $week',
-                        style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          color: isSelected ? Colors.white : Colors.black87,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          'Week $week',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            color: isSelected ? Colors.white : Colors.black87,
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                          ),
                         ),
                       ),
-                      if (isSelected) ...[
-                        const Spacer(),
-                        const Text(
-                          '✅',
-                          style: TextStyle(fontSize: 20),
+                      if (isSelected)
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                         ),
-                      ],
                     ],
                   ),
                 ),
@@ -446,18 +642,23 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
             },
           ),
         ),
+        const SizedBox(height: 20),
       ],
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildEnhancedActionButtons() {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        gradient: LinearGradient(
+          colors: [Colors.white, lightPrimary.withOpacity(0.5)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
         borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(24),
-          bottomRight: Radius.circular(24),
+          bottomLeft: Radius.circular(28),
+          bottomRight: Radius.circular(28),
         ),
       ),
       child: Row(
@@ -466,10 +667,10 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
             child: OutlinedButton(
               onPressed: widget.onClose,
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                side: BorderSide(color: Colors.grey[400]!, width: 1.5),
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                side: BorderSide(color: Colors.grey[400]!, width: 2),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
               child: Text(
@@ -482,50 +683,54 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 20),
           Expanded(
             flex: 2,
-            child: ElevatedButton(
-              onPressed: _canContinue() ? _handleContinue : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _canContinue() ? null : Colors.grey[300],
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                elevation: _canContinue() ? 4 : 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ).copyWith(
-                backgroundColor: _canContinue() 
-                    ? MaterialStateProperty.all(null)
-                    : MaterialStateProperty.all(Colors.grey[300]),
-                foregroundColor: _canContinue()
-                    ? MaterialStateProperty.all(Colors.white)
-                    : MaterialStateProperty.all(Colors.grey[500]),
-              ),
-              child: Container(
-                decoration: _canContinue() ? const BoxDecoration(
-                  color: primaryColor,
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: _canContinue() ? const LinearGradient(
+                  colors: [primaryColor, secondaryColor],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                 ) : null,
-                padding: const EdgeInsets.symmetric(vertical: 0),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Continue',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        '➡️',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ],
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: _canContinue() ? [
+                  BoxShadow(
+                    color: primaryColor.withOpacity(0.4),
+                    blurRadius: 15,
+                    offset: const Offset(0, 6),
                   ),
+                ] : null,
+              ),
+              child: ElevatedButton(
+                onPressed: _canContinue() ? _handleContinue : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _canContinue() ? Colors.transparent : Colors.grey[300],
+                  foregroundColor: _canContinue() ? Colors.white : Colors.grey[500],
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  elevation: 0,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Continue',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.arrow_forward,
+                      size: 20,
+                      color: _canContinue() ? Colors.white : Colors.grey[500],
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -537,8 +742,8 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
 
   String _formatDate(DateTime date) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
