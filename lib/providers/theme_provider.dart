@@ -48,7 +48,7 @@ class ThemeProvider extends ChangeNotifier {
       primaryColor: const Color(0xFFF8BBD9),
       scaffoldBackgroundColor: Colors.white,
       appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         foregroundColor: Colors.black,
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.black),
@@ -111,7 +111,7 @@ class ThemeProvider extends ChangeNotifier {
       primaryColor: const Color(0xFFF8BBD9),
       scaffoldBackgroundColor: const Color(0xFF121212),
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF1E1E1E),
+        backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.white),

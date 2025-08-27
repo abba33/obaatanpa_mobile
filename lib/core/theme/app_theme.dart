@@ -39,16 +39,16 @@ class AppTheme {
       
       // App Bar Theme
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.primaryWeb,
-        foregroundColor: AppColors.white,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.black,
         elevation: 0,
         centerTitle: true,
         titleTextStyle: GoogleFonts.poppins(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: AppColors.white,
+          color: Colors.black,
         ),
-        iconTheme: const IconThemeData(color: AppColors.white),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
 
       // Button Themes
@@ -172,7 +172,7 @@ class AppTheme {
       
       // App Bar Theme
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.darkSurface,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.white,
         elevation: 0,
         centerTitle: true,
