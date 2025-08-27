@@ -122,7 +122,21 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
     return Container(
       height: 120,
       decoration: BoxDecoration(
-        color: Colors.transparent,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF667EEA),
+            const Color(0xFF764BA2),
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: SafeArea(
         child: Padding(
@@ -134,10 +148,10 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.2),
+                  color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.white.withOpacity(0.3),
                     width: 1,
                   ),
                 ),
@@ -145,7 +159,7 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                   onPressed: _toggleMenu,
                   icon: Icon(
                     _isMenuOpen ? Icons.close : Icons.menu_rounded,
-                    color: Colors.black,
+                    color: Colors.white,
                     size: 24,
                   ),
                 ),
@@ -163,7 +177,7 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black,
+                        color: Colors.white,
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -171,7 +185,7 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                       'Manage your hospital operations',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey,
+                        color: Colors.white.withOpacity(0.8),
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -184,16 +198,19 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.grey.withOpacity(0.3),
-                    width: 1,
-                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: const Icon(
                   Icons.local_hospital_rounded,
-                  color: Colors.black,
+                  color: Color(0xFF667EEA),
                   size: 24,
                 ),
               ),

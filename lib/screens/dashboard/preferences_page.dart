@@ -542,8 +542,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFF8BBD9),
-                foregroundColor: Colors.white,
+                backgroundColor: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF8BBD9),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

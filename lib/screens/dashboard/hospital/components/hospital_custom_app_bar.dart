@@ -36,7 +36,7 @@ class CustomAppBar extends StatelessWidget {
                       padding: const EdgeInsets.all(8),
                       child: Icon(
                         isMenuOpen ? Icons.close : Icons.menu,
-                        color: Colors.black,
+                        color: Colors.white,
                         size: 24,
                       ),
                     ),
@@ -46,12 +46,12 @@ class CustomAppBar extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.2),
+                      color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.local_hospital,
-                      color: Colors.black,
+                      color: Colors.white,
                       size: 20,
                     ),
                   ),
@@ -66,12 +66,12 @@ class CustomAppBar extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(
                             Icons.notifications,
-                            color: Colors.black,
+                            color: Colors.white,
                             size: 20,
                           ),
                         ),
@@ -92,7 +92,7 @@ class CustomAppBar extends StatelessWidget {
                             child: const Text(
                               '3',
                               style: TextStyle(
-                                color: Colors.black,
+                                color: Colors.white,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -117,7 +117,7 @@ class CustomAppBar extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Colors.white,
                         ),
                       ),
                       SizedBox(height: 4),
@@ -125,7 +125,7 @@ class CustomAppBar extends StatelessWidget {
                         'Ridge Hospital Dashboard',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.grey,
+                          color: Colors.white70,
                         ),
                       ),
                     ],
