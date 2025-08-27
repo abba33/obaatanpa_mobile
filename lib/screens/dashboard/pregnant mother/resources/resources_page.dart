@@ -840,6 +840,14 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
   Widget _buildYouTubeVideoResources() {
     // Real YouTube videos related to pregnancy and maternal health
     final videos = [
+       {
+  'title': "A Dietitian's Guide To Eating During Each Trimester of Pregnancy",
+  'duration': '<Not specified>',
+  'videoId': 'dq7ovxsAfX8',
+  'channel': '<Not specified>',
+  'thumbnail': 'https://img.youtube.com/vi/dq7ovxsAfX8/maxresdefault.jpg',
+  'category': 'Nutrition / Pregnancy Health',
+},
       {
   'title': '10 minute PRENATAL YOGA for Beginners (Safe for ALL Trimesters)',
   'duration': '10:00',
@@ -867,14 +875,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
   'category': 'Baby care', // or whichever category best fits the content
 },
 
-      {
-  'title': "A Dietitian's Guide To Eating During Each Trimester of Pregnancy",
-  'duration': '<Not specified>',
-  'videoId': 'dq7ovxsAfX8',
-  'channel': '<Not specified>',
-  'thumbnail': 'https://img.youtube.com/vi/dq7ovxsAfX8/maxresdefault.jpg',
-  'category': 'Nutrition / Pregnancy Health',
-}
+     
 
     ];
 
