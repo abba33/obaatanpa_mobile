@@ -246,7 +246,7 @@ class CustomAppBar extends StatelessWidget {
     
     return Container(
       color: backgroundColor,
-      padding: const EdgeInsets.only(top: 50, left: 16, right: 16, bottom: 16),
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
       child: Column(
         children: [
           // Top row - Logo and title centered
