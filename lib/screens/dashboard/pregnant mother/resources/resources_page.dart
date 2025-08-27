@@ -841,37 +841,41 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
     // Real YouTube videos related to pregnancy and maternal health
     final videos = [
       {
-        'title': 'Prenatal Yoga for All Trimesters',
-        'duration': '15:30',
-        'videoId': 'oHYGCYUVyUE', // Prenatal yoga video
-        'channel': 'Yoga with Adriene',
-        'thumbnail': 'https://img.youtube.com/vi/oHYGCYUVyUE/maxresdefault.jpg',
-        'category': 'Exercise',
-      },
+  'title': '10 minute PRENATAL YOGA for Beginners (Safe for ALL Trimesters)',
+  'duration': '10:00',
+  'videoId': '4NwQKXpWN_A',
+  'channel': 'Unknown not specified in available sources',
+  'thumbnail': 'https://img.youtube.com/vi/4NwQKXpWN_A/maxresdefault.jpg',
+  'category': 'Exercise',
+},
+
       {
-        'title': 'Labor & Delivery Breathing Techniques',
-        'duration': '12:45',
-        'videoId': 'T3R9fzXpAFc', // Breathing techniques
-        'channel': 'Lamaze International',
-        'thumbnail': 'https://img.youtube.com/vi/T3R9fzXpAFc/maxresdefault.jpg',
-        'category': 'Pregnancy',
-      },
+  'title': 'How to Breathe and Push During Labor | Lamaze',
+  'duration': 'Not specified approx. short instructional video (~5 min?)',
+  'videoId': '0pNldTVh5B4',
+  'channel': 'Bridget Teyler',
+  'thumbnail': 'https://img.youtube.com/vi/0pNldTVh5B4/maxresdefault.jpg',
+  'category': 'Exercise / Childbirth Education',
+},
+
       {
-        'title': 'Baby Care Essentials for New Parents',
-        'duration': '18:20',
-        'videoId': 'Z-3IKBHZhWE', // Baby care basics
-        'channel': 'BabyCenter',
-        'thumbnail': 'https://img.youtube.com/vi/Z-3IKBHZhWE/maxresdefault.jpg',
-        'category': 'Baby Care',
-      },
+  'title': '<Video Title Here>',
+  'duration': '<HH:MM or MM:SS>',
+  'videoId': 'kDvkYvK3M2Q', // Extracted from the iframe src
+  'channel': '<Channel Name Here>',
+  'thumbnail': 'https://img.youtube.com/vi/kDvkYvK3M2Q/maxresdefault.jpg',
+  'category': 'Baby care', // or whichever category best fits the content
+},
+
       {
-        'title': 'Healthy Pregnancy Nutrition Guide',
-        'duration': '14:15',
-        'videoId': 'Q7T8vd1V6Dc', // Pregnancy nutrition
-        'channel': 'Mayo Clinic',
-        'thumbnail': 'https://img.youtube.com/vi/Q7T8vd1V6Dc/maxresdefault.jpg',
-        'category': 'Nutrition',
-      },
+  'title': "A Dietitian's Guide To Eating During Each Trimester of Pregnancy",
+  'duration': '<Not specified>',
+  'videoId': 'dq7ovxsAfX8',
+  'channel': '<Not specified>',
+  'thumbnail': 'https://img.youtube.com/vi/dq7ovxsAfX8/maxresdefault.jpg',
+  'category': 'Nutrition / Pregnancy Health',
+}
+
     ];
 
     return SizedBox(
