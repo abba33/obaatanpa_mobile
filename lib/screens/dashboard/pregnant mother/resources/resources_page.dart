@@ -1140,97 +1140,290 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
     );
   }
 
-  Widget _buildEmergencyContacts() {
-    final contacts = [
-      {
-        'title': 'Emergency Hotline',
-        'number': '911',
-        'description': '24/7 Emergency Services',
-        'icon': Icons.emergency,
-        'color': Colors.red,
-      },
-      {
-        'title': 'Maternal Health Helpline',
-        'number': '+233 30 123 4567',
-        'description': 'Pregnancy support and advice',
-        'icon': Icons.phone,
-        'color': const Color(0xFFF8BBD9),
-      },
-      {
-        'title': 'Mental Health Support',
-        'number': '+233 30 765 4321',
-        'description': 'Counseling and mental health support',
-        'icon': Icons.psychology,
-        'color': const Color(0xFF81C784),
-      },
-    ];
+Widget _buildEmergencyContacts() {
+  final contacts = [
+    {
+      'title': 'Emergency Hotline',
+      'number': '911',
+      'description': '24/7 Emergency Services',
+      'icon': Icons.emergency,
+      'color': Colors.red,
+      'gradientColors': [const Color(0xFFFF6B6B), const Color(0xFFFF5252)],
+    },
+    {
+      'title': 'Maternal Health Helpline',
+      'number': '+233 30 123 4567',
+      'description': 'Pregnancy support and advice',
+      'icon': Icons.phone,
+      'color': const Color(0xFFF8BBD9),
+      'gradientColors': [const Color(0xFFF8BBD9), const Color(0xFFF59297)],
+    },
+    {
+      'title': 'Mental Health Support',
+      'number': '+233 30 765 4321',
+      'description': 'Counseling and mental health support',
+      'icon': Icons.psychology,
+      'color': const Color(0xFF81C784),
+      'gradientColors': [const Color(0xFF81C784), const Color(0xFF66BB6A)],
+    },
+  ];
 
-    return Column(
-      children: contacts.map((contact) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
+  return Column(
+    children: contacts.asMap().entries.map((entry) {
+      final index = entry.key;
+      final contact = entry.value;
+      
+      return AnimatedContainer(
+        duration: Duration(milliseconds: 300 + (index * 100)),
+        curve: Curves.easeOutBack,
+        margin: const EdgeInsets.only(bottom: 20),
+        child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: (contact['color'] as Color).withOpacity(0.3),
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: (contact['color'] as Color).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  contact['icon'] as IconData,
-                  color: contact['color'] as Color,
-                  size: 24,
-                ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              // Main shadow for depth
+              BoxShadow(
+                color: (contact['color'] as Color).withOpacity(0.3),
+                spreadRadius: 0,
+                blurRadius: 20,
+                offset: const Offset(0, 10),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              // Secondary shadow for more depth
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                spreadRadius: 0,
+                blurRadius: 30,
+                offset: const Offset(0, 15),
+              ),
+              // Inner highlight for 3D effect
+              BoxShadow(
+                color: Colors.white.withOpacity(0.8),
+                spreadRadius: 0,
+                blurRadius: 1,
+                offset: const Offset(0, -1),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () {
+                // Handle contact tap - could open dialer
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Calling ${contact['number']}...'),
+                    backgroundColor: contact['color'] as Color,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white,
+                      Colors.grey[50]!,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.8),
+                    width: 1.5,
+                  ),
+                ),
+                child: Row(
                   children: [
-                    Text(
-                      contact['title'].toString(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                    // 3D Icon Container
+                    Container(
+                      width: 70,
+                      height: 70,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: contact['gradientColors'] as List<Color>,
+                        ),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (contact['color'] as Color).withOpacity(0.4),
+                            spreadRadius: 0,
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                          BoxShadow(
+                            color: (contact['color'] as Color).withOpacity(0.2),
+                            spreadRadius: 0,
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                          // Inner highlight
+                          const BoxShadow(
+                            color: Colors.white,
+                            spreadRadius: -1,
+                            blurRadius: 1,
+                            offset: Offset(-1, -1),
+                          ),
+                        ],
+                      ),
+                      child: Stack(
+                        children: [
+                          // Subtle inner shadow for depth
+                          Positioned.fill(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(18),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.white.withOpacity(0.3),
+                                    Colors.transparent,
+                                    Colors.black.withOpacity(0.1),
+                                  ],
+                                  stops: const [0.0, 0.5, 1.0],
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Icon
+                          Center(
+                            child: Icon(
+                              contact['icon'] as IconData,
+                              color: Colors.white,
+                              size: 28,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Text(
-                      contact['number'].toString(),
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: contact['color'] as Color,
-                        fontWeight: FontWeight.w600,
+                    
+                    const SizedBox(width: 20),
+                    
+                    // Contact Information
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            contact['title'].toString(),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.black87,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  (contact['color'] as Color).withOpacity(0.1),
+                                  (contact['color'] as Color).withOpacity(0.05),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: (contact['color'] as Color).withOpacity(0.2),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              contact['number'].toString(),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: contact['color'] as Color,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            contact['description'].toString(),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                              height: 1.3,
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Text(
-                      contact['description'].toString(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
+                    
+                    // Call Action Button with 3D Effect
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 0,
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 0,
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          ),
+                          // Inner highlight
+                          const BoxShadow(
+                            color: Colors.white,
+                            spreadRadius: -1,
+                            blurRadius: 1,
+                            offset: Offset(-1, -1),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(15),
+                          onTap: () {
+                            // Handle call button tap
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Calling ${contact['number']}...'),
+                                backgroundColor: contact['color'] as Color,
+                              ),
+                            );
+                          },
+                          child: Center(
+                            child: Icon(
+                              Icons.call,
+                              color: contact['color'] as Color,
+                              size: 22,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              Icon(
-                Icons.call,
-                color: contact['color'] as Color,
-                size: 20,
-              ),
-            ],
+            ),
           ),
-        );
-      }).toList(),
-    );
-  }
+        ),
+      );
+    }).toList(),
+  );
+}
 }

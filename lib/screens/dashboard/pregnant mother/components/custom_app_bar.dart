@@ -269,15 +269,15 @@ class CustomAppBar extends StatelessWidget {
                     errorBuilder: (context, error, stackTrace) {
                       // Fallback to the original design if image fails to load
                       return Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.white, // Match the app bar background
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.favorite,
-                            color: Color(0xFFF8BBD9), // Keep icon pink for accent
-                            size: 30, // Increased icon size
-                          ),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFF8BBD9),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.favorite,
+                          color: Colors.white,
+                          size: 30, // Increased icon size
+                        ),
                       );
                     },
                   ),
