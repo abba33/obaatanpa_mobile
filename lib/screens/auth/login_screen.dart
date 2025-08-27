@@ -78,11 +78,7 @@ class _LoginScreenState extends State<LoginScreen>
             height: double.infinity,
             clipBehavior: Clip.antiAlias,
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment(0.50, 0.00),
-                end: Alignment(0.50, 1.00),
-                colors: [Color(0xFFFCD7DA), Color(0xFFE7EDFA)],
-              ),
+              color: Colors.white,
             ),
             child: SingleChildScrollView(
               child: Stack(
@@ -114,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen>
             Colors.black.withOpacity(0.9),
           ],
         ),
-        color: const Color(0xFF7DA8E6),
+        color: Colors.transparent,
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 23),
@@ -585,11 +581,7 @@ class _LoginScreenState extends State<LoginScreen>
       constraints: const BoxConstraints(maxWidth: 320),
       height: 55,
       decoration: ShapeDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment(0.00, 0.50),
-          end: Alignment(1.00, 0.50),
-          colors: [Color(0xFF7DA8E6), Color(0xFFF8A7AB)],
-        ),
+        color: const Color(0xFFF59297),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
