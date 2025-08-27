@@ -256,21 +256,21 @@ class PersonalizedToolsCard extends StatelessWidget {
           'subtitle': 'First prenatal visits',
           'color': const Color(0xFF6B9BFF),
           'icon': Icons.calendar_today,
-          'imagePath': 'assets/images/tools/appointment_scheduler.jpg',
+          'imagePath': 'assets/images/tools/appointment_scheduler.png',
         },
         {
           'title': 'Nutrition Guide',
           'subtitle': 'What to eat & avoid',
           'color': const Color(0xFFFFB6C1),
           'icon': Icons.restaurant,
-          'imagePath': 'assets/images/tools/nutrition_guide.jpg',
+          'imagePath': 'assets/images/tools/nutrition_guide.png',
         },
         {
           'title': 'Early Pregnancy Tips',
           'subtitle': 'Essential first trimester advice',
           'color': const Color(0xFFDDA0DD),
           'icon': Icons.lightbulb,
-          'imagePath': 'assets/images/tools/early_pregnancy_tips.jpg',
+          'imagePath': 'assets/images/tools/early_pregnancy_tips.png',
         },
       ];
     } else if (trimester == 'Second') {
@@ -311,28 +311,28 @@ class PersonalizedToolsCard extends StatelessWidget {
           'subtitle': 'Time labor contractions',
           'color': const Color(0xFFFF6B6B),
           'icon': Icons.timer,
-          'imagePath': 'assets/images/tools/contraction_timer.jpg',
+          'imagePath': 'assets/images/tools/contraction_timer.png',
         },
         {
           'title': 'Hospital Bag',
           'subtitle': 'Delivery essentials list',
           'color': const Color(0xFF87CEEB),
           'icon': Icons.luggage,
-          'imagePath': 'assets/images/tools/hospital_bag.jpg',
+          'imagePath': 'assets/images/tools/hospital_bag.png',
         },
         {
           'title': 'Birth Plan',
           'subtitle': 'Plan your ideal delivery',
           'color': const Color(0xFFDDA0DD),
           'icon': Icons.assignment,
-          'imagePath': 'assets/images/tools/birth_plan.jpg',
+          'imagePath': 'assets/images/tools/birth_plan.png',
         },
         {
           'title': 'Newborn Care',
           'subtitle': 'Essential baby care tips',
           'color': const Color(0xFFFFB6C1),
           'icon': Icons.baby_changing_station,
-          'imagePath': 'assets/images/tools/newborn_care.jpg',
+          'imagePath': 'assets/images/tools/newborn_care.png',
         },
       ];
     }
