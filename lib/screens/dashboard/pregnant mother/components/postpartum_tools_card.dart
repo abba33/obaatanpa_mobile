@@ -16,79 +16,64 @@ class PersonalizedToolsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final tools = _getPersonalizedTools(trimester, currentWeek);
     
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Row(
-            children: [
-              Container(
-                width: 24,
-                height: 24,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF8BBD9),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.build,
-                  color: Colors.white,
-                  size: 12,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header
+        Row(
+          children: [
+            Container(
+              width: 24,
+              height: 24,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF8BBD9),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.build,
+                color: Colors.white,
+                size: 12,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '${trimester} Trimester Tools',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  '${trimester} Trimester Tools',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Week $currentWeek essentials',
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
             ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Week $currentWeek essentials',
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.grey,
           ),
-          const SizedBox(height: 16),
-          
-          // Grid of tools
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.1,
-            ),
-            itemCount: tools.length,
-            itemBuilder: (context, index) {
-              final tool = tools[index];
-              return _buildToolCard(tool);
-            },
+        ),
+        const SizedBox(height: 16),
+        
+        // Grid of tools
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.1,
           ),
-        ],
-      ),
+          itemCount: tools.length,
+          itemBuilder: (context, index) {
+            final tool = tools[index];
+            return _buildToolCard(tool);
+          },
+        ),
+      ],
     );
   }
 

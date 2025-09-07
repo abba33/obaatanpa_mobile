@@ -3,7 +3,7 @@ import 'package:obaatanpa_mobile/providers/theme_provider.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/help_support_page.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/preferences_page.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/profile_settings_page.dart';
-import 'package:obaatanpa_mobile/screens/dashboard/notification_page.dart'; // Add this import
+import 'package:obaatanpa_mobile/screens/dashboard/notification_page.dart';
 import 'package:provider/provider.dart';
 
 // Custom App Bar Component with Dark Mode Support and Profile Dropdown
@@ -14,7 +14,8 @@ class CustomAppBar extends StatelessWidget {
   const CustomAppBar({
     Key? key,
     required this.isMenuOpen,
-    required this.onMenuTap, required String title,
+    required this.onMenuTap, 
+    required String title,
   }) : super(key: key);
 
   void _showProfileMenu(BuildContext context) {
@@ -23,7 +24,7 @@ class CustomAppBar extends StatelessWidget {
     
     showMenu(
       context: context,
-      position: const RelativeRect.fromLTRB(1000, 120, 0, 0), // Position near the profile
+      position: const RelativeRect.fromLTRB(1000, 120, 0, 0),
       color: isDark ? const Color(0xFF2D2D2D) : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -40,9 +41,9 @@ class CustomAppBar extends StatelessWidget {
               Icon(
                 Icons.person_outline,
                 color: isDark ? Colors.white : Colors.black87,
-                size: 20,
+                size: 18,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Text(
                 'Profile Settings',
                 style: TextStyle(
@@ -60,9 +61,9 @@ class CustomAppBar extends StatelessWidget {
               Icon(
                 Icons.settings_outlined,
                 color: isDark ? Colors.white : Colors.black87,
-                size: 20,
+                size: 18,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Text(
                 'Preferences',
                 style: TextStyle(
@@ -80,9 +81,9 @@ class CustomAppBar extends StatelessWidget {
               Icon(
                 Icons.help_outline,
                 color: isDark ? Colors.white : Colors.black87,
-                size: 20,
+                size: 18,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Text(
                 'Help & Support',
                 style: TextStyle(
@@ -93,7 +94,6 @@ class CustomAppBar extends StatelessWidget {
             ],
           ),
         ),
-        // Divider
         const PopupMenuDivider(),
         PopupMenuItem<String>(
           value: 'logout',
@@ -102,9 +102,9 @@ class CustomAppBar extends StatelessWidget {
               const Icon(
                 Icons.logout,
                 color: Colors.red,
-                size: 20,
+                size: 18,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Text(
                 'Logout',
                 style: TextStyle(
@@ -118,7 +118,6 @@ class CustomAppBar extends StatelessWidget {
         ),
       ],
     ).then((value) {
-      // Handle menu selection
       if (value != null) {
         _handleMenuSelection(context, value);
       }
@@ -128,7 +127,6 @@ class CustomAppBar extends StatelessWidget {
   void _handleMenuSelection(BuildContext context, String value) {
     switch (value) {
       case 'profile':
-        // Navigate to profile settings
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -137,7 +135,6 @@ class CustomAppBar extends StatelessWidget {
         );
         break;
       case 'preferences':
-        // Navigate to preferences
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -146,7 +143,6 @@ class CustomAppBar extends StatelessWidget {
         );
         break;
       case 'help':
-        // Navigate to help
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -155,13 +151,11 @@ class CustomAppBar extends StatelessWidget {
         );
         break;
       case 'logout':
-        // Show logout confirmation
         _showLogoutDialog(context);
         break;
     }
   }
 
-  // Handle notification tap - Navigate to notification page
   void _navigateToNotifications(BuildContext context) {
     Navigator.push(
       context,
@@ -199,7 +193,7 @@ class CustomAppBar extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
+                Navigator.of(context).pop();
               },
               child: Text(
                 'Cancel',
@@ -210,8 +204,7 @@ class CustomAppBar extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                // Handle logout logic here
+                Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Logged out successfully'),
@@ -219,8 +212,6 @@ class CustomAppBar extends StatelessWidget {
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
-                // TODO: Implement actual logout logic
-                // e.g., clear user data, navigate to login screen
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
@@ -246,7 +237,7 @@ class CustomAppBar extends StatelessWidget {
     
     return Container(
       color: backgroundColor,
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 20), // Increased bottom padding
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
       child: Column(
         children: [
           // Top row - Logo and title centered
@@ -254,20 +245,19 @@ class CustomAppBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 70, // Increased logo size
-                height: 70, // Increased logo size
+                width: 45,
+                height: 45,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(35), // Updated border radius
+                  borderRadius: BorderRadius.circular(22.5),
                   child: Image.asset(
-                    'assets/images/navbar/maternity-logo.png', // Replace with your logo path
+                    'assets/images/navbar/maternity-logo.png',
                     fit: BoxFit.cover,
-                    width: 70,
-                    height: 70,
+                    width: 45,
+                    height: 45,
                     errorBuilder: (context, error, stackTrace) {
-                      // Fallback to the original design if image fails to load
                       return Container(
                         decoration: const BoxDecoration(
                           color: Color(0xFFF8BBD9),
@@ -276,7 +266,7 @@ class CustomAppBar extends StatelessWidget {
                         child: const Icon(
                           Icons.favorite,
                           color: Colors.white,
-                          size: 35, // Increased icon size
+                          size: 24,
                         ),
                       );
                     },
@@ -284,20 +274,19 @@ class CustomAppBar extends StatelessWidget {
                 ),
               ),
               
-              const SizedBox(width: 20), // Increased spacing
+              const SizedBox(width: 12),
               
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Updated OBAATANPA text with special coloring
                   RichText(
                     text: TextSpan(
                       children: [
                         TextSpan(
                           text: 'OBAA',
                           style: TextStyle(
-                            fontSize: 28, // Increased font size
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: textColor,
                           ),
@@ -305,9 +294,9 @@ class CustomAppBar extends StatelessWidget {
                         TextSpan(
                           text: 'TANPA',
                           style: TextStyle(
-                            fontSize: 28, // Increased font size
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFFF59297), // Your specified color
+                            color: const Color(0xFFF59297),
                           ),
                         ),
                       ],
@@ -316,7 +305,7 @@ class CustomAppBar extends StatelessWidget {
                   Text(
                     'Your Pregnancy Dashboard',
                     style: TextStyle(
-                      fontSize: 16, // Increased subtitle size
+                      fontSize: 12,
                       color: isDark ? Colors.grey[400] : Colors.grey[600],
                     ),
                   ),
@@ -325,7 +314,7 @@ class CustomAppBar extends StatelessWidget {
             ],
           ),
           
-          const SizedBox(height: 18), // Increased spacing
+          const SizedBox(height: 14),
           
           // Bottom row - Controls and user info
           Row(
@@ -333,31 +322,28 @@ class CustomAppBar extends StatelessWidget {
               // Left side - Menu and dark mode toggle
               Row(
                 children: [
-                  // Menu icon - Bigger size
                   GestureDetector(
                     onTap: onMenuTap,
                     child: Icon(
                       isMenuOpen ? Icons.close : Icons.menu,
                       color: textColor,
-                      size: 32, // Increased size significantly
+                      size: 24,
                     ),
                   ),
                   
-                  const SizedBox(width: 20), // Increased spacing
+                  const SizedBox(width: 16),
                   
-                  // Dark mode toggle button (keep icon but remove functionality)
                   Icon(
                     isDark ? Icons.light_mode : Icons.dark_mode_outlined,
                     color: isDark ? const Color(0xFFF8BBD9) : textColor,
-                    size: 24,
+                    size: 20,
                   ),
                 ],
               ),
               
-              // Spacer to center the greeting
               const Spacer(),
               
-              // Center - Greeting - Much bigger text
+              // Center - Greeting
               RichText(
                 text: TextSpan(
                   children: [
@@ -365,15 +351,15 @@ class CustomAppBar extends StatelessWidget {
                       text: 'Hello, ',
                       style: TextStyle(
                         color: textColor,
-                        fontSize: 28, // Significantly increased size
+                        fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     TextSpan(
                       text: 'Abba',
                       style: TextStyle(
-                        color: const Color(0xFFF59297), // Changed to requested color
-                        fontSize: 28, // Significantly increased size
+                        color: const Color(0xFFF59297),
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -381,23 +367,21 @@ class CustomAppBar extends StatelessWidget {
                 ),
               ),
               
-              // Spacer to push right content to the end
               const Spacer(),
               
               // Right side - Notification and profile
               Row(
                 children: [
-                  // Notification icon - Updated with tap functionality
                   GestureDetector(
                     onTap: () => _navigateToNotifications(context),
                     child: Icon(
                       Icons.notifications_outlined,
                       color: textColor,
-                      size: 28, // Increased size
+                      size: 22,
                     ),
                   ),
                   
-                  const SizedBox(width: 20), // Increased spacing
+                  const SizedBox(width: 16),
                   
                   // Profile section with dropdown
                   GestureDetector(
@@ -406,31 +390,30 @@ class CustomAppBar extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         CircleAvatar(
-                          radius: 26, // Increased from 22 to 26
+                          radius: 18,
                           backgroundColor: isDark ? Colors.grey[700] : Colors.grey[300],
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(26), // Updated radius
+                            borderRadius: BorderRadius.circular(18),
                             child: Image.asset(
-                              'assets/images/navbar/profile-1.png', // Replace with your profile image path
+                              'assets/images/navbar/profile-1.png',
                               fit: BoxFit.cover,
-                              width: 52, // Increased size
-                              height: 52, // Increased size
+                              width: 36,
+                              height: 36,
                               errorBuilder: (context, error, stackTrace) {
-                                // Fallback to default person icon if image fails to load
                                 return Icon(
                                   Icons.person,
                                   color: isDark ? Colors.white : Colors.grey[600],
-                                  size: 28, // Increased icon size
+                                  size: 20,
                                 );
                               },
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8), // Increased spacing
+                        const SizedBox(width: 6),
                         Icon(
                           Icons.keyboard_arrow_down,
                           color: textColor,
-                          size: 28, // Increased size
+                          size: 20,
                         ),
                       ],
                     ),

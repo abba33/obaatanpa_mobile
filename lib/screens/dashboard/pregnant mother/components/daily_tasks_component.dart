@@ -153,31 +153,15 @@ class _DailyTasksCardState extends State<DailyTasksCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16), // Reduced from 20 to 16
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 15,
-            spreadRadius: 1,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          const SizedBox(height: 12), // Reduced from 16 to 12
-          _buildTasksList(),
-          const SizedBox(height: 12), // Reduced from 16 to 12
-          _buildProgressBar(),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildHeader(),
+        const SizedBox(height: 12), // Reduced from 16 to 12
+        _buildTasksList(),
+        const SizedBox(height: 12), // Reduced from 16 to 12
+        _buildProgressBar(),
+      ],
     );
   }
 
