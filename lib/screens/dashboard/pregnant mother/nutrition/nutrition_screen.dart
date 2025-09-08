@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/custom_app_bar.dart';
+import 'package:obaatanpa_mobile/widgets/navigation/navigation_menu.dart';
 
 class NutritionScreen extends StatefulWidget {
   const NutritionScreen({super.key});
@@ -9,6 +11,7 @@ class NutritionScreen extends StatefulWidget {
 }
 
 class _NutritionScreenState extends State<NutritionScreen> {
+  bool _isMenuOpen = false;
   String selectedTrimester = '2nd Trimester';
   final List<String> trimesters = [
     '1st Trimester',
@@ -17,62 +20,72 @@ class _NutritionScreenState extends State<NutritionScreen> {
     'Postpartum',
   ];
 
+  void _toggleMenu() {
+    setState(() {
+      _isMenuOpen = !_isMenuOpen;
+    });
+  }
+
+  void _navigateToPage(String routeName) {
+    _toggleMenu();
+    if (routeName != '/nutrition') {
+      context.go(routeName);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => context.go('/dashboard/pregnant-mother'),
-        ),
-        title: const Text(
-          'Nutrition Guide',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+      backgroundColor: const Color(0xFFFAFAFA),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              // Custom App Bar
+              CustomAppBar(
+                isMenuOpen: _isMenuOpen,
+                onMenuTap: _toggleMenu,
+                title: 'Nutrition',
+              ),
+              
+              // Nutrition Content
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header Section with Trimester Selection
+                      _buildHeaderSection(),
+                      
+                      // Daily Nutrition Goals
+                      _buildDailyNutritionGoals(),
+                      
+                      // Recommended Foods Section
+                      _buildRecommendedFoods(),
+                      
+                      // Meal Planning Section
+                      _buildMealPlanningSection(),
+                      
+                      // Foods to Avoid Section
+                      _buildFoodsToAvoid(),
+                      
+                      // Nutrition Tips Section
+                      _buildNutritionTips(),
+                      
+                      // Supplements Section
+                      _buildSupplementsSection(),
+                      
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.bookmark_outline, color: Colors.black),
-            onPressed: () {
-              // Add bookmark functionality
-            },
-          ),
+          
+          // Side Navigation Menu
+          if (_isMenuOpen) _buildNavigationMenu(),
         ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Section with Trimester Selection
-            _buildHeaderSection(),
-            
-            // Daily Nutrition Goals
-            _buildDailyNutritionGoals(),
-            
-            // Recommended Foods Section
-            _buildRecommendedFoods(),
-            
-            // Meal Planning Section
-            _buildMealPlanningSection(),
-            
-            // Foods to Avoid Section
-            _buildFoodsToAvoid(),
-            
-            // Nutrition Tips Section
-            _buildNutritionTips(),
-            
-            // Supplements Section
-            _buildSupplementsSection(),
-            
-            const SizedBox(height: 20),
-          ],
-        ),
       ),
     );
   }
@@ -80,41 +93,67 @@ class _NutritionScreenState extends State<NutritionScreen> {
   Widget _buildHeaderSection() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFFF8BBD9).withOpacity(0.3),
-            const Color(0xFFF8BBD9).withOpacity(0.1),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          const Text(
-            'Healthy Nutrition for You & Baby',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-            textAlign: TextAlign.center,
+          Row(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF7DA8E6).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(
+                  Icons.restaurant_menu,
+                  color: Color(0xFF7DA8E6),
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 20),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Healthy Nutrition for You & Baby',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF2C2C2C),
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      'Personalized guidance for your pregnancy journey',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF6B7280),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'Personalized nutrition guidance for your pregnancy journey',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-              height: 1.4,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           // Trimester Selection
-          Container(
+          SizedBox(
             height: 50,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
@@ -136,17 +175,25 @@ class _NutritionScreenState extends State<NutritionScreen> {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFFF8BBD9) : Colors.white,
+                      color: isSelected ? const Color(0xFFF59297) : Colors.white,
                       borderRadius: BorderRadius.circular(25),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFFF8BBD9) : Colors.grey.shade300,
+                        color: isSelected ? const Color(0xFFF59297) : const Color(0xFFE5E7EB),
                       ),
+                      boxShadow: [
+                        if (isSelected)
+                          BoxShadow(
+                            color: const Color(0xFFF59297).withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                      ],
                     ),
                     child: Text(
                       trimester,
                       style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black,
-                        fontWeight: FontWeight.w500,
+                        color: isSelected ? Colors.white : const Color(0xFF6B7280),
+                        fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
                     ),
@@ -162,7 +209,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
 
   Widget _buildDailyNutritionGoals() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -170,34 +217,34 @@ class _NutritionScreenState extends State<NutritionScreen> {
             'Daily Nutrition Goals',
             style: TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2C2C2C),
+              letterSpacing: -0.3,
             ),
           ),
           const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 6,
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: Column(
               children: [
-                _buildNutritionGoalItem('Calories', '2,200', '2,500 kcal', 0.88, const Color(0xFF81C784)),
-                const SizedBox(height: 16),
-                _buildNutritionGoalItem('Protein', '65g', '75g', 0.87, const Color(0xFFF8BBD9)),
-                const SizedBox(height: 16),
-                _buildNutritionGoalItem('Folate', '550μg', '600μg', 0.92, const Color(0xFF64B5F6)),
-                const SizedBox(height: 16),
-                _buildNutritionGoalItem('Iron', '22mg', '27mg', 0.81, const Color(0xFFFFB74D)),
+                _buildNutritionGoalItem('Calories', '2,200', '2,500 kcal', 0.88, const Color(0xFF10B981)),
+                const SizedBox(height: 20),
+                _buildNutritionGoalItem('Protein', '65g', '75g', 0.87, const Color(0xFFF59297)),
+                const SizedBox(height: 20),
+                _buildNutritionGoalItem('Folate', '550μg', '600μg', 0.92, const Color(0xFF7DA8E6)),
+                const SizedBox(height: 20),
+                _buildNutritionGoalItem('Iron', '22mg', '27mg', 0.81, const Color(0xFFF59E0B)),
               ],
             ),
           ),
@@ -217,150 +264,193 @@ class _NutritionScreenState extends State<NutritionScreen> {
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
+                color: Color(0xFF2C2C2C),
               ),
             ),
             Text(
               '$current / $target',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
-                color: Colors.grey[600],
+                color: Color(0xFF6B7280),
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         LinearProgressIndicator(
           value: progress,
-          backgroundColor: color.withOpacity(0.2),
+          backgroundColor: color.withOpacity(0.15),
           valueColor: AlwaysStoppedAnimation<Color>(color),
-          minHeight: 8,
+          minHeight: 6,
         ),
       ],
     );
   }
 
-  Widget _buildRecommendedFoods() {
-    final recommendedFoods = [
-      {
-        'name': 'Leafy Greens',
-        'benefit': 'Rich in folate & iron',
-        'icon': Icons.eco,
-        'color': const Color(0xFF81C784),
-        'examples': 'Spinach, Kale, Broccoli',
-      },
-      {
-        'name': 'Lean Proteins',
-        'benefit': 'Essential for baby growth',
-        'icon': Icons.food_bank,
-        'color': const Color(0xFFF8BBD9),
-        'examples': 'Fish, Chicken, Beans, Eggs',
-      },
-      {
-        'name': 'Whole Grains',
-        'benefit': 'Energy & fiber',
-        'icon': Icons.grain,
-        'color': const Color(0xFFFFB74D),
-        'examples': 'Brown rice, Oats, Quinoa',
-      },
-      {
-        'name': 'Dairy Products',
-        'benefit': 'Calcium for bones',
-        'icon': Icons.local_drink,
-        'color': const Color(0xFF64B5F6),
-        'examples': 'Milk, Yogurt, Cheese',
-      },
-    ];
+Widget _buildRecommendedFoods() {
+  final recommendedFoods = [
+    {
+      'name': 'Leafy Greens',
+      'benefit': 'Rich in folate & iron',
+      'image': 'assets/images/foods/leafy_greens.png', // Add your image path
+      'color': const Color(0xFF10B981),
+      'examples': 'Spinach, Kale, Broccoli',
+    },
+    {
+      'name': 'Lean Proteins',
+      'benefit': 'Essential for baby growth',
+      'image': 'assets/images/foods/lean_proteins.png', // Add your image path
+      'color': const Color(0xFFF59297),
+      'examples': 'Fish, Chicken, Beans, Eggs',
+    },
+    {
+      'name': 'Whole Grains',
+      'benefit': 'Energy & fiber',
+      'image': 'assets/images/foods/whole_grains.png', // Add your image path
+      'color': const Color(0xFFF59E0B),
+      'examples': 'Brown rice, Oats, Quinoa',
+    },
+    {
+      'name': 'Dairy Products',
+      'benefit': 'Calcium for bones',
+      'image': 'assets/images/foods/dairy_products.png', // Add your image path
+      'color': const Color(0xFF7DA8E6),
+      'examples': 'Milk, Yogurt, Cheese',
+    },
+  ];
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Recommended Foods',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
+  return Padding(
+    padding: const EdgeInsets.all(20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Recommended Foods',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF2C2C2C),
+            letterSpacing: -0.3,
           ),
-          const SizedBox(height: 16),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.85,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-            ),
-            itemCount: recommendedFoods.length,
-            itemBuilder: (context, index) {
-              final food = recommendedFoods[index];
-              return Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      spreadRadius: 1,
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+        ),
+        const SizedBox(height: 16),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.85,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+          ),
+          itemCount: recommendedFoods.length,
+          itemBuilder: (context, index) {
+            final food = recommendedFoods[index];
+            return Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: (food['color'] as Color).withOpacity(0.2),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: (food['color'] as Color).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        food['icon'] as IconData,
-                        color: food['color'] as Color,
-                        size: 24,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Image Container
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: (food['color'] as Color).withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        food['image'].toString(),
+                        width: 44,
+                        height: 44,
+                        fit: BoxFit.cover,
+                        // Fallback to icon if image fails to load
+                        errorBuilder: (context, error, stackTrace) {
+                          // Fallback icons based on food type
+                          IconData fallbackIcon;
+                          switch (index) {
+                            case 0:
+                              fallbackIcon = Icons.eco_outlined;
+                              break;
+                            case 1:
+                              fallbackIcon = Icons.food_bank_outlined;
+                              break;
+                            case 2:
+                              fallbackIcon = Icons.grain_outlined;
+                              break;
+                            case 3:
+                              fallbackIcon = Icons.local_drink_outlined;
+                              break;
+                            default:
+                              fallbackIcon = Icons.restaurant_menu;
+                          }
+                          return Icon(
+                            fallbackIcon,
+                            color: food['color'] as Color,
+                            size: 22,
+                          );
+                        },
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      food['name'].toString(),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    food['name'].toString(),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2C2C2C),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
+                  ),
+                  const SizedBox(height: 4),
+                  Flexible(
+                    child: Text(
                       food['benefit'].toString(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: Color(0xFF6B7280),
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
+                  ),
+                  const SizedBox(height: 6),
+                  Flexible(
+                    child: Text(
                       food['examples'].toString(),
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 11,
                         color: food['color'] as Color,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildMealPlanningSection() {
     final mealPlan = [
@@ -369,87 +459,105 @@ class _NutritionScreenState extends State<NutritionScreen> {
         'time': '7:00 AM',
         'suggestion': 'Oatmeal with berries and nuts',
         'calories': '350 cal',
-        'color': const Color(0xFFFFB74D),
-        'icon': Icons.wb_sunny,
+        'color': const Color(0xFFF59E0B),
+        'icon': Icons.wb_sunny_outlined,
       },
       {
         'meal': 'Mid-Morning',
         'time': '10:00 AM',
         'suggestion': 'Greek yogurt with fruit',
         'calories': '150 cal',
-        'color': const Color(0xFF81C784),
-        'icon': Icons.local_cafe,
+        'color': const Color(0xFF10B981),
+        'icon': Icons.local_cafe_outlined,
       },
       {
         'meal': 'Lunch',
         'time': '1:00 PM',
         'suggestion': 'Grilled chicken salad',
         'calories': '450 cal',
-        'color': const Color(0xFFF8BBD9),
-        'icon': Icons.lunch_dining,
+        'color': const Color(0xFFF59297),
+        'icon': Icons.lunch_dining_outlined,
       },
       {
         'meal': 'Snack',
         'time': '4:00 PM',
         'suggestion': 'Hummus with vegetables',
         'calories': '200 cal',
-        'color': const Color(0xFF64B5F6),
-        'icon': Icons.cookie,
+        'color': const Color(0xFF7DA8E6),
+        'icon': Icons.cookie_outlined,
       },
       {
         'meal': 'Dinner',
         'time': '7:00 PM',
         'suggestion': 'Salmon with quinoa',
         'calories': '500 cal',
-        'color': const Color(0xFF9575CD),
-        'icon': Icons.dinner_dining,
+        'color': const Color(0xFF8B5CF6),
+        'icon': Icons.dinner_dining_outlined,
       },
     ];
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Today\'s Meal Plan',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Today\'s Meal Plan',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF2C2C2C),
+                  letterSpacing: -0.3,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  context.go('/meal-planner');
+                },
+                icon: const Icon(Icons.edit_outlined, size: 16),
+                label: const Text('Edit Plan'),
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF7DA8E6),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Column(
             children: mealPlan.map((meal) {
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: (meal['color'] as Color).withOpacity(0.2),
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      spreadRadius: 1,
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
                     ),
                   ],
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 50,
-                      height: 50,
+                      width: 48,
+                      height: 48,
                       decoration: BoxDecoration(
-                        color: (meal['color'] as Color).withOpacity(0.2),
+                        color: (meal['color'] as Color).withOpacity(0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         meal['icon'] as IconData,
                         color: meal['color'] as Color,
-                        size: 24,
+                        size: 22,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -464,24 +572,27 @@ class _NutritionScreenState extends State<NutritionScreen> {
                                 meal['meal'].toString(),
                                 style: const TextStyle(
                                   fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF2C2C2C),
                                 ),
                               ),
                               Text(
                                 meal['time'].toString(),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFF6B7280),
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 6),
                           Text(
                             meal['suggestion'].toString(),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[700],
+                              color: Color(0xFF4B5563),
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -490,11 +601,24 @@ class _NutritionScreenState extends State<NutritionScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               color: meal['color'] as Color,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
                       ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.check_circle_outline, size: 20),
+                      color: const Color(0xFF10B981),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${meal['meal']} marked as completed!'),
+                            duration: const Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -511,40 +635,41 @@ class _NutritionScreenState extends State<NutritionScreen> {
       {
         'name': 'Raw Fish & Meat',
         'reason': 'Risk of bacterial infection',
-        'icon': Icons.no_food,
-        'color': Colors.red,
+        'icon': Icons.no_food_outlined,
+        'color': const Color(0xFFDC2626),
       },
       {
         'name': 'High Mercury Fish',
         'reason': 'Can affect baby\'s development',
-        'icon': Icons.warning,
-        'color': Colors.orange,
+        'icon': Icons.warning_outlined,
+        'color': const Color(0xFFF59E0B),
       },
       {
         'name': 'Alcohol',
         'reason': 'No safe amount during pregnancy',
-        'icon': Icons.local_bar,
-        'color': Colors.red,
+        'icon': Icons.local_bar_outlined,
+        'color': const Color(0xFFDC2626),
       },
       {
         'name': 'Excess Caffeine',
         'reason': 'Limit to 200mg per day',
-        'icon': Icons.coffee,
-        'color': Colors.orange,
+        'icon': Icons.coffee_outlined,
+        'color': const Color(0xFFF59E0B),
       },
     ];
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Foods to Avoid',
+            'Foods to Limit or Avoid',
             style: TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2C2C2C),
+              letterSpacing: -0.3,
             ),
           ),
           const SizedBox(height: 16),
@@ -552,22 +677,29 @@ class _NutritionScreenState extends State<NutritionScreen> {
             children: avoidFoods.map((food) {
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: (food['color'] as Color).withOpacity(0.3),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 40,
-                      height: 40,
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
-                        color: (food['color'] as Color).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color: (food['color'] as Color).withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
                         food['icon'] as IconData,
@@ -583,15 +715,18 @@ class _NutritionScreenState extends State<NutritionScreen> {
                           Text(
                             food['name'].toString(),
                             style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2C2C2C),
                             ),
                           ),
+                          const SizedBox(height: 4),
                           Text(
                             food['reason'].toString(),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF6B7280),
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -617,55 +752,66 @@ class _NutritionScreenState extends State<NutritionScreen> {
     ];
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Nutrition Tips',
+            'Essential Nutrition Tips',
             style: TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2C2C2C),
+              letterSpacing: -0.3,
             ),
           ),
           const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFFF8BBD9).withOpacity(0.1),
-                  const Color(0xFFF8BBD9).withOpacity(0.05),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFF7DA8E6).withOpacity(0.2),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Column(
               children: tips.map((tip) {
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.only(bottom: 16),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        width: 6,
-                        height: 6,
-                        margin: const EdgeInsets.only(top: 6),
+                        width: 20,
+                        height: 20,
+                        margin: const EdgeInsets.only(top: 2),
                         decoration: const BoxDecoration(
-                          color: Color(0xFFF8BBD9),
+                          color: Color(0xFF10B981),
                           shape: BoxShape.circle,
                         ),
+                        child: const Icon(
+                          Icons.check,
+                          color: Colors.white,
+                          size: 12,
+                        ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: Text(
                           tip,
                           style: const TextStyle(
-                            fontSize: 14,
-                            height: 1.4,
+                            fontSize: 15,
+                            height: 1.5,
+                            color: Color(0xFF4B5563),
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
@@ -686,27 +832,27 @@ class _NutritionScreenState extends State<NutritionScreen> {
         'name': 'Prenatal Vitamin',
         'dosage': '1 tablet daily',
         'time': 'With breakfast',
-        'color': const Color(0xFFF8BBD9),
+        'color': const Color(0xFFF59297),
         'taken': true,
       },
       {
         'name': 'Iron Supplement',
         'dosage': '30mg daily',
         'time': 'Between meals',
-        'color': const Color(0xFFFFB74D),
+        'color': const Color(0xFFF59E0B),
         'taken': false,
       },
       {
         'name': 'Omega-3 (DHA)',
         'dosage': '200mg daily',
         'time': 'With dinner',
-        'color': const Color(0xFF64B5F6),
+        'color': const Color(0xFF7DA8E6),
         'taken': true,
       },
     ];
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -714,8 +860,9 @@ class _NutritionScreenState extends State<NutritionScreen> {
             'Daily Supplements',
             style: TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2C2C2C),
+              letterSpacing: -0.3,
             ),
           ),
           const SizedBox(height: 16),
@@ -724,39 +871,59 @@ class _NutritionScreenState extends State<NutritionScreen> {
               final taken = supplement['taken'] as bool;
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: (supplement['color'] as Color).withOpacity(0.2),
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      spreadRadius: 1,
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
                     ),
                   ],
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: taken ? (supplement['color'] as Color) : Colors.transparent,
-                        border: Border.all(
-                          color: supplement['color'] as Color,
-                          width: 2,
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          supplement['taken'] = !taken;
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              taken
+                                  ? '${supplement['name']} unmarked'
+                                  : '${supplement['name']} marked as taken!',
+                            ),
+                            duration: const Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: taken ? (supplement['color'] as Color) : Colors.transparent,
+                          border: Border.all(
+                            color: supplement['color'] as Color,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        shape: BoxShape.circle,
+                        child: taken
+                            ? const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 14,
+                              )
+                            : null,
                       ),
-                      child: taken
-                          ? const Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: 12,
-                            )
-                          : null,
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -767,16 +934,18 @@ class _NutritionScreenState extends State<NutritionScreen> {
                             supplement['name'].toString(),
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               decoration: taken ? TextDecoration.lineThrough : null,
-                              color: taken ? Colors.grey : Colors.black,
+                              color: taken ? const Color(0xFF9CA3AF) : const Color(0xFF2C2C2C),
                             ),
                           ),
+                          const SizedBox(height: 4),
                           Text(
                             '${supplement['dosage']} • ${supplement['time']}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF6B7280),
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -788,6 +957,126 @@ class _NutritionScreenState extends State<NutritionScreen> {
             }).toList(),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNavigationMenu() {
+    return Positioned(
+      left: 0,
+      top: 0,
+      bottom: 0,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.75,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(2, 0),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // App Bar in Menu
+            Container(
+              height: 120,
+              padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF7DA8E6),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.pregnant_woman,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Obaatanpa',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        'Pregnancy Dashboard',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: _toggleMenu,
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.black,
+                      size: 24,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Menu Items
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    NavigationMenuItem(
+                      title: 'Dashboard',
+                      onTap: () => _navigateToPage('/dashboard/pregnant-mother'),
+                      textColor: Colors.black87,
+                    ),
+                    const SizedBox(height: 32),
+                    NavigationMenuItem(
+                      title: 'Resources',
+                      onTap: () => _navigateToPage('/resources'),
+                      textColor: Colors.black87,
+                    ),
+                    const SizedBox(height: 32),
+                    NavigationMenuItem(
+                      title: 'Appointments',
+                      onTap: () => _navigateToPage('/appointments'),
+                      textColor: Colors.black87,
+                    ),
+                    const SizedBox(height: 32),
+                    NavigationMenuItem(
+                      title: 'Nutrition',
+                      isActive: true,
+                      onTap: () => _navigateToPage('/nutrition'),
+                      textColor: const Color(0xFF7DA8E6),
+                    ),
+                    const SizedBox(height: 32),
+                    NavigationMenuItem(
+                      title: 'Health',
+                      onTap: () => _navigateToPage('/health'),
+                      textColor: Colors.black87,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

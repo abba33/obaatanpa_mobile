@@ -14,6 +14,7 @@ class ResourcesScreen extends StatefulWidget {
 class _ResourcesScreenState extends State<ResourcesScreen> {
   String selectedCategory = 'All';
   bool isMenuOpen = false;
+  bool showAllArticles = false; // Added for expandable articles
   
   final List<String> categories = [
     'All',
@@ -275,6 +276,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
             onTap: () {
               setState(() {
                 selectedCategory = category;
+                // Reset show all articles when category changes
+                showAllArticles = false;
               });
             },
             child: AnimatedContainer(
@@ -356,19 +359,19 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
             {
               'title': 'Your Complete Pregnancy Guide',
               'subtitle': 'Everything you need to know',
-              'imagePath': 'assets/images/resources/pregnancy_guide.png', // Replace with your actual image path
+              'imagePath': 'assets/images/resources/pregnancy_guide.png',
               'overlayColor': const Color(0xFFF59297),
             },
             {
               'title': 'Healthy Pregnancy Diet',
               'subtitle': 'Nutrition for you and baby',
-              'imagePath': 'assets/images/resources/healthy_diet.png', // Replace with your actual image path
+              'imagePath': 'assets/images/resources/healthy_diet.png',
               'overlayColor': const Color(0xFF81C784),
             },
             {
               'title': 'Prenatal Exercise Plan',
               'subtitle': 'Safe workouts during pregnancy',
-              'imagePath': 'assets/images/resources/prenatal_exercise.png', // Replace with your actual image path
+              'imagePath': 'assets/images/resources/prenatal_exercise.png',
               'overlayColor': const Color(0xFF64B5F6),
             },
           ];
@@ -630,253 +633,313 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
         ? articles 
         : articles.where((article) => article['category'] == selectedCategory).toList();
 
+    // Determine how many articles to show
+    final articlesToShow = showAllArticles ? filteredArticles : filteredArticles.take(3).toList();
+    final hasMoreArticles = filteredArticles.length > 3;
+
     return Column(
-      children: filteredArticles.map((article) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.08),
-                spreadRadius: 0,
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
+      children: [
+        // Articles list
+        ...articlesToShow.map((article) {
+          return Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              onTap: () {
-                // Handle article tap
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Opening: ${article['title']}'),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header with category and bookmark
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: (article['categoryColor'] as Color).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: (article['categoryColor'] as Color).withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Text(
-                            article['category'].toString(),
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: article['categoryColor'] as Color,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            // Handle bookmark toggle
-                            setState(() {
-                              article['isBookmarked'] = !(article['isBookmarked'] as bool);
-                            });
-                          },
-                          child: Icon(
-                            (article['isBookmarked'] as bool) 
-                              ? Icons.bookmark 
-                              : Icons.bookmark_border,
-                            color: (article['isBookmarked'] as bool) 
-                              ? const Color(0xFFF59297) 
-                              : Colors.grey[400],
-                            size: 22,
-                          ),
-                        ),
-                      ],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.08),
+                  spreadRadius: 0,
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () {
+                  // Handle article tap
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Opening: ${article['title']}'),
+                      duration: const Duration(seconds: 2),
                     ),
-                    
-                    const SizedBox(height: 12),
-                    
-                    // Article title
-                    Text(
-                      article['title'].toString(),
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                        height: 1.3,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    
-                    const SizedBox(height: 8),
-                    
-                    // Article description
-                    Text(
-                      article['description'].toString(),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                        height: 1.4,
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Author and article info
-                    Row(
-                      children: [
-                        // Author avatar
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: (article['categoryColor'] as Color).withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Icon(
-                            Icons.person,
-                            color: article['categoryColor'] as Color,
-                            size: 18,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        
-                        // Author and publish info
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                article['author'].toString(),
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
-                                ),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header with category and bookmark
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: (article['categoryColor'] as Color).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: (article['categoryColor'] as Color).withOpacity(0.3),
+                                width: 1,
                               ),
-                              Text(
-                                article['publishDate'].toString(),
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey[500],
+                            ),
+                            child: Text(
+                              article['category'].toString(),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: article['categoryColor'] as Color,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              // Handle bookmark toggle
+                              setState(() {
+                                article['isBookmarked'] = !(article['isBookmarked'] as bool);
+                              });
+                            },
+                            child: Icon(
+                              (article['isBookmarked'] as bool) 
+                                ? Icons.bookmark 
+                                : Icons.bookmark_border,
+                              color: (article['isBookmarked'] as bool) 
+                                ? const Color(0xFFF59297) 
+                                : Colors.grey[400],
+                              size: 22,
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 12),
+                      
+                      // Article title
+                      Text(
+                        article['title'].toString(),
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                          height: 1.3,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      
+                      const SizedBox(height: 8),
+                      
+                      // Article description
+                      Text(
+                        article['description'].toString(),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          height: 1.4,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // Author and article info
+                      Row(
+                        children: [
+                          // Author avatar
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: (article['categoryColor'] as Color).withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Icon(
+                              Icons.person,
+                              color: article['categoryColor'] as Color,
+                              size: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          
+                          // Author and publish info
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  article['author'].toString(),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
                                 ),
+                                Text(
+                                  article['publishDate'].toString(),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[500],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          
+                          // Read time and likes
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.access_time,
+                                    size: 14,
+                                    color: Colors.grey[500],
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    article['readTime'].toString(),
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.grey[500],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 2),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.favorite_border,
+                                    size: 14,
+                                    color: Colors.grey[500],
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    article['likes'].toString(),
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ),
-                        
-                        // Read time and likes
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.access_time,
-                                  size: 14,
-                                  color: Colors.grey[500],
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  article['readTime'].toString(),
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.grey[500],
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 2),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.favorite_border,
-                                  size: 14,
-                                  color: Colors.grey[500],
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  article['likes'].toString(),
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.grey[500],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+        
+        // See More/See Less button
+        if (hasMoreArticles)
+          Container(
+            margin: const EdgeInsets.only(top: 8),
+            child: Center(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    showAllArticles = !showAllArticles;
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFF59297), Color(0xFFF8BBD9)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                  ],
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFF59297).withOpacity(0.3),
+                        spreadRadius: 0,
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        showAllArticles ? 'See Less' : 'See More Articles',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      AnimatedRotation(
+                        turns: showAllArticles ? 0.5 : 0.0,
+                        duration: const Duration(milliseconds: 300),
+                        child: const Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        );
-      }).toList(),
+      ],
     );
   }
 
   Widget _buildYouTubeVideoResources() {
     // Real YouTube videos related to pregnancy and maternal health
     final videos = [
-       {
-  'title': "A Dietitian's Guide To Eating During Each Trimester of Pregnancy",
-  'duration': '<Not specified>',
-  'videoId': 'dq7ovxsAfX8',
-  'channel': '<Not specified>',
-  'thumbnail': 'https://img.youtube.com/vi/dq7ovxsAfX8/maxresdefault.jpg',
-  'category': 'Nutrition / Pregnancy Health',
-},
       {
-  'title': '10 minute PRENATAL YOGA for Beginners (Safe for ALL Trimesters)',
-  'duration': '10:00',
-  'videoId': '4NwQKXpWN_A',
-  'channel': 'Unknown not specified in available sources',
-  'thumbnail': 'https://img.youtube.com/vi/4NwQKXpWN_A/maxresdefault.jpg',
-  'category': 'Exercise',
-},
-
+        'title': "A Dietitian's Guide To Eating During Each Trimester of Pregnancy",
+        'duration': '15:20',
+        'videoId': 'dq7ovxsAfX8',
+        'channel': 'Healthy Pregnancy',
+        'thumbnail': 'https://img.youtube.com/vi/dq7ovxsAfX8/maxresdefault.jpg',
+        'category': 'Nutrition',
+      },
       {
-  'title': 'How to Breathe and Push During Labor | Lamaze',
-  'duration': 'Not specified approx. short instructional video (~5 min?)',
-  'videoId': '0pNldTVh5B4',
-  'channel': 'Bridget Teyler',
-  'thumbnail': 'https://img.youtube.com/vi/0pNldTVh5B4/maxresdefault.jpg',
-  'category': 'Exercise / Childbirth Education',
-},
-
+        'title': '10 minute PRENATAL YOGA for Beginners (Safe for ALL Trimesters)',
+        'duration': '10:00',
+        'videoId': '4NwQKXpWN_A',
+        'channel': 'Prenatal Yoga',
+        'thumbnail': 'https://img.youtube.com/vi/4NwQKXpWN_A/maxresdefault.jpg',
+        'category': 'Exercise',
+      },
       {
-  'title': '<Video Title Here>',
-  'duration': '<HH:MM or MM:SS>',
-  'videoId': 'kDvkYvK3M2Q', // Extracted from the iframe src
-  'channel': '<Channel Name Here>',
-  'thumbnail': 'https://img.youtube.com/vi/kDvkYvK3M2Q/maxresdefault.jpg',
-  'category': 'Baby care', // or whichever category best fits the content
-},
-
-     
-
+        'title': 'How to Breathe and Push During Labor | Lamaze',
+        'duration': '8:30',
+        'videoId': '0pNldTVh5B4',
+        'channel': 'Bridget Teyler',
+        'thumbnail': 'https://img.youtube.com/vi/0pNldTVh5B4/maxresdefault.jpg',
+        'category': 'Childbirth',
+      },
+      {
+        'title': 'Baby Care Essentials for New Parents',
+        'duration': '12:15',
+        'videoId': 'kDvkYvK3M2Q',
+        'channel': 'Baby Care Guide',
+        'thumbnail': 'https://img.youtube.com/vi/kDvkYvK3M2Q/maxresdefault.jpg',
+        'category': 'Baby Care',
+      },
     ];
 
     return SizedBox(
@@ -1145,174 +1208,78 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
     );
   }
 
-Widget _buildEmergencyContacts() {
-  final contacts = [
-    {
-      'title': 'Emergency Hotline',
-      'number': '911',
-      'description': '24/7 Emergency Services',
-      'icon': Icons.emergency,
-      'color': Colors.red,
-      'gradientColors': [const Color(0xFFFF6B6B), const Color(0xFFFF5252)],
-    },
-    {
-      'title': 'Maternal Health Helpline',
-      'number': '+233 30 123 4567',
-      'description': 'Pregnancy support and advice',
-      'icon': Icons.phone,
-      'color': const Color(0xFFF8BBD9),
-      'gradientColors': [const Color(0xFFF8BBD9), const Color(0xFFF59297)],
-    },
-    {
-      'title': 'Mental Health Support',
-      'number': '+233 30 765 4321',
-      'description': 'Counseling and mental health support',
-      'icon': Icons.psychology,
-      'color': const Color(0xFF81C784),
-      'gradientColors': [const Color(0xFF81C784), const Color(0xFF66BB6A)],
-    },
-  ];
+  Widget _buildEmergencyContacts() {
+    final contacts = [
+      {
+        'title': 'Emergency',
+        'number': '911',
+        'icon': Icons.emergency,
+        'color': Colors.red,
+      },
+      {
+        'title': 'Maternal Health',
+        'number': '+233 30 123 4567',
+        'icon': Icons.phone,
+        'color': const Color(0xFFF8BBD9),
+      },
+      {
+        'title': 'Mental Health',
+        'number': '+233 30 765 4321',
+        'icon': Icons.psychology,
+        'color': const Color(0xFF81C784),
+      },
+    ];
 
-  return Column(
-    children: contacts.asMap().entries.map((entry) {
-      final index = entry.key;
-      final contact = entry.value;
-      
-      return AnimatedContainer(
-        duration: Duration(milliseconds: 300 + (index * 100)),
-        curve: Curves.easeOutBack,
-        margin: const EdgeInsets.only(bottom: 20),
-        child: Container(
+    return Column(
+      children: contacts.map((contact) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
             boxShadow: [
-              // Main shadow for depth
               BoxShadow(
-                color: (contact['color'] as Color).withOpacity(0.3),
+                color: Colors.grey.withOpacity(0.08),
                 spreadRadius: 0,
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-              // Secondary shadow for more depth
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                spreadRadius: 0,
-                blurRadius: 30,
-                offset: const Offset(0, 15),
-              ),
-              // Inner highlight for 3D effect
-              BoxShadow(
-                color: Colors.white.withOpacity(0.8),
-                spreadRadius: 0,
-                blurRadius: 1,
-                offset: const Offset(0, -1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(12),
               onTap: () {
-                // Handle contact tap - could open dialer
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Calling ${contact['number']}...'),
                     backgroundColor: contact['color'] as Color,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
                   ),
                 );
               },
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white,
-                      Colors.grey[50]!,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.8),
-                    width: 1.5,
-                  ),
-                ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    // 3D Icon Container
+                    // Icon container
                     Container(
-                      width: 70,
-                      height: 70,
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: contact['gradientColors'] as List<Color>,
-                        ),
-                        borderRadius: BorderRadius.circular(18),
-                        boxShadow: [
-                          BoxShadow(
-                            color: (contact['color'] as Color).withOpacity(0.4),
-                            spreadRadius: 0,
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
-                          ),
-                          BoxShadow(
-                            color: (contact['color'] as Color).withOpacity(0.2),
-                            spreadRadius: 0,
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                          // Inner highlight
-                          const BoxShadow(
-                            color: Colors.white,
-                            spreadRadius: -1,
-                            blurRadius: 1,
-                            offset: Offset(-1, -1),
-                          ),
-                        ],
+                        color: (contact['color'] as Color).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Stack(
-                        children: [
-                          // Subtle inner shadow for depth
-                          Positioned.fill(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(18),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.white.withOpacity(0.3),
-                                    Colors.transparent,
-                                    Colors.black.withOpacity(0.1),
-                                  ],
-                                  stops: const [0.0, 0.5, 1.0],
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Icon
-                          Center(
-                            child: Icon(
-                              contact['icon'] as IconData,
-                              color: Colors.white,
-                              size: 28,
-                            ),
-                          ),
-                        ],
+                      child: Icon(
+                        contact['icon'] as IconData,
+                        color: contact['color'] as Color,
+                        size: 20,
                       ),
                     ),
                     
-                    const SizedBox(width: 20),
+                    const SizedBox(width: 16),
                     
-                    // Contact Information
+                    // Contact info
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1320,105 +1287,35 @@ Widget _buildEmergencyContacts() {
                           Text(
                             contact['title'].toString(),
                             style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
                               color: Colors.black87,
-                              letterSpacing: -0.5,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  (contact['color'] as Color).withOpacity(0.1),
-                                  (contact['color'] as Color).withOpacity(0.05),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: (contact['color'] as Color).withOpacity(0.2),
-                                width: 1,
-                              ),
-                            ),
-                            child: Text(
-                              contact['number'].toString(),
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: contact['color'] as Color,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 2),
                           Text(
-                            contact['description'].toString(),
+                            contact['number'].toString(),
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.grey[600],
-                              height: 1.3,
-                              letterSpacing: -0.2,
                             ),
                           ),
                         ],
                       ),
                     ),
                     
-                    // Call Action Button with 3D Effect
+                    // Call button
                     Container(
-                      width: 50,
-                      height: 50,
+                      width: 36,
+                      height: 36,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            spreadRadius: 0,
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            spreadRadius: 0,
-                            blurRadius: 15,
-                            offset: const Offset(0, 8),
-                          ),
-                          // Inner highlight
-                          const BoxShadow(
-                            color: Colors.white,
-                            spreadRadius: -1,
-                            blurRadius: 1,
-                            offset: Offset(-1, -1),
-                          ),
-                        ],
+                        color: (contact['color'] as Color).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(15),
-                          onTap: () {
-                            // Handle call button tap
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Calling ${contact['number']}...'),
-                                backgroundColor: contact['color'] as Color,
-                              ),
-                            );
-                          },
-                          child: Center(
-                            child: Icon(
-                              Icons.call,
-                              color: contact['color'] as Color,
-                              size: 22,
-                            ),
-                          ),
-                        ),
+                      child: Icon(
+                        Icons.call,
+                        color: contact['color'] as Color,
+                        size: 18,
                       ),
                     ),
                   ],
@@ -1426,9 +1323,8 @@ Widget _buildEmergencyContacts() {
               ),
             ),
           ),
-        ),
-      );
-    }).toList(),
-  );
-}
+        );
+      }).toList(),
+    );
+  }
 }
