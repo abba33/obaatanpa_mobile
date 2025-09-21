@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/custom_app_bar.dart';
 import 'package:obaatanpa_mobile/widgets/navigation/navigation_menu.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NutritionScreen extends StatefulWidget {
   const NutritionScreen({super.key});
@@ -293,28 +294,28 @@ Widget _buildRecommendedFoods() {
     {
       'name': 'Leafy Greens',
       'benefit': 'Rich in folate & iron',
-      'image': 'assets/images/foods/leafy_greens.png', // Add your image path
+      'image': 'assets/images/foods/leafy_greens.png', 
       'color': const Color(0xFF10B981),
       'examples': 'Spinach, Kale, Broccoli',
     },
     {
       'name': 'Lean Proteins',
       'benefit': 'Essential for baby growth',
-      'image': 'assets/images/foods/lean_proteins.png', // Add your image path
+      'image': 'assets/images/foods/lean_proteins.png', 
       'color': const Color(0xFFF59297),
       'examples': 'Fish, Chicken, Beans, Eggs',
     },
     {
       'name': 'Whole Grains',
       'benefit': 'Energy & fiber',
-      'image': 'assets/images/foods/whole_grains.png', // Add your image path
+      'image': 'assets/images/foods/whole_grains.png', 
       'color': const Color(0xFFF59E0B),
       'examples': 'Brown rice, Oats, Quinoa',
     },
     {
       'name': 'Dairy Products',
       'benefit': 'Calcium for bones',
-      'image': 'assets/images/foods/dairy_products.png', // Add your image path
+      'image': 'assets/images/foods/dairy_products.png', 
       'color': const Color(0xFF7DA8E6),
       'examples': 'Milk, Yogurt, Cheese',
     },
@@ -743,12 +744,27 @@ Widget _buildRecommendedFoods() {
   }
 
   Widget _buildNutritionTips() {
-    final tips = [
-      'Stay hydrated - drink 8-10 glasses of water daily',
-      'Take prenatal vitamins as recommended by your doctor',
-      'Eat small, frequent meals to manage nausea',
-      'Listen to your body and eat when hungry',
-      'Choose colorful fruits and vegetables for variety',
+    final nutritionVideos = [
+      {
+        'title': 'Pregnancy Nutrition: What to Eat During Pregnancy',
+        'videoId': 'dQw4w9WgXcQ', // Replace with actual video ID
+        'thumbnail': 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+      },
+      {
+        'title': 'Essential Prenatal Vitamins Guide',
+        'videoId': 'dQw4w9WgXcQ', // Replace with actual video ID
+        'thumbnail': 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+      },
+      {
+        'title': 'Healthy Pregnancy Diet Tips',
+        'videoId': 'dQw4w9WgXcQ', // Replace with actual video ID
+        'thumbnail': 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+      },
+      {
+        'title': 'Managing Morning Sickness Through Diet',
+        'videoId': 'dQw4w9WgXcQ', // Replace with actual video ID
+        'thumbnail': 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+      },
     ];
 
     return Padding(
@@ -767,7 +783,7 @@ Widget _buildRecommendedFoods() {
           ),
           const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -783,39 +799,83 @@ Widget _buildRecommendedFoods() {
               ],
             ),
             child: Column(
-              children: tips.map((tip) {
+              children: nutritionVideos.map((video) {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 20,
-                        height: 20,
-                        margin: const EdgeInsets.only(top: 2),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF10B981),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 12,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          tip,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            height: 1.5,
-                            color: Color(0xFF4B5563),
-                            fontWeight: FontWeight.w500,
+                  child: GestureDetector(
+                    onTap: () => _launchYouTubeVideo(video['videoId']!),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
                           ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Video thumbnail
+                            Stack(
+                              children: [
+                                Image.network(
+                                  video['thumbnail']!,
+                                  width: double.infinity,
+                                  height: 180,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: double.infinity,
+                                      height: 180,
+                                      color: const Color(0xFF7DA8E6).withOpacity(0.1),
+                                      child: const Icon(
+                                        Icons.play_circle_outline,
+                                        size: 50,
+                                        color: Color(0xFF7DA8E6),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                // Play button overlay
+                                Positioned.fill(
+                                  child: Container(
+                                    color: Colors.black.withOpacity(0.3),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.play_circle_filled,
+                                        color: Colors.white,
+                                        size: 50,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            // Video title
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              color: Colors.white,
+                              child: Text(
+                                video['title']!,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF2C2C2C),
+                                  height: 1.4,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 );
               }).toList(),
@@ -824,6 +884,27 @@ Widget _buildRecommendedFoods() {
         ],
       ),
     );
+  }
+
+  void _launchYouTubeVideo(String videoId) async {
+    final youtubeUrl = 'https://www.youtube.com/watch?v=$videoId';
+    final youtubeAppUrl = 'youtube://watch?v=$videoId';
+    
+    try {
+      // Try to open in YouTube app first
+      if (await canLaunchUrl(Uri.parse(youtubeAppUrl))) {
+        await launchUrl(Uri.parse(youtubeAppUrl));
+      } else {
+        // Fall back to web browser
+        await launchUrl(
+          Uri.parse(youtubeUrl),
+          mode: LaunchMode.externalApplication,
+        );
+      }
+    } catch (e) {
+      // Handle error - maybe show a snackbar
+      print('Could not launch video: $e');
+    }
   }
 
   Widget _buildSupplementsSection() {

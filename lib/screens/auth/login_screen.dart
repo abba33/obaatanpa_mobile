@@ -3,14 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-// Core imports
-
 // Provider imports
 import '../../providers/auth_provider.dart';
 import 'components/pregnancy_info_popup.dart';
 import '../../providers/pregnancy_data_provider.dart';
 
-/// Login Screen - Using original UI design with modern functionality
+/// Login Screen - Updated to match signup screen design
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -30,6 +28,34 @@ class _LoginScreenState extends State<LoginScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+
+  // User type options data - matching signup screen
+  final List<Map<String, dynamic>> _userTypes = [
+    {
+      'value': 'pregnant',
+      'title': 'Pregnant Mother',
+      'subtitle': 'Expecting a baby',
+      'emoji': '🤰',
+    },
+    {
+      'value': 'new_mother',
+      'title': 'New Mother',
+      'subtitle': 'Already have a baby',
+      'emoji': '👶',
+    },
+    {
+      'value': 'hospital',
+      'title': 'Hospital/Clinic',
+      'subtitle': 'Medical facility',
+      'emoji': '🏥',
+    },
+    {
+      'value': 'practitioner',
+      'title': 'Health Practitioner',
+      'subtitle': 'Healthcare professional',
+      'emoji': '🧑‍⚕️',
+    },
+  ];
 
   @override
   void initState() {
@@ -69,29 +95,28 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            clipBehavior: Clip.antiAlias,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFFFCD7DA), Color(0xFFE7EDFA)],
-              ),
-            ),
-            child: SingleChildScrollView(
-              child: Stack(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFCD7DA), Color(0xFFE7EDFA)],
+          ),
+        ),
+        child: SafeArea(
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: Column(
                 children: [
-                  // Hero image with overlay
-                  _buildHeroSection(),
-
-                  // Main content
-                  _buildMainContent(),
+                  _buildHeader(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(24.0),
+                      child: _buildMainContent(),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -101,110 +126,81 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildHeroSection() {
+  Widget _buildHeader() {
     return Container(
-      width: MediaQuery.of(context).size.width,
-      height: 375,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: const Alignment(0.50, 0.00),
-          end: const Alignment(0.50, 1.00),
-          colors: [
-            const Color(0xFF666666).withOpacity(0.8),
-            Colors.black.withOpacity(0.9),
-          ],
+      height: 250,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage("assets/images/auth/pregnant-mother-hero.png"), 
+          fit: BoxFit.cover,
         ),
-        color: Colors.transparent,
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 23),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Flexible top spacing instead of fixed 146px
-            const Spacer(flex: 3),
-
-            // Constrained content area
-            Expanded(
-              flex: 4,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF666666).withOpacity(0.7),
+              Colors.black.withOpacity(0.8)
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  // Title with responsive font size
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      return SizedBox(
-                        width: constraints.maxWidth > 321
-                            ? 321
-                            : constraints.maxWidth,
-                        child: Text(
-                          'WELCOME TO OBAATANPA',
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontSize: constraints.maxWidth < 350 ? 28 : 32,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      );
-                    },
+                  IconButton(
+                    onPressed: () => context.go('/'),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
-                  const SizedBox(height: 12),
-
-                  // Subtitle
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      return SizedBox(
-                        width: constraints.maxWidth > 321
-                            ? 321
-                            : constraints.maxWidth,
-                        child: Text(
-                          'Your Pregnancy & Motherhood Companion',
-                          style: GoogleFonts.inter(
-                            color: const Color(0xFFF59297),
-                            fontSize: constraints.maxWidth < 350 ? 18 : 20,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Description - made flexible to prevent overflow
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return SizedBox(
-                          width: constraints.maxWidth > 321
-                              ? 321
-                              : constraints.maxWidth,
-                          child: Text(
-                            'Sign in to access your personalized dashboard, track your progress, and continue receiving the care and support you deserve.',
-                            style: GoogleFonts.inter(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              height: 1.3, // Line height for better readability
-                            ),
-                            maxLines: 4,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        );
-                      },
+                  const Spacer(),
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      image: const DecorationImage(
+                        image: AssetImage("assets/images/navbar/maternity-logo.png"),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-
-            // Small bottom spacing
-            const Spacer(flex: 1),
-          ],
+              const Spacer(),
+              Text(
+                'WELCOME TO OBAATANPA',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Your Companion in Care',
+                style: GoogleFonts.poppins(
+                  color: const Color(0xFFF59297),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Sign in to access your personalized dashboard and continue receiving the care and support you deserve.',
+                style: GoogleFonts.lora(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -213,30 +209,62 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _buildMainContent() {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
-        return Padding(
-          padding: const EdgeInsets.only(top: 397),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // User type selection
-                _buildUserTypeSelection(),
-
-                const SizedBox(height: 25),
-
-                // Sign In section
-                _buildSignInSection(authProvider),
-
-                const SizedBox(height: 17),
-
-                // Create account link
-                _buildCreateAccountLink(),
-
-                // Add bottom padding to ensure content is not cut off
-                const SizedBox(height: 50),
-              ],
-            ),
+        return Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Choose Who You Are',
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Select the option that best describes you',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildUserTypeSelection(),
+              const SizedBox(height: 32),
+              
+              Text(
+                'Sign In to Your Account',
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Enter your credentials to continue',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 24),
+              
+              _buildLoginForm(authProvider),
+              const SizedBox(height: 24),
+              _buildRememberMeRow(),
+              const SizedBox(height: 32),
+              
+              // Error message
+              if (authProvider.error != null)
+                _buildErrorMessage(authProvider.error!),
+              
+              _buildLoginButton(authProvider),
+              const SizedBox(height: 24),
+              _buildCreateAccountLink(),
+            ],
           ),
         );
       },
@@ -244,305 +272,228 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildUserTypeSelection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 23),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'I am a:',
-            style: GoogleFonts.inter(
-              color: Colors.black,
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // Pregnant Mother option
-          _buildUserTypeOption(
-            'pregnant',
-            '🤰Pregnant Mother',
-            isFirst: true,
-          ),
-          const SizedBox(height: 16),
-
-          // New Mother option
-          _buildUserTypeOption(
-            'new_mother',
-            '👶 New Mother',
-          ),
-          const SizedBox(height: 16),
-
-          // Hospital/Clinic option
-          _buildUserTypeOption(
-            'hospital',
-            '🏥 Hospital/Clinic',
-          ),
-          const SizedBox(height: 16),
-
-          // Health Practitioner option
-          _buildUserTypeOption(
-            'practitioner',
-            '🧑‍⚕️ Health Practitioner',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUserTypeOption(String value, String title,
-      {bool isFirst = false}) {
-    final isSelected = _selectedUserType == value;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedUserType = value;
-        });
-      },
-      child: Container(
-        width: double.infinity,
-        constraints: const BoxConstraints(maxWidth: 320),
-        height: 55,
-        decoration: ShapeDecoration(
-          color: Colors.white,
-          shape: RoundedRectangleBorder(
-            side: BorderSide(
-              width: isSelected ? 2 : 1,
-              color: isSelected
-                  ? const Color(0xFFF59297)
-                  : const Color(0x7F666666),
-            ),
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        child: Center(
-          child: Text(
-            title,
-            style: GoogleFonts.inter(
-              color: Colors.black,
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSignInSection(AuthProvider authProvider) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 23),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Sign In:',
-            style: GoogleFonts.inter(
-              color: Colors.black,
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 18),
-
-          // Email field
-          Text(
-            'Email *',
-            style: GoogleFonts.inter(
-              color: Colors.black,
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _buildEmailField(),
-
-          const SizedBox(height: 16),
-
-          // Password field
-          Text(
-            'Password *',
-            style: GoogleFonts.inter(
-              color: Colors.black,
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _buildPasswordField(),
-
-          const SizedBox(height: 16),
-
-          // Remember me and forgot password row
-          _buildRememberMeRow(),
-
-          const SizedBox(height: 22),
-
-          // Error message
-          if (authProvider.error != null)
-            _buildErrorMessage(authProvider.error!),
-
-          // Login button
-          _buildLoginButton(authProvider),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmailField() {
-    return Container(
-      width: double.infinity,
-      constraints: const BoxConstraints(maxWidth: 320),
-      height: 55,
-      decoration: ShapeDecoration(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(
-            width: 1,
-            color: Color(0x7F666666),
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      child: TextFormField(
-        controller: _emailController,
-        keyboardType: TextInputType.emailAddress,
-        decoration: InputDecoration(
-          hintText: 'Enter your email address',
-          hintStyle: GoogleFonts.inter(
-            color: const Color(0x7F666666),
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
-          ),
-          border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 13, vertical: 16),
-        ),
-        style: GoogleFonts.inter(
-          fontSize: 20,
-          color: Colors.black,
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Email is required';
-          }
-          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-            return 'Please enter a valid email';
-          }
-          return null;
-        },
-      ),
-    );
-  }
-
-  Widget _buildPasswordField() {
-    return Container(
-      width: double.infinity,
-      constraints: const BoxConstraints(maxWidth: 320),
-      height: 55,
-      decoration: ShapeDecoration(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(
-            width: 1,
-            color: Color(0x7F666666),
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      child: TextFormField(
-        controller: _passwordController,
-        obscureText: _obscurePassword,
-        decoration: InputDecoration(
-          hintText: 'Enter your password',
-          hintStyle: GoogleFonts.inter(
-            color: const Color(0x7F666666),
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
-          ),
-          border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 13, vertical: 16),
-          suffixIcon: GestureDetector(
+    return Column(
+      children: _userTypes.map((userType) {
+        bool isSelected = _selectedUserType == userType['value'];
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: InkWell(
             onTap: () {
+              setState(() {
+                _selectedUserType = userType['value'];
+              });
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: isSelected ? const Color(0xFFF59297) : const Color(0xFFE0E0E0),
+                  width: isSelected ? 2 : 1,
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: isSelected ? [
+                  BoxShadow(
+                    color: const Color(0xFFF59297).withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ] : null,
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    userType['emoji'],
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          userType['title'],
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          userType['subtitle'],
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (isSelected)
+                    const Icon(
+                      Icons.check_circle,
+                      color: Color(0xFFF59297),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildLoginForm(AuthProvider authProvider) {
+    return Column(
+      children: [
+        _buildTextFormField(
+          controller: _emailController,
+          label: 'Email *',
+          hint: 'Enter your email address',
+          keyboardType: TextInputType.emailAddress,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your email';
+            }
+            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+              return 'Please enter a valid email';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 16),
+        _buildTextFormField(
+          controller: _passwordController,
+          label: 'Password *',
+          hint: 'Enter your password',
+          obscureText: _obscurePassword,
+          suffixIcon: IconButton(
+            icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+            onPressed: () {
               setState(() {
                 _obscurePassword = !_obscurePassword;
               });
             },
-            child: Container(
-              width: 25,
-              height: 25,
-              margin: const EdgeInsets.all(15),
-              child: Icon(
-                _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                color: const Color(0x7F666666),
-                size: 20,
-              ),
-            ),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your password';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextFormField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    bool obscureText = false,
+    TextInputType? keyboardType,
+    Widget? suffixIcon,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
           ),
         ),
-        style: GoogleFonts.inter(
-          fontSize: 20,
-          color: Colors.black,
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          validator: validator,
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
+            suffixIcon: suffixIcon,
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[400]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[400]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFF59297), width: 2),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          ),
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            color: Colors.black,
+          ),
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Password is required';
-          }
-          return null;
-        },
-      ),
+      ],
     );
   }
 
   Widget _buildRememberMeRow() {
     return Row(
       children: [
-        GestureDetector(
+        InkWell(
           onTap: () {
             setState(() {
               _rememberMe = !_rememberMe;
             });
           },
-          child: Container(
-            width: 25,
-            height: 25,
-            decoration: ShapeDecoration(
-              color: _rememberMe ? const Color(0xFFF59297) : Colors.transparent,
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(
-                  width: 1,
-                  color: Color(0x7F666666),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: _rememberMe ? const Color(0xFFF59297) : Colors.transparent,
+                  border: Border.all(
+                    color: _rememberMe ? const Color(0xFFF59297) : Colors.grey[400]!,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(4),
                 ),
-                borderRadius: BorderRadius.circular(4),
+                child: _rememberMe
+                    ? const Icon(Icons.check, color: Colors.white, size: 14)
+                    : null,
               ),
-            ),
-            child: _rememberMe
-                ? const Icon(Icons.check, color: Colors.white, size: 16)
-                : null,
-          ),
-        ),
-        const SizedBox(width: 6),
-        Text(
-          'Remember Me',
-          style: GoogleFonts.inter(
-            color: Colors.black,
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
+              const SizedBox(width: 8),
+              Text(
+                'Remember Me',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.black,
+                ),
+              ),
+            ],
           ),
         ),
         const Spacer(),
-        GestureDetector(
-          onTap: () {
+        TextButton(
+          onPressed: () {
             // Handle forgot password
           },
           child: Text(
-            'Forgot Password',
-            style: GoogleFonts.inter(
+            'Forgot Password?',
+            style: GoogleFonts.poppins(
+              fontSize: 14,
               color: const Color(0xFFF59297),
-              fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -568,7 +519,7 @@ class _LoginScreenState extends State<LoginScreen>
           Expanded(
             child: Text(
               error,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: Colors.red,
               ),
@@ -580,21 +531,29 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildLoginButton(AuthProvider authProvider) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      constraints: const BoxConstraints(maxWidth: 320),
       height: 55,
-      decoration: ShapeDecoration(
-        color: const Color(0xFFF59297),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+      child: ElevatedButton(
+        onPressed: authProvider.isLoading ? null : _handleLogin,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          disabledBackgroundColor: Colors.grey[300],
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: authProvider.isLoading ? null : _handleLogin,
-          borderRadius: BorderRadius.circular(10),
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: !authProvider.isLoading
+                ? const LinearGradient(
+                    colors: [Color(0xFF7DA8E6), Color(0xFFF8A7AB)],
+                  )
+                : null,
+            color: !authProvider.isLoading ? null : Colors.grey[300],
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Container(
             alignment: Alignment.center,
             child: authProvider.isLoading
@@ -608,10 +567,10 @@ class _LoginScreenState extends State<LoginScreen>
                   )
                 : Text(
                     'Login',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
           ),
@@ -621,36 +580,29 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildCreateAccountLink() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 67),
-      child: SizedBox(
-        width: 233,
-        child: GestureDetector(
-          onTap: () => context.go('/auth/signup'),
-          child: Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                  text: 'New to Obaatanpa?',
-                  style: GoogleFonts.inter(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                TextSpan(
-                  text: ' \nCreate an account',
-                  style: GoogleFonts.inter(
-                    color: const Color(0xFFF59297),
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'New to Obaatanpa? ',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              color: Colors.black,
             ),
-            textAlign: TextAlign.center,
           ),
-        ),
+          TextButton(
+            onPressed: () => context.go('/auth/signup'),
+            child: Text(
+              'Create Account',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                color: const Color(0xFFF59297),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
