@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 
-// New Mother Week Card
 class NewMotherWeekCard extends StatelessWidget {
   final int currentWeek;
   final String recoveryPhase;
   final int daysSinceBirth;
   final String babyName;
-  final VoidCallback? onJournalTap; // Add callback for journal
+  final VoidCallback? onJournalTap;
 
   const NewMotherWeekCard({
     Key? key,
-    required this.currentWeek,
-    required this.recoveryPhase,
-    required this.daysSinceBirth,
-    required this.babyName,
-    this.onJournalTap, // Optional callback
+    this.currentWeek = 4,
+    this.recoveryPhase = "Postpartum",
+    this.daysSinceBirth = 28,
+    this.babyName = "Baby",
+    this.onJournalTap,
   }) : super(key: key);
 
   @override
