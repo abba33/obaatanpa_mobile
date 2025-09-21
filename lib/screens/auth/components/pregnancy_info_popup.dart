@@ -25,7 +25,7 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
   final TextEditingController dueDateController = TextEditingController();
   final TextEditingController lastPeriodController = TextEditingController();
 
-  // Refined color scheme
+  // Solid color scheme - using pink as primary
   static const Color primaryColor = Color(0xFFF59297);
   static const Color secondaryColor = Color(0xFF7DA8E6);
   static const Color lightPrimary = Color(0xFFFEFBFC);
@@ -65,8 +65,8 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
           return Transform.scale(
             scale: _scaleAnimation.value,
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.9,
-              height: MediaQuery.of(context).size.height * 0.75,
+              width: MediaQuery.of(context).size.width * 0.92,
+              height: MediaQuery.of(context).size.height * 0.68,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -87,10 +87,10 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
               ),
               child: Column(
                 children: [
-                  _buildRefinedHeader(),
-                  _buildMinimalTabBar(),
+                  _buildCompactHeader(),
+                  _buildCompactTabBar(),
                   Expanded(child: _buildTabContent()),
-                  _buildRefinedActionButtons(),
+                  _buildCompactActionButtons(),
                 ],
               ),
             ),
@@ -100,18 +100,11 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
     );
   }
 
-  Widget _buildRefinedHeader() {
+  Widget _buildCompactHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+      padding: const EdgeInsets.fromLTRB(20, 16, 16, 12),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            primaryColor.withOpacity(0.05),
-            secondaryColor.withOpacity(0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: primaryColor.withOpacity(0.03),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
@@ -126,23 +119,19 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [primaryColor, secondaryColor],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(12),
+              color: primaryColor,
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.pregnant_woman,
               color: Colors.white,
-              size: 24,
+              size: 20,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,17 +140,16 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
                   'Pregnancy Timeline',
                   style: GoogleFonts.inter(
                     color: Colors.black87,
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.2,
                   ),
                 ),
-                const SizedBox(height: 4),
                 Text(
                   'Help us personalize your experience',
                   style: GoogleFonts.inter(
                     color: neutralGray,
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -173,14 +161,15 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
             icon: Icon(
               Icons.close,
               color: neutralGray,
-              size: 20,
+              size: 18,
             ),
             style: IconButton.styleFrom(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               backgroundColor: lightGray,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
+              minimumSize: const Size(32, 32),
             ),
           ),
         ],
@@ -188,28 +177,28 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
     );
   }
 
-  Widget _buildMinimalTabBar() {
+  Widget _buildCompactTabBar() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       child: Container(
         decoration: BoxDecoration(
           color: lightGray,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
         ),
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(3),
         child: Row(
           children: [
-            _buildMinimalTab('due_date', 'Due Date', Icons.event_available),
-            _buildMinimalTab('last_period', 'Last Period', Icons.calendar_today),
-            _buildMinimalTab('current_week', 'Current Week', Icons.timeline),
+            _buildCompactTab('due_date', 'Due Date', Icons.event_available),
+            _buildCompactTab('last_period', 'Last Period', Icons.calendar_today),
+            _buildCompactTab('current_week', 'Current Week', Icons.timeline),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMinimalTab(String tabId, String title, IconData icon) {
+  Widget _buildCompactTab(String tabId, String title, IconData icon) {
     final isSelected = selectedTab == tabId;
     return Expanded(
       child: GestureDetector(
@@ -221,14 +210,14 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut,
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
           decoration: BoxDecoration(
             color: isSelected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(6),
             boxShadow: isSelected ? [
               BoxShadow(
                 color: Colors.black.withOpacity(0.04),
-                blurRadius: 8,
+                blurRadius: 6,
                 offset: const Offset(0, 2),
               ),
             ] : null,
@@ -239,16 +228,16 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
             children: [
               Icon(
                 icon,
-                size: 16,
+                size: 14,
                 color: isSelected ? primaryColor : neutralGray.withOpacity(0.6),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 4),
               Flexible(
                 child: Text(
                   title,
                   style: GoogleFonts.inter(
                     color: isSelected ? Colors.black87 : neutralGray.withOpacity(0.7),
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
                   ),
                   textAlign: TextAlign.center,
@@ -268,7 +257,7 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
         color: Colors.white,
       ),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -282,7 +271,7 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
   }
 
   Widget _buildDueDateContent() {
-    return _buildRefinedDateInputSection(
+    return _buildCompactDateInputSection(
       title: 'Expected Due Date',
       subtitle: 'When is your baby expected to arrive?',
       description: 'Enter the estimated delivery date provided by your healthcare provider.',
@@ -293,17 +282,17 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
   }
 
   Widget _buildLastPeriodContent() {
-    return _buildRefinedDateInputSection(
+    return _buildCompactDateInputSection(
       title: 'Last Menstrual Period',
       subtitle: 'First day of your last period',
       description: 'This helps calculate your pregnancy timeline and estimated due date.',
       icon: Icons.calendar_today,
-      color: secondaryColor,
+      color: primaryColor,
       onTap: () => _selectDate(context, 'last_period'),
     );
   }
 
-  Widget _buildRefinedDateInputSection({
+  Widget _buildCompactDateInputSection({
     required String title,
     required String subtitle,
     required String description,
@@ -314,44 +303,44 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         Text(
           title,
           style: GoogleFonts.inter(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
             letterSpacing: -0.2,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         Text(
           subtitle,
           style: GoogleFonts.inter(
-            fontSize: 14,
+            fontSize: 13,
             fontWeight: FontWeight.w400,
             color: neutralGray,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         Text(
           description,
           style: GoogleFonts.inter(
-            fontSize: 13,
+            fontSize: 12,
             color: neutralGray.withOpacity(0.8),
-            height: 1.4,
+            height: 1.3,
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
         GestureDetector(
           onTap: onTap,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             width: double.infinity,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: selectedDate != null ? color.withOpacity(0.04) : lightGray,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: selectedDate != null ? color.withOpacity(0.2) : Colors.grey.withOpacity(0.2),
                 width: 1,
@@ -360,19 +349,19 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
             child: Row(
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
                     color: selectedDate != null ? color : Colors.grey.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Icon(
                     icon,
                     color: selectedDate != null ? Colors.white : neutralGray.withOpacity(0.5),
-                    size: 18,
+                    size: 16,
                   ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -382,17 +371,17 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
                             ? _formatDate(selectedDate!)
                             : 'Select date',
                         style: GoogleFonts.inter(
-                          fontSize: 15,
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: selectedDate != null ? Colors.black87 : neutralGray.withOpacity(0.6),
                         ),
                       ),
                       if (selectedDate != null) ...[
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 1),
                         Text(
                           _getDateDescription(),
                           style: GoogleFonts.inter(
-                            fontSize: 12,
+                            fontSize: 11,
                             color: color,
                             fontWeight: FontWeight.w400,
                           ),
@@ -403,14 +392,14 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
                 ),
                 Icon(
                   Icons.arrow_forward_ios,
-                  size: 14,
+                  size: 12,
                   color: selectedDate != null ? color : neutralGray.withOpacity(0.4),
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
       ],
     );
   }
@@ -419,44 +408,44 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         Text(
           'Current Week',
           style: GoogleFonts.inter(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
             letterSpacing: -0.2,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         Text(
           'How many weeks pregnant are you?',
           style: GoogleFonts.inter(
-            fontSize: 14,
+            fontSize: 13,
             fontWeight: FontWeight.w400,
             color: neutralGray,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         Text(
           'Select your current week of pregnancy for personalized information.',
           style: GoogleFonts.inter(
-            fontSize: 13,
+            fontSize: 12,
             color: neutralGray.withOpacity(0.8),
-            height: 1.4,
+            height: 1.3,
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
         Container(
-          height: 200,
+          height: 160,
           decoration: BoxDecoration(
             color: lightGray,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
           ),
           child: ListView.builder(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(6),
             itemCount: 42,
             itemBuilder: (context, index) {
               final week = index + 1;
@@ -465,11 +454,11 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
                 onTap: () => setState(() => selectedWeek = week),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
-                  margin: const EdgeInsets.symmetric(vertical: 2),
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  margin: const EdgeInsets.symmetric(vertical: 1),
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   decoration: BoxDecoration(
                     color: isSelected ? primaryColor : Colors.white,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(6),
                     border: isSelected ? null : Border.all(
                       color: Colors.grey.withOpacity(0.1),
                       width: 1,
@@ -478,29 +467,29 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
                   child: Row(
                     children: [
                       Container(
-                        width: 28,
-                        height: 28,
+                        width: 24,
+                        height: 24,
                         decoration: BoxDecoration(
                           color: isSelected ? Colors.white.withOpacity(0.2) : primaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(4),
                         ),
                         child: Center(
                           child: Text(
                             '$week',
                             style: GoogleFonts.inter(
-                              fontSize: 12,
+                              fontSize: 11,
                               fontWeight: FontWeight.w600,
                               color: isSelected ? Colors.white : primaryColor,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           'Week $week',
                           style: GoogleFonts.inter(
-                            fontSize: 14,
+                            fontSize: 13,
                             color: isSelected ? Colors.white : Colors.black87,
                             fontWeight: FontWeight.w500,
                           ),
@@ -510,7 +499,7 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
                         Icon(
                           Icons.check,
                           color: Colors.white,
-                          size: 16,
+                          size: 14,
                         ),
                     ],
                   ),
@@ -519,14 +508,14 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
             },
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
       ],
     );
   }
 
-  Widget _buildRefinedActionButtons() {
+  Widget _buildCompactActionButtons() {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.only(
@@ -546,23 +535,23 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
             child: OutlinedButton(
               onPressed: widget.onClose,
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 side: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
               child: Text(
                 'Cancel',
                 style: GoogleFonts.inter(
                   color: neutralGray,
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             flex: 2,
             child: ElevatedButton(
@@ -570,11 +559,11 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
               style: ElevatedButton.styleFrom(
                 backgroundColor: _canContinue() ? primaryColor : Colors.grey.withOpacity(0.2),
                 foregroundColor: _canContinue() ? Colors.white : neutralGray.withOpacity(0.5),
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 elevation: 0,
                 shadowColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
               child: Row(
@@ -583,14 +572,14 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
                   Text(
                     'Continue',
                     style: GoogleFonts.inter(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  Icon(
+                  const SizedBox(width: 4),
+                  const Icon(
                     Icons.arrow_forward,
-                    size: 16,
+                    size: 14,
                   ),
                 ],
               ),
