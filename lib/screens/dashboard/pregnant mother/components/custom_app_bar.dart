@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:obaatanpa_mobile/providers/theme_provider.dart';
 import 'package:obaatanpa_mobile/providers/auth_provider.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/help_support_page.dart';
@@ -205,15 +206,29 @@ class CustomAppBar extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Logged out successfully'),
-                    duration: Duration(milliseconds: 1000),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
+              onPressed: () async {
+                // Get the auth provider
+                final authProvider = context.read<AuthProvider>();
+
+                // Call logout
+                await authProvider.logout();
+
+                if (context.mounted) {
+                  // Close the dialog
+                  Navigator.of(context).pop();
+
+                  // Show success message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Logged out successfully'),
+                      duration: Duration(milliseconds: 1000),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+
+                  // Navigate to login screen
+                  context.go('/auth/login');
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,

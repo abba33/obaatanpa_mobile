@@ -10,6 +10,7 @@ import 'components/upcoming_appointments_card.dart';
 import 'components/new_mother_tips_section.dart';
 import 'components/recovery_nutrition_card.dart';
 import 'components/support_resources_card.dart';
+import 'components/baby_development_card.dart';
 // ... other component imports
 import '../../../widgets/navigation/navigation_menu.dart';
 
@@ -45,11 +46,45 @@ class _NewMotherDashboardPageState extends State<NewMotherDashboardPage> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Main Dashboard Content
           _buildDashboardContent(),
-          
-          // Side Navigation Menu
           if (_isMenuOpen) _buildNavigationMenu(),
+          _buildFloatingButtons(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFloatingButtons() {
+    return Positioned(
+      right: 16,
+      bottom: 16,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            heroTag: 'chatbot',
+            onPressed: () {
+              // Show chatbot
+            },
+            backgroundColor: const Color(0xFF9B59B6),
+            child: const Icon(
+              Icons.chat_bubble_outline,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton(
+            heroTag: 'sos',
+            onPressed: () {
+              // Show emergency contacts/help
+              context.go('/emergency-contacts');
+            },
+            backgroundColor: Colors.red,
+            child: const Icon(
+              Icons.emergency_outlined,
+              color: Colors.white,
+            ),
+          ),
         ],
       ),
     );
@@ -80,24 +115,32 @@ class _NewMotherDashboardPageState extends State<NewMotherDashboardPage> {
                 BabyCareQuickActions(),
                 const SizedBox(height: 24),
                 
-                // Two-column layout for key cards
-                Row(
+                // Daily progress section
+                const Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(child: RecoveryProgressCard()),
-                    const SizedBox(width: 12),
-                    Expanded(child: FeedingTrackerCard()),
+                    Expanded(
+                      child: RecoveryProgressCard(),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: FeedingTrackerCard(),
+                    ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                
-                // Mental wellness card
-                MentalWellnessCard(),
                 const SizedBox(height: 24),
-                
-                // Upcoming appointments
-                UpcomingAppointmentsCard(),
-                const SizedBox(height: 20),
+
+                // Mental wellness tips and mood tracker
+                const MentalWellnessCard(),
+                const SizedBox(height: 24),
+
+                // Health appointments and checkups
+                const UpcomingAppointmentsCard(),
+                const SizedBox(height: 24),
+
+                // Baby development tracker
+                const BabyDevelopmentCard(),
+                const SizedBox(height: 24),
                 
                 // New mother tips and articles
                 NewMotherTipsSection(),
