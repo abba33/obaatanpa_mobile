@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 
 // Personalized Tools Card Component
@@ -78,152 +79,184 @@ class PersonalizedToolsCard extends StatelessWidget {
   }
 
   Widget _buildToolCard(Map<String, dynamic> tool) {
-    return GestureDetector(
-      onTap: () {
-        // Handle tool tap - navigate to specific tool
-        print('Tapped on ${tool['title']}');
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Stack(
-            children: [
-              // Background image
-              Container(
-                width: double.infinity,
-                height: double.infinity,
-                child: Image.asset(
-                  tool['imagePath'],
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    // Fallback gradient if image not found
-                    return Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            tool['color'].withOpacity(0.8),
-                            tool['color'].withOpacity(0.6),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              
-              // Gradient overlay for text readability
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.black.withOpacity(0.3),
-                      Colors.black.withOpacity(0.6),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-              ),
-              
-              // Content
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    // Icon
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        tool['icon'],
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    
-                    // Title
-                    Text(
-                      tool['title'],
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black54,
-                            offset: Offset(1, 1),
-                            blurRadius: 2,
-                          ),
-                        ],
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    
-                    // Subtitle
-                    Text(
-                      tool['subtitle'],
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.white.withOpacity(0.9),
-                        shadows: const [
-                          Shadow(
-                            color: Colors.black54,
-                            offset: Offset(1, 1),
-                            blurRadius: 2,
-                          ),
-                        ],
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Tap indicator
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.arrow_forward,
-                    size: 12,
-                    color: Colors.white,
-                  ),
-                ),
+    return Builder(
+      builder: (context) => GestureDetector(
+        onTap: () {
+          // Navigate to appropriate page based on tool type
+          _navigateToTool(context, tool['title']);
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
             ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Stack(
+              children: [
+                // Background image
+                Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: Image.asset(
+                    tool['imagePath'],
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback gradient if image not found
+                      return Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              tool['color'].withOpacity(0.8),
+                              tool['color'].withOpacity(0.6),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                
+                // Gradient overlay for text readability
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.black.withOpacity(0.3),
+                        Colors.black.withOpacity(0.6),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+                
+                // Content
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // Icon
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          tool['icon'],
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      
+                      // Title
+                      Text(
+                        tool['title'],
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black54,
+                              offset: Offset(1, 1),
+                              blurRadius: 2,
+                            ),
+                          ],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      
+                      // Subtitle
+                      Text(
+                        tool['subtitle'],
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.white.withOpacity(0.9),
+                          shadows: const [
+                            Shadow(
+                              color: Colors.black54,
+                              offset: Offset(1, 1),
+                              blurRadius: 2,
+                            ),
+                          ],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Tap indicator
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.arrow_forward,
+                      size: 12,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  void _navigateToTool(BuildContext context, String toolTitle) {
+    // Navigate to appropriate page based on tool type
+    switch (toolTitle) {
+      case 'Symptom Tracker':
+      case 'Kick Counter':
+      case 'Contraction Timer':
+        context.go('/health');
+        break;
+      case 'Appointment Scheduler':
+        context.go('/appointments');
+        break;
+      case 'Nutrition Guide':
+        context.go('/nutrition');
+        break;
+      case 'Weight Tracker':
+        context.go('/health');
+        break;
+      case 'Baby Shopping List':
+      case 'Hospital Bag':
+      case 'Birth Plan':
+      case 'Newborn Care':
+      case 'Early Pregnancy Tips':
+      case 'Gender Reveal Ideas':
+        context.go('/resources');
+        break;
+      default:
+        context.go('/resources');
+    }
   }
 
   List<Map<String, dynamic>> _getPersonalizedTools(String trimester, int week) {

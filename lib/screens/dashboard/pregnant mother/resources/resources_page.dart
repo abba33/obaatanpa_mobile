@@ -15,7 +15,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
   String selectedCategory = 'All';
   bool isMenuOpen = false;
   bool showAllArticles = false; // Added for expandable articles
-  
+
   final List<String> categories = [
     'All',
     'Pregnancy',
@@ -34,17 +34,81 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
 
   void _navigateToPage(String routeName) {
     _toggleMenu();
-    
+
     if (routeName != '/resources') {
       context.go(routeName);
+    }
+  }
+
+  void _navigateToResource(String resourceTitle) {
+    // Navigate to appropriate page based on resource type
+    switch (resourceTitle.toLowerCase()) {
+      case 'your complete pregnancy guide':
+        context.go('/resources');
+        break;
+      case 'healthy pregnancy diet':
+        context.go('/nutrition');
+        break;
+      case 'prenatal exercise plan':
+        context.go('/health');
+        break;
+      default:
+        context.go('/resources');
+    }
+  }
+
+  void _navigateToArticle(String category) {
+    // Navigate to appropriate page based on article category
+    switch (category.toLowerCase()) {
+      case 'pregnancy':
+        context.go('/resources');
+        break;
+      case 'nutrition':
+        context.go('/nutrition');
+        break;
+      case 'exercise':
+        context.go('/health');
+        break;
+      case 'mental health':
+        context.go('/health');
+        break;
+      case 'baby care':
+        context.go('/resources');
+        break;
+      case 'breastfeeding':
+        context.go('/resources');
+        break;
+      default:
+        context.go('/resources');
+    }
+  }
+
+  void _navigateToTool(String toolTitle) {
+    // Navigate to appropriate page based on tool type
+    switch (toolTitle.toLowerCase()) {
+      case 'due date calculator':
+        context.go('/resources');
+        break;
+      case 'weight tracker':
+        context.go('/health');
+        break;
+      case 'kick counter':
+        context.go('/health');
+        break;
+      case 'contraction timer':
+        context.go('/health');
+        break;
+      default:
+        context.go('/health');
     }
   }
 
   // Function to launch YouTube videos
   Future<void> _launchYouTubeVideo(String videoId) async {
     final youtubeUrl = Uri.parse('https://www.youtube.com/watch?v=$videoId');
-    final youtubeAppUrl = Uri.parse('youtube://www.youtube.com/watch?v=$videoId');
-    
+    final youtubeAppUrl =
+        Uri.parse('youtube://www.youtube.com/watch?v=$videoId');
+
     try {
       // Try to open in YouTube app first
       if (await canLaunchUrl(youtubeAppUrl)) {
@@ -57,6 +121,25 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
       // Handle error - could show a snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Could not open video')),
+      );
+    }
+  }
+
+  // Function to make phone calls
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final phoneUrl = Uri.parse('tel:$phoneNumber');
+
+    try {
+      if (await canLaunchUrl(phoneUrl)) {
+        await launchUrl(phoneUrl);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not make phone call')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not make phone call')),
       );
     }
   }
@@ -76,14 +159,14 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                 onMenuTap: _toggleMenu,
                 title: 'Resources',
               ),
-              
+
               // Resources Content
               Expanded(
                 child: Column(
                   children: [
                     // Category Filter
                     _buildCategoryFilter(),
-                    
+
                     // Resources Content
                     Expanded(
                       child: SingleChildScrollView(
@@ -95,30 +178,30 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                             _buildSectionHeader('Featured Resources'),
                             const SizedBox(height: 12),
                             _buildFeaturedResources(),
-                            
+
                             const SizedBox(height: 32),
-                            
+
                             // Educational Articles Section
                             _buildSectionHeader('Educational Articles'),
                             const SizedBox(height: 12),
                             _buildArticlesList(),
-                            
+
                             const SizedBox(height: 32),
-                            
+
                             // YouTube Video Resources Section
                             _buildSectionHeader('Video Resources'),
                             const SizedBox(height: 12),
                             _buildYouTubeVideoResources(),
-                            
+
                             const SizedBox(height: 32),
-                            
+
                             // Tools & Calculators Section
                             _buildSectionHeader('Tools & Calculators'),
                             const SizedBox(height: 12),
                             _buildToolsGrid(),
-                            
+
                             const SizedBox(height: 32),
-                            
+
                             // Emergency Contacts Section
                             _buildSectionHeader('Emergency Contacts'),
                             const SizedBox(height: 12),
@@ -132,7 +215,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
               ),
             ],
           ),
-          
+
           // Navigation Menu Overlay
           if (isMenuOpen) _buildNavigationMenu(),
         ],
@@ -223,7 +306,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                     NavigationMenuItem(
                       title: 'Dashboard',
                       textColor: Colors.black87,
-                      onTap: () => _navigateToPage('/dashboard/pregnant-mother'),
+                      onTap: () =>
+                          _navigateToPage('/dashboard/pregnant-mother'),
                     ),
                     const SizedBox(height: 32),
                     NavigationMenuItem(
@@ -271,7 +355,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
         itemBuilder: (context, index) {
           final category = categories[index];
           final isSelected = category == selectedCategory;
-          
+
           return GestureDetector(
             onTap: () {
               setState(() {
@@ -286,38 +370,36 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
               margin: const EdgeInsets.only(right: 12),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
-                gradient: isSelected 
-                  ? const LinearGradient(
-                      colors: [Color(0xFFF59297), Color(0xFFF8BBD9)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : null,
+                gradient: isSelected
+                    ? const LinearGradient(
+                        colors: [Color(0xFFF59297), Color(0xFFF8BBD9)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : null,
                 color: isSelected ? null : Colors.grey[50],
                 borderRadius: BorderRadius.circular(25),
                 border: Border.all(
-                  color: isSelected 
-                    ? Colors.transparent 
-                    : Colors.grey[300]!,
+                  color: isSelected ? Colors.transparent : Colors.grey[300]!,
                   width: 1.5,
                 ),
-                boxShadow: isSelected 
-                  ? [
-                      BoxShadow(
-                        color: const Color(0xFFF59297).withOpacity(0.3),
-                        spreadRadius: 0,
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 0,
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: const Color(0xFFF59297).withOpacity(0.3),
+                          spreadRadius: 0,
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 0,
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
               ),
               child: Center(
                 child: Text(
@@ -375,9 +457,9 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
               'overlayColor': const Color(0xFF64B5F6),
             },
           ];
-          
+
           final resource = resources[index];
-          
+
           return Container(
             width: 300,
             margin: EdgeInsets.only(right: index < 2 ? 16 : 0),
@@ -409,7 +491,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                (resource['overlayColor'] as Color).withOpacity(0.8),
+                                (resource['overlayColor'] as Color)
+                                    .withOpacity(0.8),
                                 (resource['overlayColor'] as Color),
                               ],
                             ),
@@ -418,7 +501,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                       },
                     ),
                   ),
-                  
+
                   // Gradient Overlay for Text Visibility
                   Positioned.fill(
                     child: Container(
@@ -436,7 +519,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                       ),
                     ),
                   ),
-                  
+
                   // Color Overlay for Theme Consistency
                   Positioned.fill(
                     child: Container(
@@ -445,14 +528,16 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            (resource['overlayColor'] as Color).withOpacity(0.2),
-                            (resource['overlayColor'] as Color).withOpacity(0.4),
+                            (resource['overlayColor'] as Color)
+                                .withOpacity(0.2),
+                            (resource['overlayColor'] as Color)
+                                .withOpacity(0.4),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  
+
                   // Content
                   Positioned(
                     left: 20,
@@ -475,16 +560,18 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                             ),
                           ),
                           child: Icon(
-                            index == 0 ? Icons.menu_book_rounded :
-                            index == 1 ? Icons.restaurant_menu :
-                            Icons.fitness_center,
+                            index == 0
+                                ? Icons.menu_book_rounded
+                                : index == 1
+                                    ? Icons.restaurant_menu
+                                    : Icons.fitness_center,
                             color: Colors.white,
                             size: 22,
                           ),
                         ),
-                        
+
                         const SizedBox(height: 12),
-                        
+
                         // Title and Subtitle
                         Text(
                           resource['title'].toString(),
@@ -510,40 +597,47 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 12),
-                        
+
                         // Read More Button
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                spreadRadius: 0,
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Read More',
-                                style: TextStyle(
-                                  color: resource['overlayColor'] as Color,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
+                        GestureDetector(
+                          onTap: () {
+                            // Navigate to appropriate page based on resource type
+                            _navigateToResource(resource['title'].toString());
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  spreadRadius: 0,
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
                                 ),
-                              ),
-                              const SizedBox(width: 6),
-                              Icon(
-                                Icons.arrow_forward,
-                                size: 14,
-                                color: resource['overlayColor'] as Color,
-                              ),
-                            ],
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Read More',
+                                  style: TextStyle(
+                                    color: resource['overlayColor'] as Color,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Icon(
+                                  Icons.arrow_forward,
+                                  size: 14,
+                                  color: resource['overlayColor'] as Color,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -564,7 +658,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
         'title': 'First Trimester Changes: What to Expect',
         'category': 'Pregnancy',
         'readTime': '8 min read',
-        'description': 'Understanding your body\'s changes, morning sickness, and essential prenatal care during weeks 1-12.',
+        'description':
+            'Understanding your body\'s changes, morning sickness, and essential prenatal care during weeks 1-12.',
         'author': 'Dr. Sarah Mitchell',
         'publishDate': '2 days ago',
         'likes': '324',
@@ -575,7 +670,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
         'title': 'Folic Acid and Iron: Essential Nutrients',
         'category': 'Nutrition',
         'readTime': '5 min read',
-        'description': 'Why these vitamins are crucial for your baby\'s development and the best food sources.',
+        'description':
+            'Why these vitamins are crucial for your baby\'s development and the best food sources.',
         'author': 'Nutritionist Jane Adams',
         'publishDate': '1 week ago',
         'likes': '156',
@@ -586,7 +682,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
         'title': 'Coping with Pregnancy Anxiety and Stress',
         'category': 'Mental Health',
         'readTime': '10 min read',
-        'description': 'Practical strategies for managing worries and maintaining emotional wellness during pregnancy.',
+        'description':
+            'Practical strategies for managing worries and maintaining emotional wellness during pregnancy.',
         'author': 'Dr. Michael Chen',
         'publishDate': '3 days ago',
         'likes': '89',
@@ -597,7 +694,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
         'title': 'Birth Plan Essentials: What You Need to Know',
         'category': 'Pregnancy',
         'readTime': '12 min read',
-        'description': 'Creating a flexible birth plan that covers pain management, delivery preferences, and postpartum care.',
+        'description':
+            'Creating a flexible birth plan that covers pain management, delivery preferences, and postpartum care.',
         'author': 'Midwife Emma Thompson',
         'publishDate': '5 days ago',
         'likes': '278',
@@ -608,7 +706,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
         'title': 'Safe Exercise During Each Trimester',
         'category': 'Exercise',
         'readTime': '7 min read',
-        'description': 'Modified workouts and activities that are safe and beneficial throughout your pregnancy journey.',
+        'description':
+            'Modified workouts and activities that are safe and beneficial throughout your pregnancy journey.',
         'author': 'Fitness Coach Lisa Park',
         'publishDate': '1 week ago',
         'likes': '201',
@@ -619,7 +718,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
         'title': 'Preparing Your Home for Baby\'s Arrival',
         'category': 'Baby Care',
         'readTime': '6 min read',
-        'description': 'Essential baby-proofing tips and must-have items for your newborn\'s safety and comfort.',
+        'description':
+            'Essential baby-proofing tips and must-have items for your newborn\'s safety and comfort.',
         'author': 'Pediatric Nurse Amy Wilson',
         'publishDate': '4 days ago',
         'likes': '145',
@@ -629,12 +729,15 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
     ];
 
     // Filter articles based on selected category
-    final filteredArticles = selectedCategory == 'All' 
-        ? articles 
-        : articles.where((article) => article['category'] == selectedCategory).toList();
+    final filteredArticles = selectedCategory == 'All'
+        ? articles
+        : articles
+            .where((article) => article['category'] == selectedCategory)
+            .toList();
 
     // Determine how many articles to show
-    final articlesToShow = showAllArticles ? filteredArticles : filteredArticles.take(3).toList();
+    final articlesToShow =
+        showAllArticles ? filteredArticles : filteredArticles.take(3).toList();
     final hasMoreArticles = filteredArticles.length > 3;
 
     return Column(
@@ -660,13 +763,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(16),
                 onTap: () {
-                  // Handle article tap
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Opening: ${article['title']}'),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
+                  // Navigate to appropriate page based on article category
+                  _navigateToArticle(article['category'].toString());
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -678,12 +776,15 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: (article['categoryColor'] as Color).withOpacity(0.1),
+                              color: (article['categoryColor'] as Color)
+                                  .withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: (article['categoryColor'] as Color).withOpacity(0.3),
+                                color: (article['categoryColor'] as Color)
+                                    .withOpacity(0.3),
                                 width: 1,
                               ),
                             ),
@@ -700,24 +801,25 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                             onTap: () {
                               // Handle bookmark toggle
                               setState(() {
-                                article['isBookmarked'] = !(article['isBookmarked'] as bool);
+                                article['isBookmarked'] =
+                                    !(article['isBookmarked'] as bool);
                               });
                             },
                             child: Icon(
-                              (article['isBookmarked'] as bool) 
-                                ? Icons.bookmark 
-                                : Icons.bookmark_border,
-                              color: (article['isBookmarked'] as bool) 
-                                ? const Color(0xFFF59297) 
-                                : Colors.grey[400],
+                              (article['isBookmarked'] as bool)
+                                  ? Icons.bookmark
+                                  : Icons.bookmark_border,
+                              color: (article['isBookmarked'] as bool)
+                                  ? const Color(0xFFF59297)
+                                  : Colors.grey[400],
                               size: 22,
                             ),
                           ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 12),
-                      
+
                       // Article title
                       Text(
                         article['title'].toString(),
@@ -730,9 +832,9 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      
+
                       const SizedBox(height: 8),
-                      
+
                       // Article description
                       Text(
                         article['description'].toString(),
@@ -744,9 +846,9 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       // Author and article info
                       Row(
                         children: [
@@ -755,7 +857,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                             width: 32,
                             height: 32,
                             decoration: BoxDecoration(
-                              color: (article['categoryColor'] as Color).withOpacity(0.2),
+                              color: (article['categoryColor'] as Color)
+                                  .withOpacity(0.2),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Icon(
@@ -765,7 +868,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                             ),
                           ),
                           const SizedBox(width: 10),
-                          
+
                           // Author and publish info
                           Expanded(
                             child: Column(
@@ -789,7 +892,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                               ],
                             ),
                           ),
-                          
+
                           // Read time and likes
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -843,7 +946,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
             ),
           );
         }).toList(),
-        
+
         // See More/See Less button
         if (hasMoreArticles)
           Container(
@@ -856,7 +959,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                   });
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [Color(0xFFF59297), Color(0xFFF8BBD9)],
@@ -909,7 +1013,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
     // Real YouTube videos related to pregnancy and maternal health
     final videos = [
       {
-        'title': "A Dietitian's Guide To Eating During Each Trimester of Pregnancy",
+        'title':
+            "A Dietitian's Guide To Eating During Each Trimester of Pregnancy",
         'duration': '15:20',
         'videoId': 'dq7ovxsAfX8',
         'channel': 'Healthy Pregnancy',
@@ -917,7 +1022,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
         'category': 'Nutrition',
       },
       {
-        'title': '10 minute PRENATAL YOGA for Beginners (Safe for ALL Trimesters)',
+        'title':
+            '10 minute PRENATAL YOGA for Beginners (Safe for ALL Trimesters)',
         'duration': '10:00',
         'videoId': '4NwQKXpWN_A',
         'channel': 'Prenatal Yoga',
@@ -949,12 +1055,13 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
         itemCount: videos.length,
         itemBuilder: (context, index) {
           final video = videos[index];
-          
+
           return GestureDetector(
             onTap: () => _launchYouTubeVideo(video['videoId'].toString()),
             child: Container(
               width: 280,
-              margin: EdgeInsets.only(right: index < videos.length - 1 ? 16 : 0),
+              margin:
+                  EdgeInsets.only(right: index < videos.length - 1 ? 16 : 0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
@@ -1010,7 +1117,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                         },
                       ),
                     ),
-                    
+
                     // Play button overlay
                     Center(
                       child: Container(
@@ -1027,13 +1134,14 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                         ),
                       ),
                     ),
-                    
+
                     // Duration badge
                     Positioned(
                       bottom: 8,
                       right: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.8),
                           borderRadius: BorderRadius.circular(4),
@@ -1048,7 +1156,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                         ),
                       ),
                     ),
-                    
+
                     // Video info overlay
                     Positioned(
                       bottom: 0,
@@ -1084,9 +1192,11 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                             Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF8BBD9).withOpacity(0.8),
+                                    color: const Color(0xFFF8BBD9)
+                                        .withOpacity(0.8),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
@@ -1162,46 +1272,52 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
       itemCount: tools.length,
       itemBuilder: (context, index) {
         final tool = tools[index];
-        
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: (tool['color'] as Color).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
+
+        return GestureDetector(
+          onTap: () {
+            // Navigate to appropriate page based on tool type
+            _navigateToTool(tool['title'].toString());
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
                 ),
-                child: Icon(
-                  tool['icon'] as IconData,
-                  color: tool['color'] as Color,
-                  size: 24,
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: (tool['color'] as Color).withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    tool['icon'] as IconData,
+                    color: tool['color'] as Color,
+                    size: 24,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                tool['title'].toString(),
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12,
+                const SizedBox(height: 12),
+                Text(
+                  tool['title'].toString(),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -1251,12 +1367,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
             child: InkWell(
               borderRadius: BorderRadius.circular(12),
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Calling ${contact['number']}...'),
-                    backgroundColor: contact['color'] as Color,
-                  ),
-                );
+                // Launch phone dialer
+                _makePhoneCall(contact['number'].toString());
               },
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -1276,9 +1388,9 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                         size: 20,
                       ),
                     ),
-                    
+
                     const SizedBox(width: 16),
-                    
+
                     // Contact info
                     Expanded(
                       child: Column(
@@ -1303,7 +1415,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                         ],
                       ),
                     ),
-                    
+
                     // Call button
                     Container(
                       width: 36,

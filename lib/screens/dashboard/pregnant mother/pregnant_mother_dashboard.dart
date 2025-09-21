@@ -107,6 +107,26 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  void _navigateToChatTopic(String topic) {
+    // Navigate to appropriate page based on chat topic
+    switch (topic.toLowerCase()) {
+      case 'pregnancy symptoms':
+        context.go('/health');
+        break;
+      case 'nutrition tips':
+        context.go('/nutrition');
+        break;
+      case 'exercise guide':
+        context.go('/health');
+        break;
+      case 'doctor questions':
+        context.go('/appointments');
+        break;
+      default:
+        context.go('/resources');
+    }
+  }
+
   void _showJournalBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -203,7 +223,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       nutritionTips: pregnancyProvider.currentNutritionTips,
                       currentWeek: pregnancyProvider.currentWeek,
                     ),
-                    
+
                     // Add bottom padding to account for floating buttons
                     const SizedBox(height: 80),
                   ],
@@ -278,7 +298,7 @@ class _DashboardPageState extends State<DashboardPage> {
               borderRadius: BorderRadius.circular(3),
             ),
           ),
-          
+
           // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -346,7 +366,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ],
             ),
           ),
-          
+
           // Form content
           Expanded(
             child: SingleChildScrollView(
@@ -392,9 +412,9 @@ class _DashboardPageState extends State<DashboardPage> {
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Mood section
                   const Text(
                     'How are you feeling today?',
@@ -405,7 +425,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -422,17 +442,22 @@ class _DashboardPageState extends State<DashboardPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildEnhancedMoodButton('😊', 'Amazing', const Color(0xFF4CAF50)),
-                        _buildEnhancedMoodButton('🙂', 'Good', const Color(0xFF8BC34A)),
-                        _buildEnhancedMoodButton('😐', 'Okay', const Color(0xFFFFEB3B)),
-                        _buildEnhancedMoodButton('😟', 'Tired', const Color(0xFFFF9800)),
-                        _buildEnhancedMoodButton('😰', 'Anxious', const Color(0xFFF44336)),
+                        _buildEnhancedMoodButton(
+                            '😊', 'Amazing', const Color(0xFF4CAF50)),
+                        _buildEnhancedMoodButton(
+                            '🙂', 'Good', const Color(0xFF8BC34A)),
+                        _buildEnhancedMoodButton(
+                            '😐', 'Okay', const Color(0xFFFFEB3B)),
+                        _buildEnhancedMoodButton(
+                            '😟', 'Tired', const Color(0xFFFF9800)),
+                        _buildEnhancedMoodButton(
+                            '😰', 'Anxious', const Color(0xFFF44336)),
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Journal entry section
                   const Text(
                     'Share your thoughts',
@@ -443,7 +468,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   Container(
                     height: 200,
                     decoration: BoxDecoration(
@@ -465,7 +490,8 @@ class _DashboardPageState extends State<DashboardPage> {
                       maxLines: null,
                       expands: true,
                       decoration: InputDecoration(
-                        hintText: 'Write about your day, symptoms, thoughts, or special moments...\n\nWhat made you smile today?\nHow is baby doing?\nAny new symptoms or changes?',
+                        hintText:
+                            'Write about your day, symptoms, thoughts, or special moments...\n\nWhat made you smile today?\nHow is baby doing?\nAny new symptoms or changes?',
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.all(20),
                         hintStyle: TextStyle(
@@ -481,9 +507,9 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Photo section
                   Container(
                     width: double.infinity,
@@ -541,7 +567,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             ],
                           ),
                         ),
-                        
+
                         // Photo upload buttons
                         Padding(
                           padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -554,20 +580,23 @@ class _DashboardPageState extends State<DashboardPage> {
                                     HapticFeedback.lightImpact();
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFF7DA8E6),
                                       borderRadius: BorderRadius.circular(16),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: const Color(0xFF7DA8E6).withOpacity(0.3),
+                                          color: const Color(0xFF7DA8E6)
+                                              .withOpacity(0.3),
                                           blurRadius: 8,
                                           offset: const Offset(0, 4),
                                         ),
                                       ],
                                     ),
                                     child: const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           Icons.camera_alt,
@@ -596,7 +625,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                     HapticFeedback.lightImpact();
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
                                     decoration: BoxDecoration(
                                       border: Border.all(
                                         color: const Color(0xFF7DA8E6),
@@ -605,7 +635,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     child: const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           Icons.photo_library,
@@ -632,9 +663,9 @@ class _DashboardPageState extends State<DashboardPage> {
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Save button
                   Container(
                     width: double.infinity,
@@ -699,7 +730,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 20),
                 ],
               ),
@@ -732,19 +763,21 @@ class _DashboardPageState extends State<DashboardPage> {
                 color: isSelected ? color : color.withOpacity(0.3),
                 width: 2,
               ),
-              boxShadow: isSelected ? [
-                BoxShadow(
-                  color: color.withOpacity(0.4),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ] : [
-                BoxShadow(
-                  color: color.withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: color.withOpacity(0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: color.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
             ),
             child: Center(
               child: Text(
@@ -770,8 +803,18 @@ class _DashboardPageState extends State<DashboardPage> {
   String _formatCurrentDate() {
     final now = DateTime.now();
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
     ];
     return '${now.day} ${months[now.month - 1]} ${now.year}';
   }
@@ -850,7 +893,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 ],
               ),
             ),
-            
+
             // Chat messages area
             Expanded(
               child: Container(
@@ -874,7 +917,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ),
                     ),
-                    
+
                     // Quick action buttons
                     Wrap(
                       spacing: 8,
@@ -886,13 +929,13 @@ class _DashboardPageState extends State<DashboardPage> {
                         _buildQuickChatButton('Doctor questions'),
                       ],
                     ),
-                    
+
                     const Spacer(),
                   ],
                 ),
               ),
             ),
-            
+
             // Chat input
             Container(
               padding: const EdgeInsets.all(16),
@@ -907,7 +950,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 children: [
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(25),
@@ -948,7 +992,8 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildQuickChatButton(String text) {
     return GestureDetector(
       onTap: () {
-        // Handle quick chat button tap
+        // Navigate to appropriate page based on chat topic
+        _navigateToChatTopic(text);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -997,7 +1042,8 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             // App Bar in Menu - UPDATED: Removed extra space
             Container(
-              padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
+              padding: const EdgeInsets.only(
+                  top: 16, left: 16, right: 16, bottom: 16),
               child: Row(
                 children: [
                   Container(

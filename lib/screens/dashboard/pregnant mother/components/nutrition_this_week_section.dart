@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../providers/pregnancy_data_provider.dart';
 
 class PersonalizedNutritionSection extends StatelessWidget {
@@ -15,35 +16,50 @@ class PersonalizedNutritionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: Colors.grey.withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header section
+          // Elegant Header
           Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50), // Fresh green for nutrition
-                  borderRadius: BorderRadius.circular(12),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF2E7D32), Color(0xFF4CAF50)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF4CAF50).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: const Icon(
-                  Icons.restaurant_menu,
+                  Icons.restaurant_menu_rounded,
                   color: Colors.white,
-                  size: 20,
+                  size: 24,
                 ),
               ),
               const SizedBox(width: 16),
@@ -54,16 +70,17 @@ class PersonalizedNutritionSection extends StatelessWidget {
                     Text(
                       'Nutrition Guide',
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2D3748),
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1A1A1A),
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
-                      'Week $currentWeek • Personalized for you',
+                      'Week $currentWeek • Tailored recommendations',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 14,
                         color: Colors.grey[600],
                         fontWeight: FontWeight.w500,
                       ),
@@ -73,18 +90,25 @@ class PersonalizedNutritionSection extends StatelessWidget {
               ),
             ],
           ),
-          
-          const SizedBox(height: 20),
-          
-          // Week-specific advice card
+
+          const SizedBox(height: 24),
+
+          // Professional Week Focus Card
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFFF59297).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFFF8F9FA),
+                  const Color(0xFFE8F5E8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: const Color(0xFFF59297).withOpacity(0.2),
+                color: const Color(0xFF4CAF50).withOpacity(0.2),
                 width: 1,
               ),
             ),
@@ -93,115 +117,155 @@ class PersonalizedNutritionSection extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.lightbulb_outline,
-                      color: const Color(0xFFF59297),
-                      size: 18,
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4CAF50).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.insights_rounded,
+                        color: const Color(0xFF2E7D32),
+                        size: 20,
+                      ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 12),
                     Text(
                       'This Week\'s Focus',
-                      style: TextStyle(
-                        fontSize: 14,
+                      style: const TextStyle(
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFFF59297),
+                        color: Color(0xFF2E7D32),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Text(
                   _getWeekSpecificNutritionAdvice(currentWeek),
                   style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF4A5568),
-                    height: 1.4,
+                    fontSize: 15,
+                    color: Color(0xFF424242),
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ],
             ),
           ),
-          
-          const SizedBox(height: 16),
-          
-          // Nutrition tips
-          Text(
-            'Key Nutrients',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF2D3748),
-            ),
-          ),
-          const SizedBox(height: 12),
-          
-          ...nutritionTips.take(3).map((tip) => Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF4CAF50).withOpacity(0.05),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: const Color(0xFF4CAF50).withOpacity(0.1),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 6,
-                  height: 6,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF4CAF50),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    tip,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF4A5568),
-                      height: 1.3,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )).toList(),
-          
+
           const SizedBox(height: 20),
-          
-          // CTA Button
+
+          // Professional Nutrients Section
+          Text(
+            'Essential Nutrients',
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1A1A1A),
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Elegant Nutrient Cards
+          ...nutritionTips
+              .take(3)
+              .map((tip) => Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.grey.withOpacity(0.15),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.03),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4CAF50),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            tip,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF424242),
+                              height: 1.4,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ))
+              .toList(),
+
+          const SizedBox(height: 24),
+
+          // Elegant CTA Button
           Container(
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                // Handle meal plan navigation
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4CAF50),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
+            height: 52,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF2E7D32), Color(0xFF4CAF50)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.calendar_today, size: 16),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'View Weekly Meal Plan',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF4CAF50).withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () {
+                  context.go('/trimester-meals');
+                },
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.calendar_today_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        'View Weekly Meal Plan',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -235,7 +299,7 @@ class PersonalizedArticlesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final articles = _getPersonalizedArticles(trimester, currentWeek);
-    
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -295,36 +359,31 @@ class PersonalizedArticlesSection extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Article cards
           Row(
             children: [
               Expanded(
-                child: _buildArticleCard(
-                  articles[0], 
-                  const Color(0xFFF59297), 
-                  Icons.favorite_outline
-                ),
+                child: _buildArticleCard(articles[0], const Color(0xFFF59297),
+                    Icons.favorite_outline),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildArticleCard(
-                  articles[1], 
-                  const Color(0xFF7DA8E6), 
-                  Icons.health_and_safety_outlined
-                ),
+                child: _buildArticleCard(articles[1], const Color(0xFF7DA8E6),
+                    Icons.health_and_safety_outlined),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // View all articles link
           GestureDetector(
             onTap: () {
-              // Handle view all articles
+              // Navigate to resources page
+              context.go('/resources');
             },
             child: Container(
               width: double.infinity,
@@ -383,71 +442,74 @@ class PersonalizedArticlesSection extends StatelessWidget {
   }
 
   Widget _buildArticleCard(String title, Color color, IconData icon) {
-    return Container(
-      height: 120,
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.2),
-          width: 1,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
+    return Builder(
+      builder: (context) => Container(
+        height: 120,
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
-          onTap: () {
-            // Handle article tap
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF2D3748),
-                    height: 1.3,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Text(
-                      'Read more',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: color,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(width: 2),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: 10,
+          border: Border.all(
+            color: color.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () {
+              // Navigate to resources page for article content
+              context.go('/resources');
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
                       color: color,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ],
-                ),
-              ],
+                    child: Icon(
+                      icon,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF2D3748),
+                      height: 1.3,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        'Read more',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: color,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 2),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 10,
+                        color: color,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

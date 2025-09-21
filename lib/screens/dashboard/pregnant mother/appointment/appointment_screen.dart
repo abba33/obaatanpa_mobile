@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/custom_app_bar.dart';
 import 'package:obaatanpa_mobile/widgets/navigation/navigation_menu.dart';
 import 'package:obaatanpa_mobile/providers/theme_provider.dart';
@@ -35,6 +36,58 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
 
     if (routeName != '/appointments') {
       context.go(routeName);
+    }
+  }
+
+  void _showChatDialog(String doctorName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Chat with $doctorName'),
+          content: const Text(
+              'This feature will allow you to chat with your doctor. Coming soon!'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _makePhoneCall(String hospitalName) async {
+    // Get phone number based on hospital name
+    String phoneNumber = _getHospitalPhoneNumber(hospitalName);
+    final phoneUrl = Uri.parse('tel:$phoneNumber');
+
+    try {
+      if (await canLaunchUrl(phoneUrl)) {
+        await launchUrl(phoneUrl);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not make phone call')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not make phone call')),
+      );
+    }
+  }
+
+  String _getHospitalPhoneNumber(String hospitalName) {
+    switch (hospitalName.toLowerCase()) {
+      case 'ridge hospital':
+        return '+233 30 987 6543';
+      case 'korle-bu hospital':
+        return '+233 30 202 0820';
+      case 'trust hospital':
+        return '+233 30 278 5555';
+      default:
+        return '+233 30 123 4567'; // Default number
     }
   }
 
@@ -160,6 +213,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                               GestureDetector(
                                 onTap: () {
                                   // Navigate to see all hospitals
+                                  context.go('/hospitals');
                                 },
                                 child: const Text(
                                   'View All',
@@ -254,6 +308,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                               GestureDetector(
                                 onTap: () {
                                   // Navigate to all appointments
+                                  context.go('/appointments');
                                 },
                                 child: const Text(
                                   'View All',
@@ -698,29 +753,41 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           // Action Buttons
           Column(
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF7DA8E6).withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.chat_outlined,
-                  color: Color(0xFF7DA8E6),
-                  size: 18,
+              GestureDetector(
+                onTap: () {
+                  // Navigate to chat with doctor
+                  _showChatDialog(doctorName);
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF7DA8E6).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.chat_outlined,
+                    color: Color(0xFF7DA8E6),
+                    size: 18,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF59297).withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.phone_outlined,
-                  color: Color(0xFFF59297),
-                  size: 18,
+              GestureDetector(
+                onTap: () {
+                  // Make phone call to hospital
+                  _makePhoneCall(hospitalName);
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF59297).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.phone_outlined,
+                    color: Color(0xFFF59297),
+                    size: 18,
+                  ),
                 ),
               ),
             ],

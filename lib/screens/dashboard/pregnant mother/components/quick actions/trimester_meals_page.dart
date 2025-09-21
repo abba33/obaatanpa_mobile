@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:obaatanpa_mobile/providers/pregnancy_data_provider.dart';
 import 'package:obaatanpa_mobile/providers/theme_provider.dart';
 
@@ -40,17 +41,17 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
           backgroundColor:
               isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA),
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
             elevation: 0,
             leading: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back_ios,
-                  color: Colors.black87, size: 20),
+              onPressed: () => context.go('/dashboard/pregnant-mother'),
+              icon: Icon(Icons.arrow_back_ios,
+                  color: isDark ? Colors.white : Colors.black87, size: 20),
             ),
             title: Text(
               '$trimester Trimester Meals',
               style: GoogleFonts.inter(
-                color: Colors.black87,
+                color: isDark ? Colors.white : Colors.black87,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -58,8 +59,8 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
             actions: [
               IconButton(
                 onPressed: () {},
-                icon: const Icon(Icons.bookmark_border,
-                    color: Colors.black87, size: 22),
+                icon: Icon(Icons.bookmark_border,
+                    color: isDark ? Colors.white : Colors.black87, size: 22),
               ),
             ],
           ),
