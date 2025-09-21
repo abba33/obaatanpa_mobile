@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class PractitionerProfilePage extends StatelessWidget {
   const PractitionerProfilePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       body: Column(
         children: [
           // Custom App Bar Header
@@ -47,7 +53,8 @@ class PractitionerProfilePage extends StatelessWidget {
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: Colors.indigo.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -118,7 +125,8 @@ class PractitionerProfilePage extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
+                                border:
+                                    Border.all(color: Colors.white, width: 2),
                               ),
                               child: const ClipOval(
                                 child: Icon(
@@ -129,7 +137,7 @@ class PractitionerProfilePage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 16),
-                            
+
                             // Practitioner Details
                             const Expanded(
                               child: Column(
@@ -160,7 +168,7 @@ class PractitionerProfilePage extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            
+
                             // Edit Profile Button
                             GestureDetector(
                               onTap: () {
@@ -181,9 +189,9 @@ class PractitionerProfilePage extends StatelessWidget {
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Quick Stats Row
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -198,9 +206,9 @@ class PractitionerProfilePage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Profile Details Card
                   Container(
                     width: double.infinity,
@@ -225,7 +233,10 @@ class PractitionerProfilePage extends StatelessWidget {
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                                  colors: [
+                                    Color(0xFFF59297),
+                                    Color(0xFF7DA8E6)
+                                  ],
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -247,18 +258,22 @@ class PractitionerProfilePage extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        
+
                         // Profile Details
-                        _buildProfileDetail('Email', 'dr.sarah@ridgehospital.com', Icons.email),
+                        _buildProfileDetail(
+                            'Email', 'dr.sarah@ridgehospital.com', Icons.email),
                         const SizedBox(height: 12),
-                        _buildProfileDetail('Phone', '+233 24 123 4567', Icons.phone),
+                        _buildProfileDetail(
+                            'Phone', '+233 24 123 4567', Icons.phone),
                         const SizedBox(height: 12),
-                        _buildProfileDetail('Specialization', 'Obstetrics & Gynecology', Icons.medical_services),
+                        _buildProfileDetail('Specialization',
+                            'Obstetrics & Gynecology', Icons.medical_services),
                         const SizedBox(height: 12),
-                        _buildProfileDetail('License No.', 'MD-GH-2016-0123', Icons.verified),
-                        
+                        _buildProfileDetail(
+                            'License No.', 'MD-GH-2016-0123', Icons.verified),
+
                         const SizedBox(height: 20),
-                        
+
                         // Action Buttons
                         Row(
                           children: [
@@ -268,10 +283,14 @@ class PractitionerProfilePage extends StatelessWidget {
                                   // Edit profile
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
-                                      colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                                      colors: [
+                                        Color(0xFFF59297),
+                                        Color(0xFF7DA8E6)
+                                      ],
                                     ),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -294,11 +313,13 @@ class PractitionerProfilePage extends StatelessWidget {
                                   // Settings
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: const Color(0xFFF59297)),
+                                    border: Border.all(
+                                        color: const Color(0xFFF59297)),
                                   ),
                                   child: const Text(
                                     'Settings',

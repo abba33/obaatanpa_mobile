@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../../../providers/pregnancy_data_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class PersonalizedQuickActionsRow extends StatefulWidget {
   final int currentWeek;
@@ -13,10 +12,12 @@ class PersonalizedQuickActionsRow extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<PersonalizedQuickActionsRow> createState() => _PersonalizedQuickActionsRowState();
+  State<PersonalizedQuickActionsRow> createState() =>
+      _PersonalizedQuickActionsRowState();
 }
 
-class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRow> {
+class _PersonalizedQuickActionsRowState
+    extends State<PersonalizedQuickActionsRow> {
   late PageController _pageController;
   int _currentPage = 0;
 
@@ -35,7 +36,7 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
   @override
   Widget build(BuildContext context) {
     final weekFocusData = _getWeekSpecificActionsData(widget.currentWeek);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -46,10 +47,13 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.only(right: 16, bottom: 10, top: 5),
-            itemCount: _getPersonalizedActionsData(widget.currentWeek, widget.trimester).length,
+            itemCount: _getPersonalizedActionsData(
+                    widget.currentWeek, widget.trimester)
+                .length,
             separatorBuilder: (context, index) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
-              final actionData = _getPersonalizedActionsData(widget.currentWeek, widget.trimester)[index];
+              final actionData = _getPersonalizedActionsData(
+                  widget.currentWeek, widget.trimester)[index];
               return _buildScrollableQuickAction(
                 icon: actionData['icon'],
                 title: actionData['title'],
@@ -60,9 +64,9 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
             },
           ),
         ),
-        
+
         const SizedBox(height: 20),
-        
+
         // This Week's Focus - Horizontal Scrollable with dots
         Row(
           children: [
@@ -83,7 +87,7 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
           ],
         ),
         const SizedBox(height: 12),
-        
+
         // Horizontal PageView for This Week's Focus - Updated UI
         Container(
           height: 120,
@@ -148,7 +152,7 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
                             ],
                           ),
                           const SizedBox(height: 4),
-                          
+
                           // Focus title
                           Text(
                             focusData['title'],
@@ -159,7 +163,7 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
                             ),
                           ),
                           const SizedBox(height: 6),
-                          
+
                           // Description
                           Expanded(
                             child: Text(
@@ -176,7 +180,7 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
                         ],
                       ),
                     ),
-                    
+
                     // Decorative circles - matching the image
                     Positioned(
                       top: -15,
@@ -220,9 +224,9 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
             },
           ),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Pagination dots - matching the image style
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -234,9 +238,9 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
               height: 8,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(4),
-                color: _currentPage == index 
-                  ? const Color(0xFFF8BBD9) // Pink for active dot
-                  : Colors.grey.shade300,
+                color: _currentPage == index
+                    ? const Color(0xFFF8BBD9) // Pink for active dot
+                    : Colors.grey.shade300,
               ),
             ),
           ),
@@ -245,9 +249,10 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
     );
   }
 
-  List<Map<String, dynamic>> _getPersonalizedActionsData(int week, String trimester) {
+  List<Map<String, dynamic>> _getPersonalizedActionsData(
+      int week, String trimester) {
     List<Map<String, dynamic>> actions = [];
-    
+
     // Base actions always available
     actions.addAll([
       {
@@ -255,35 +260,35 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
         'title': "${trimester} Meals",
         'subtitle': 'Trimester-specific nutrition',
         'color': const Color(0xFFFF6B6B),
-        'onTap': () {},
+        'onTap': () => context.go('/trimester-meals'),
       },
       {
         'icon': Icons.favorite_border,
         'title': 'Health Tips',
         'subtitle': 'Daily wellness advice',
         'color': const Color(0xFFFF9800),
-        'onTap': () {},
+        'onTap': () => context.go('/health'),
       },
       {
         'icon': Icons.book_outlined,
         'title': 'Learn',
         'subtitle': 'Pregnancy education',
         'color': const Color(0xFF4CAF50),
-        'onTap': () {},
+        'onTap': () => context.go('/resources'),
       },
       {
         'icon': Icons.schedule,
         'title': 'Appointments',
         'subtitle': 'Track your visits',
         'color': const Color(0xFF2196F3),
-        'onTap': () {},
+        'onTap': () => context.go('/appointments'),
       },
       {
         'icon': Icons.baby_changing_station,
         'title': 'Baby Prep',
         'subtitle': 'Get ready for baby',
         'color': const Color(0xFF9C27B0),
-        'onTap': () {},
+        'onTap': () => context.go('/resources'),
       },
     ]);
 
@@ -295,21 +300,21 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
           'title': 'First Visit',
           'subtitle': 'Prenatal appointment',
           'color': const Color(0xFF90EE90),
-          'onTap': () {},
+          'onTap': () => context.go('/appointments'),
         },
         {
           'icon': Icons.sick,
           'title': 'Morning Sickness',
           'subtitle': 'Relief tips & tracking',
           'color': const Color(0xFFDDA0DD),
-          'onTap': () {},
+          'onTap': () => context.go('/health'),
         },
         {
           'icon': Icons.medication,
           'title': 'Vitamins',
           'subtitle': 'Prenatal supplements',
           'color': const Color(0xFFE91E63),
-          'onTap': () {},
+          'onTap': () => context.go('/nutrition'),
         },
       ]);
     } else if (trimester == 'Second') {
@@ -319,45 +324,46 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
           'title': 'Safe Exercise',
           'subtitle': 'Second trimester workouts',
           'color': const Color(0xFFFFE066),
-          'onTap': () {},
+          'onTap': () => context.go('/health'),
         },
         {
           'icon': Icons.child_care,
           'title': 'Baby Movement',
           'subtitle': 'Track kicks & movement',
           'color': const Color(0xFFFFB6C1),
-          'onTap': () {},
+          'onTap': () => context.go('/health'),
         },
         {
           'icon': Icons.camera_alt,
           'title': 'Ultrasound',
           'subtitle': 'Anatomy scan prep',
           'color': const Color(0xFF00BCD4),
-          'onTap': () {},
+          'onTap': () => context.go('/appointments'),
         },
       ]);
-    } else { // Third trimester
+    } else {
+      // Third trimester
       actions.addAll([
         {
           'icon': Icons.local_hospital,
           'title': 'Hospital Bag',
           'subtitle': 'Delivery prep checklist',
           'color': const Color(0xFF87CEEB),
-          'onTap': () {},
+          'onTap': () => context.go('/resources'),
         },
         {
           'icon': Icons.timer,
           'title': 'Contraction Timer',
           'subtitle': 'Track labor signs',
           'color': const Color(0xFFFFA07A),
-          'onTap': () {},
+          'onTap': () => context.go('/health'),
         },
         {
           'icon': Icons.school,
           'title': 'Birth Classes',
           'subtitle': 'Labor preparation',
           'color': const Color(0xFF8BC34A),
-          'onTap': () {},
+          'onTap': () => context.go('/resources'),
         },
       ]);
     }
@@ -367,55 +373,64 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
 
   List<Map<String, dynamic>> _getWeekSpecificActionsData(int week) {
     List<Map<String, dynamic>> actions = [];
-    
+
     // Early pregnancy (weeks 1-12)
     if (week <= 12) {
       actions.addAll([
         {
           'title': 'Prenatal Vitamins',
-          'description': 'They provide essential nutrients like folic acid, iron, calcium, and DHA, which support the healthy development of the baby',
+          'description':
+              'They provide essential nutrients like folic acid, iron, calcium, and DHA, which support the healthy development of the baby',
         },
         {
           'title': 'What to Avoid',
-          'description': 'Learn about foods and activities to avoid during early pregnancy for your safety and baby\'s development',
+          'description':
+              'Learn about foods and activities to avoid during early pregnancy for your safety and baby\'s development',
         },
         {
           'title': 'Early Symptoms',
-          'description': 'Understanding common early pregnancy symptoms and when to contact your healthcare provider',
+          'description':
+              'Understanding common early pregnancy symptoms and when to contact your healthcare provider',
         },
       ]);
-    } 
+    }
     // Mid pregnancy (weeks 13-27)
     else if (week <= 27) {
       actions.addAll([
         {
           'title': 'Ultrasound Preparation',
-          'description': 'Get ready for your anatomy scan and learn what to expect during this important milestone',
+          'description':
+              'Get ready for your anatomy scan and learn what to expect during this important milestone',
         },
         {
           'title': 'Baby Shopping',
-          'description': 'Essential items checklist for your growing baby and preparing your home for arrival',
+          'description':
+              'Essential items checklist for your growing baby and preparing your home for arrival',
         },
         {
           'title': 'Exercise Guidelines',
-          'description': 'Safe exercises and activities recommended during the second trimester for optimal health',
+          'description':
+              'Safe exercises and activities recommended during the second trimester for optimal health',
         },
       ]);
-    } 
+    }
     // Late pregnancy (weeks 28+)
     else {
       actions.addAll([
         {
           'title': 'Birth Classes',
-          'description': 'Prepare for delivery with comprehensive birth education and breathing techniques',
+          'description':
+              'Prepare for delivery with comprehensive birth education and breathing techniques',
         },
         {
           'title': 'Nursery Setup',
-          'description': 'Complete checklist for setting up your baby\'s room and essential items needed',
+          'description':
+              'Complete checklist for setting up your baby\'s room and essential items needed',
         },
         {
           'title': 'Hospital Bag',
-          'description': 'What to pack for your hospital stay and delivery day essentials for you and baby',
+          'description':
+              'What to pack for your hospital stay and delivery day essentials for you and baby',
         },
       ]);
     }

@@ -5,6 +5,8 @@ import 'package:obaatanpa_mobile/screens/dashboard/hospital/components/hospital_
 import 'package:obaatanpa_mobile/screens/dashboard/hospital/patients/patient_list_card.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/hospital/profile/hospital_profile_card.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/hospital/resources/resource_management_card.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 import 'components/hospital_stats_overview.dart';
 import 'components/practitioner_management_card.dart';
 import 'components/appointment_requests_card.dart';
@@ -34,7 +36,7 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
       _selectedIndex = index;
       _isMenuOpen = false;
     });
-    
+
     if (routeName != '/hospital/dashboard') {
       context.go(routeName);
     }
@@ -42,16 +44,20 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF1F5F9),
       body: Stack(
         children: [
           // Main Dashboard Content
           _buildDashboardContent(),
-          
+
           // Side Navigation Menu
           if (_isMenuOpen) _buildNavigationMenu(),
-          
+
           // Overlay
           if (_isMenuOpen)
             GestureDetector(
@@ -70,7 +76,7 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
       children: [
         // Modern App Bar
         _buildModernAppBar(),
-        
+
         // Dashboard Content
         Expanded(
           child: SingleChildScrollView(
@@ -81,19 +87,19 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                 // Welcome Section
                 _buildWelcomeSection(),
                 const SizedBox(height: 24),
-                
+
                 // Hospital Stats Overview
                 _buildModernStatsOverview(),
                 const SizedBox(height: 28),
-                
+
                 // Quick Actions Grid
                 _buildQuickActionsGrid(),
                 const SizedBox(height: 28),
-                
+
                 // Management Cards Section
                 _buildManagementSection(),
                 const SizedBox(height: 28),
-                
+
                 // Patient Management
                 _buildSectionTitle('Patient Management', Icons.people_outline),
                 const SizedBox(height: 16),
@@ -102,11 +108,11 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                   child: HospitalPatientsPage(),
                 ),
                 const SizedBox(height: 28),
-                
+
                 // Resources & Analytics
                 _buildResourcesAnalyticsSection(),
                 const SizedBox(height: 28),
-                
+
                 // Notifications & Profile
                 _buildBottomSection(),
                 const SizedBox(height: 32),
@@ -165,7 +171,7 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Title Section
               Expanded(
                 child: Column(
@@ -192,7 +198,7 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                   ],
                 ),
               ),
-              
+
               // Profile Avatar
               Container(
                 width: 48,
@@ -379,7 +385,7 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
           child: NotificationCenterCard(),
         ),
         const SizedBox(height: 28),
-        
+
         // Hospital Profile
         _buildSectionTitle('Hospital Profile', Icons.business_outlined),
         const SizedBox(height: 16),
@@ -448,13 +454,41 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
 
   Widget _buildNavigationMenu() {
     final menuItems = [
-      {'title': 'Dashboard', 'icon': Icons.dashboard_rounded, 'route': '/hospital/dashboard'},
-      {'title': 'Practitioners', 'icon': Icons.medical_services_rounded, 'route': '/hospital/practitioners'},
-      {'title': 'Appointments', 'icon': Icons.calendar_today_rounded, 'route': '/hospital/appointments'},
-      {'title': 'Patients', 'icon': Icons.people_rounded, 'route': '/hospital/patients'},
-      {'title': 'Resources', 'icon': Icons.inventory_2_rounded, 'route': '/hospital/resources'},
-      {'title': 'Analytics', 'icon': Icons.analytics_rounded, 'route': '/hospital/analytics'},
-      {'title': 'Profile', 'icon': Icons.business_rounded, 'route': '/hospital/profile'},
+      {
+        'title': 'Dashboard',
+        'icon': Icons.dashboard_rounded,
+        'route': '/hospital/dashboard'
+      },
+      {
+        'title': 'Practitioners',
+        'icon': Icons.medical_services_rounded,
+        'route': '/hospital/practitioners'
+      },
+      {
+        'title': 'Appointments',
+        'icon': Icons.calendar_today_rounded,
+        'route': '/hospital/appointments'
+      },
+      {
+        'title': 'Patients',
+        'icon': Icons.people_rounded,
+        'route': '/hospital/patients'
+      },
+      {
+        'title': 'Resources',
+        'icon': Icons.inventory_2_rounded,
+        'route': '/hospital/resources'
+      },
+      {
+        'title': 'Analytics',
+        'icon': Icons.analytics_rounded,
+        'route': '/hospital/analytics'
+      },
+      {
+        'title': 'Profile',
+        'icon': Icons.business_rounded,
+        'route': '/hospital/profile'
+      },
     ];
 
     return Positioned(
@@ -560,7 +594,7 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                 ),
               ),
             ),
-            
+
             // Menu Items
             Expanded(
               child: Padding(
@@ -570,24 +604,28 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                     final index = entry.key;
                     final item = entry.value;
                     final isActive = _selectedIndex == index;
-                    
+
                     return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 4),
                       child: Material(
                         color: Colors.transparent,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
-                          onTap: () => _navigateToPage(item['route'] as String, index),
+                          onTap: () =>
+                              _navigateToPage(item['route'] as String, index),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 16),
                             decoration: BoxDecoration(
-                              color: isActive 
+                              color: isActive
                                   ? const Color(0xFF667EEA).withOpacity(0.1)
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(12),
-                              border: isActive 
+                              border: isActive
                                   ? Border.all(
-                                      color: const Color(0xFF667EEA).withOpacity(0.3),
+                                      color: const Color(0xFF667EEA)
+                                          .withOpacity(0.3),
                                       width: 1,
                                     )
                                   : null,
@@ -598,14 +636,14 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                                   width: 40,
                                   height: 40,
                                   decoration: BoxDecoration(
-                                    color: isActive 
+                                    color: isActive
                                         ? const Color(0xFF667EEA)
                                         : const Color(0xFFF3F4F6),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Icon(
                                     item['icon'] as IconData,
-                                    color: isActive 
+                                    color: isActive
                                         ? Colors.white
                                         : const Color(0xFF6B7280),
                                     size: 20,
@@ -616,8 +654,10 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                                   item['title'] as String,
                                   style: TextStyle(
                                     fontSize: 16,
-                                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                                    color: isActive 
+                                    fontWeight: isActive
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                    color: isActive
                                         ? const Color(0xFF667EEA)
                                         : const Color(0xFF374151),
                                   ),
@@ -632,7 +672,7 @@ class _HospitalDashboardPageState extends State<HospitalDashboardPage> {
                 ),
               ),
             ),
-            
+
             // Menu Footer
             Container(
               padding: const EdgeInsets.all(24),

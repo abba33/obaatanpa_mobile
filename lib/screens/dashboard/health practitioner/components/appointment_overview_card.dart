@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class PractitionerAppointmentsPage extends StatelessWidget {
   const PractitionerAppointmentsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       body: Column(
         children: [
           // Custom App Bar Header
@@ -47,7 +53,8 @@ class PractitionerAppointmentsPage extends StatelessWidget {
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: Colors.orange.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -91,23 +98,26 @@ class PractitionerAppointmentsPage extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildQuickStat('Today', '4', const Color(0xFFF59297), Icons.today),
+                        child: _buildQuickStat(
+                            'Today', '4', const Color(0xFFF59297), Icons.today),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _buildQuickStat('This Week', '8', const Color(0xFF7DA8E6), Icons.calendar_view_week),
+                        child: _buildQuickStat('This Week', '8',
+                            const Color(0xFF7DA8E6), Icons.calendar_view_week),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Main Appointments Card
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFF59297).withOpacity(0.2)),
+                      border: Border.all(
+                          color: const Color(0xFFF59297).withOpacity(0.2)),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.08),
@@ -125,7 +135,10 @@ class PractitionerAppointmentsPage extends StatelessWidget {
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                                  colors: [
+                                    Color(0xFFF59297),
+                                    Color(0xFF7DA8E6)
+                                  ],
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -147,18 +160,22 @@ class PractitionerAppointmentsPage extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 20),
-                        
+
                         // Appointment Stats
-                        _buildAppointmentStat('Today\'s Schedule', '4', const Color(0xFFF59297)),
+                        _buildAppointmentStat(
+                            'Today\'s Schedule', '4', const Color(0xFFF59297)),
                         const SizedBox(height: 14),
-                        _buildAppointmentStat('Pending Requests', '2', const Color(0xFFFF9800)),
+                        _buildAppointmentStat(
+                            'Pending Requests', '2', const Color(0xFFFF9800)),
                         const SizedBox(height: 14),
-                        _buildAppointmentStat('This Week Total', '8', const Color(0xFF7DA8E6)),
+                        _buildAppointmentStat(
+                            'This Week Total', '8', const Color(0xFF7DA8E6)),
                         const SizedBox(height: 14),
-                        _buildAppointmentStat('Completed Today', '1', const Color(0xFF4CAF50)),
-                        
+                        _buildAppointmentStat(
+                            'Completed Today', '1', const Color(0xFF4CAF50)),
+
                         const SizedBox(height: 24),
-                        
+
                         // Action Buttons Row
                         Row(
                           children: [
@@ -168,10 +185,14 @@ class PractitionerAppointmentsPage extends StatelessWidget {
                                   // Navigate to detailed appointments view
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
-                                      colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                                      colors: [
+                                        Color(0xFFF59297),
+                                        Color(0xFF7DA8E6)
+                                      ],
                                     ),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -194,11 +215,13 @@ class PractitionerAppointmentsPage extends StatelessWidget {
                                   // Navigate to schedule new appointment
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: const Color(0xFFF59297)),
+                                    border: Border.all(
+                                        color: const Color(0xFFF59297)),
                                   ),
                                   child: const Text(
                                     'Schedule New',
@@ -226,7 +249,8 @@ class PractitionerAppointmentsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickStat(String label, String count, Color color, IconData icon) {
+  Widget _buildQuickStat(
+      String label, String count, Color color, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

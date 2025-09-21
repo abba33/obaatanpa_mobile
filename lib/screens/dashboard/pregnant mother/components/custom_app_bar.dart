@@ -6,6 +6,7 @@ import 'package:obaatanpa_mobile/screens/dashboard/preferences_page.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/profile_settings_page.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/notification_page.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
 
 // Custom App Bar Component with Dark Mode Support and Profile Dropdown
 class CustomAppBar extends StatelessWidget {
@@ -399,27 +400,51 @@ class CustomAppBar extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        CircleAvatar(
-                          radius: 18,
-                          backgroundColor:
-                              isDark ? Colors.grey[700] : Colors.grey[300],
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(18),
-                            child: Image.asset(
-                              'assets/images/navbar/profile-1.png',
-                              fit: BoxFit.cover,
-                              width: 36,
-                              height: 36,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(
-                                  Icons.person,
-                                  color:
-                                      isDark ? Colors.white : Colors.grey[600],
-                                  size: 20,
-                                );
-                              },
-                            ),
-                          ),
+                        Consumer<AuthProvider>(
+                          builder: (context, authProvider, child) {
+                            final profilePicture = authProvider.profilePicture;
+                            return CircleAvatar(
+                              radius: 18,
+                              backgroundColor:
+                                  isDark ? Colors.grey[700] : Colors.grey[300],
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(18),
+                                child: profilePicture != null
+                                    ? Image.file(
+                                        File(profilePicture),
+                                        fit: BoxFit.cover,
+                                        width: 36,
+                                        height: 36,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Icon(
+                                            Icons.person,
+                                            color: isDark
+                                                ? Colors.white
+                                                : Colors.grey[600],
+                                            size: 20,
+                                          );
+                                        },
+                                      )
+                                    : Image.asset(
+                                        'assets/images/navbar/profile-1.png',
+                                        fit: BoxFit.cover,
+                                        width: 36,
+                                        height: 36,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Icon(
+                                            Icons.person,
+                                            color: isDark
+                                                ? Colors.white
+                                                : Colors.grey[600],
+                                            size: 20,
+                                          );
+                                        },
+                                      ),
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(width: 6),
                         Icon(

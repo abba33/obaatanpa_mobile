@@ -7,6 +7,7 @@ import 'dart:convert';
 class AuthProvider extends ChangeNotifier {
   static const String _tokenKey = 'auth_token';
   static const String _userKey = 'user_data';
+  static const String _signupDataKey = 'signup_data';
   // Standalone mode - no backend required
 
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
@@ -28,6 +29,7 @@ class AuthProvider extends ChangeNotifier {
   String? get userEmail => _user?['email'];
   String? get userName =>
       '${_user?['first_name'] ?? ''} ${_user?['last_name'] ?? ''}'.trim();
+  String? get profilePicture => _user?['profile_picture'];
 
   AuthProvider() {
     _initializeAuth();
@@ -109,15 +111,45 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
 
+      // Retrieve signup data
+      final signupDataString = await _storage.read(key: _signupDataKey);
+      Map<String, dynamic>? signupData;
+
+      if (signupDataString != null) {
+        try {
+          signupData = json.decode(signupDataString);
+        } catch (e) {
+          debugPrint('Error parsing signup data: $e');
+        }
+      }
+
       // Mock successful login
       _token = 'mock_token_${DateTime.now().millisecondsSinceEpoch}';
+
+      // Use actual signup data if available, otherwise fallback to email extraction
+      String firstName, lastName, userType;
+
+      if (signupData != null && signupData['email'] == email) {
+        firstName = signupData['firstName'] ?? 'User';
+        lastName = signupData['lastName'] ?? '';
+        userType = signupData['userType'] ?? 'pregnant';
+      } else {
+        // Fallback: extract from email if no signup data found
+        final username = email.split('@').first;
+        firstName = _capitalizeUsername(username);
+        lastName = '';
+        userType = _getUserTypeFromEmail(email);
+      }
+
       _user = {
         'id': 1,
         'email': email,
-        'first_name': 'Demo',
-        'last_name': 'User',
-        'user_type': _getUserTypeFromEmail(email),
-        'created_at': DateTime.now().toIso8601String(),
+        'first_name': firstName,
+        'last_name': lastName,
+        'user_type': userType,
+        'created_at':
+            signupData?['createdAt'] ?? DateTime.now().toIso8601String(),
+        'profile_picture': signupData?['profilePicture'] ?? null,
       };
       _isAuthenticated = true;
 
@@ -134,6 +166,20 @@ class AuthProvider extends ChangeNotifier {
     } finally {
       _setLoading(false);
     }
+  }
+
+  /// Capitalize username properly
+  String _capitalizeUsername(String username) {
+    if (username.isEmpty) return 'User';
+
+    // Handle common separators and capitalize each part
+    final parts = username.split(RegExp(r'[._-]'));
+    final capitalizedParts = parts.map((part) {
+      if (part.isEmpty) return '';
+      return part[0].toUpperCase() + part.substring(1).toLowerCase();
+    }).toList();
+
+    return capitalizedParts.join(' ');
   }
 
   /// Determine user type from email for demo purposes
@@ -229,9 +275,18 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
 
-      // Mock successful registration - DO NOT auto-login
-      // In a real app, this would create the account on the server
-      // but not return authentication tokens
+      // Store signup data for later login
+      final signupData = {
+        'email': email,
+        'password': password, // In real app, this would be hashed
+        'firstName': firstName,
+        'lastName': lastName,
+        'userType': userType,
+        'additionalData': additionalData,
+        'createdAt': DateTime.now().toIso8601String(),
+      };
+
+      await _storage.write(key: _signupDataKey, value: json.encode(signupData));
 
       debugPrint('Mock account created for: $email');
       debugPrint('User type: $userType');
@@ -263,6 +318,31 @@ class AuthProvider extends ChangeNotifier {
       await _clearAuthData();
     } finally {
       _setLoading(false);
+    }
+  }
+
+  /// Update user profile picture
+  Future<void> updateProfilePicture(String? imagePath) async {
+    if (_user != null) {
+      _user!['profile_picture'] = imagePath;
+
+      // Update stored user data
+      await _storage.write(key: _userKey, value: json.encode(_user));
+
+      // Also update signup data if it exists
+      final signupDataString = await _storage.read(key: _signupDataKey);
+      if (signupDataString != null) {
+        try {
+          final signupData = json.decode(signupDataString);
+          signupData['profilePicture'] = imagePath;
+          await _storage.write(
+              key: _signupDataKey, value: json.encode(signupData));
+        } catch (e) {
+          debugPrint('Error updating signup data: $e');
+        }
+      }
+
+      notifyListeners();
     }
   }
 

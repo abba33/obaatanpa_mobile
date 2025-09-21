@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class PractitionerResourcesPage extends StatelessWidget {
   const PractitionerResourcesPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       body: Column(
         children: [
           // Custom App Bar Header
@@ -47,7 +53,8 @@ class PractitionerResourcesPage extends StatelessWidget {
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: Colors.purple.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -91,27 +98,33 @@ class PractitionerResourcesPage extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildQuickStat('Total Views', '247', const Color(0xFFF59297), Icons.visibility),
+                        child: _buildQuickStat('Total Views', '247',
+                            const Color(0xFFF59297), Icons.visibility),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _buildQuickStat('This Month', '89', const Color(0xFF7DA8E6), Icons.trending_up),
+                        child: _buildQuickStat('This Month', '89',
+                            const Color(0xFF7DA8E6), Icons.trending_up),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Main Resources Card
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [const Color(0xFFF59297).withOpacity(0.05), const Color(0xFF7DA8E6).withOpacity(0.05)],
+                        colors: [
+                          const Color(0xFFF59297).withOpacity(0.05),
+                          const Color(0xFF7DA8E6).withOpacity(0.05)
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFF59297).withOpacity(0.2)),
+                      border: Border.all(
+                          color: const Color(0xFFF59297).withOpacity(0.2)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,7 +135,10 @@ class PractitionerResourcesPage extends StatelessWidget {
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                                  colors: [
+                                    Color(0xFFF59297),
+                                    Color(0xFF7DA8E6)
+                                  ],
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -144,18 +160,20 @@ class PractitionerResourcesPage extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        
+
                         // Resource Stats
                         Row(
                           children: [
-                            _buildResourceStat('Resources Shared', '12', const Color(0xFFF59297)),
+                            _buildResourceStat('Resources Shared', '12',
+                                const Color(0xFFF59297)),
                             const SizedBox(width: 24),
-                            _buildResourceStat('Views This Month', '247', const Color(0xFF7DA8E6)),
+                            _buildResourceStat('Views This Month', '247',
+                                const Color(0xFF7DA8E6)),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 20),
-                        
+
                         // Recent Resources
                         const Text(
                           'Recent Contributions',
@@ -166,7 +184,7 @@ class PractitionerResourcesPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        
+
                         _buildResourceItem(
                           'Postpartum Care Guide',
                           'PDF • 3 days ago',
@@ -190,9 +208,9 @@ class PractitionerResourcesPage extends StatelessWidget {
                           Icons.article,
                           const Color(0xFFF59297).withOpacity(0.8),
                         ),
-                        
+
                         const SizedBox(height: 20),
-                        
+
                         // Action Buttons
                         Row(
                           children: [
@@ -202,10 +220,14 @@ class PractitionerResourcesPage extends StatelessWidget {
                                   // Navigate to add resource
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
-                                      colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                                      colors: [
+                                        Color(0xFFF59297),
+                                        Color(0xFF7DA8E6)
+                                      ],
                                       begin: Alignment.centerLeft,
                                       end: Alignment.centerRight,
                                     ),
@@ -240,11 +262,13 @@ class PractitionerResourcesPage extends StatelessWidget {
                                   // View all resources
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: const Color(0xFFF59297)),
+                                    border: Border.all(
+                                        color: const Color(0xFFF59297)),
                                   ),
                                   child: const Text(
                                     'View All Resources',
@@ -272,7 +296,8 @@ class PractitionerResourcesPage extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickStat(String label, String count, Color color, IconData icon) {
+  Widget _buildQuickStat(
+      String label, String count, Color color, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -342,7 +367,8 @@ class PractitionerResourcesPage extends StatelessWidget {
     );
   }
 
-  Widget _buildResourceItem(String title, String subtitle, String views, IconData icon, Color color) {
+  Widget _buildResourceItem(
+      String title, String subtitle, String views, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(

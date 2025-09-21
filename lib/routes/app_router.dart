@@ -29,6 +29,7 @@ import '../screens/dashboard/pregnant mother/appointment/appointment_screen.dart
 import '../screens/dashboard/pregnant mother/resources/resources_page.dart';
 import '../screens/dashboard/pregnant mother/nutrition/nutrition_screen.dart';
 import '../screens/dashboard/pregnant mother/health/health_screen.dart';
+import '../screens/dashboard/pregnant mother/components/quick actions/trimester_meals_page.dart';
 
 // Notification Page Import
 import '../screens/dashboard/notification_page.dart';
@@ -60,31 +61,31 @@ class AppRouter {
       // ============================================
       // SPLASH & ONBOARDING ROUTES
       // ============================================
-      
+
       // Splash Screen - Initial route
       GoRoute(
         path: '/',
         name: 'splash',
         builder: (context, state) => const SplashScreen(),
       ),
-      
+
       // Onboarding Screen - For new users
       GoRoute(
         path: '/onboarding',
         name: 'onboarding',
         builder: (context, state) => const OnboardingScreen(),
       ),
-      
+
       // ============================================
       // AUTH ROUTES
       // ============================================
-      
+
       GoRoute(
         path: '/auth/signup',
         name: 'signup',
         builder: (context, state) => const SignupScreen(),
       ),
-      
+
       GoRoute(
         path: '/auth/login',
         name: 'login',
@@ -94,7 +95,7 @@ class AppRouter {
       // ============================================
       // NOTIFICATION ROUTE
       // ============================================
-      
+
       GoRoute(
         path: '/notifications',
         name: 'notifications',
@@ -104,7 +105,7 @@ class AppRouter {
       // ============================================
       // PREGNANT MOTHER ROUTES (existing)
       // ============================================
-      
+
       GoRoute(
         path: '/appointments',
         name: 'appointments',
@@ -124,6 +125,11 @@ class AppRouter {
         path: '/health',
         name: 'health',
         builder: (context, state) => const HealthScreen(),
+      ),
+      GoRoute(
+        path: '/trimester-meals',
+        name: 'trimester-meals',
+        builder: (context, state) => const TrimesterMealsPage(),
       ),
 
       // Hospital booking
@@ -161,7 +167,7 @@ class AppRouter {
       // ============================================
       // HEALTH PRACTITIONER ROUTES
       // ============================================
-      
+
       // Health Practitioner Dashboard - Main Dashboard
       GoRoute(
         path: '/practitioner/dashboard',
@@ -207,7 +213,7 @@ class AppRouter {
       // ============================================
       // HOSPITAL ROUTES
       // ============================================
-      
+
       // Hospital Dashboard - Main Dashboard
       GoRoute(
         path: '/hospital/dashboard',
@@ -260,7 +266,7 @@ class AppRouter {
       // ============================================
       // NEW MOTHER ROUTES
       // ============================================
-      
+
       // New Mother Dashboard - KEEP THIS ONE
       GoRoute(
         path: '/new-mother/dashboard',

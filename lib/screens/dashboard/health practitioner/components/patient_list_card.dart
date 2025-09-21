@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class PractitionerPatientsPage extends StatelessWidget {
   const PractitionerPatientsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       body: Column(
         children: [
           // Custom App Bar Header
@@ -47,7 +53,8 @@ class PractitionerPatientsPage extends StatelessWidget {
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: Colors.blue.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -91,16 +98,18 @@ class PractitionerPatientsPage extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildQuickStat('Active', '43', const Color(0xFFF59297), Icons.person),
+                        child: _buildQuickStat('Active', '43',
+                            const Color(0xFFF59297), Icons.person),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _buildQuickStat('This Week', '12', const Color(0xFF7DA8E6), Icons.calendar_view_week),
+                        child: _buildQuickStat('This Week', '12',
+                            const Color(0xFF7DA8E6), Icons.calendar_view_week),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Main Patients Card
                   Container(
                     padding: const EdgeInsets.all(20),
@@ -124,7 +133,10 @@ class PractitionerPatientsPage extends StatelessWidget {
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                                  colors: [
+                                    Color(0xFFF59297),
+                                    Color(0xFF7DA8E6)
+                                  ],
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -160,7 +172,7 @@ class PractitionerPatientsPage extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        
+
                         // Patient List Items
                         _buildPatientItem(
                           'Sarah Mensah',
@@ -193,9 +205,9 @@ class PractitionerPatientsPage extends StatelessWidget {
                           const Color(0xFF7DA8E6).withOpacity(0.8),
                           false,
                         ),
-                        
+
                         const SizedBox(height: 20),
-                        
+
                         // Action Buttons
                         Row(
                           children: [
@@ -205,10 +217,14 @@ class PractitionerPatientsPage extends StatelessWidget {
                                   // Navigate to all patients
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
-                                      colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                                      colors: [
+                                        Color(0xFFF59297),
+                                        Color(0xFF7DA8E6)
+                                      ],
                                     ),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -231,11 +247,13 @@ class PractitionerPatientsPage extends StatelessWidget {
                                   // Add new patient
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: const Color(0xFFF59297)),
+                                    border: Border.all(
+                                        color: const Color(0xFFF59297)),
                                   ),
                                   child: const Text(
                                     'Add Patient',
@@ -263,7 +281,8 @@ class PractitionerPatientsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickStat(String label, String count, Color color, IconData icon) {
+  Widget _buildQuickStat(
+      String label, String count, Color color, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -308,7 +327,8 @@ class PractitionerPatientsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildPatientItem(String name, String status, String appointment, Color color, bool hasUpcoming) {
+  Widget _buildPatientItem(String name, String status, String appointment,
+      Color color, bool hasUpcoming) {
     return GestureDetector(
       onTap: () {
         // Navigate to patient details
@@ -337,7 +357,7 @@ class PractitionerPatientsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            
+
             // Patient Info
             Expanded(
               child: Column(
@@ -363,13 +383,14 @@ class PractitionerPatientsPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       color: hasUpcoming ? color : Colors.grey[500],
-                      fontWeight: hasUpcoming ? FontWeight.w500 : FontWeight.normal,
+                      fontWeight:
+                          hasUpcoming ? FontWeight.w500 : FontWeight.normal,
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             // Action Buttons
             Row(
               children: [

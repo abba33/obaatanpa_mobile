@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:obaatanpa_mobile/providers/pregnancy_data_provider.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
 
 class TrimesterMealsPage extends StatefulWidget {
   const TrimesterMealsPage({Key? key}) : super(key: key);
@@ -28,14 +29,16 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PregnancyDataProvider>(
-      builder: (context, pregnancyProvider, child) {
+    return Consumer2<PregnancyDataProvider, ThemeProvider>(
+      builder: (context, pregnancyProvider, themeProvider, child) {
         final trimester = pregnancyProvider.trimester;
         final currentWeek = pregnancyProvider.currentWeek;
         final trimesterData = _getTrimesterMealData(trimester);
+        final isDark = themeProvider.isDarkMode;
 
         return Scaffold(
-          backgroundColor: const Color(0xFFFAFAFA),
+          backgroundColor:
+              isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA),
           appBar: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,

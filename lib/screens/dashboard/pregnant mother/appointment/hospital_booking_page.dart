@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:obaatanpa_mobile/providers/auth_provider.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
 
 class HospitalBookingPage extends StatefulWidget {
   final String hospitalName;
@@ -47,8 +48,12 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       body: Column(
         children: [
           // Custom App Bar with back button

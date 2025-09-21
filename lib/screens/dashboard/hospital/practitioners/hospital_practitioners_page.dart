@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class HospitalPractitionersPage extends StatefulWidget {
   const HospitalPractitionersPage({Key? key}) : super(key: key);
 
   @override
-  State<HospitalPractitionersPage> createState() => _HospitalPractitionersPageState();
+  State<HospitalPractitionersPage> createState() =>
+      _HospitalPractitionersPageState();
 }
 
 class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
@@ -20,8 +23,12 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       body: Stack(
         children: [
           Column(
@@ -45,9 +52,12 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0), // FIXED: Reduced vertical padding
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 4.0), // FIXED: Reduced vertical padding
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center, // FIXED: Center content vertically
+                      mainAxisAlignment: MainAxisAlignment
+                          .center, // FIXED: Center content vertically
                       children: [
                         Row(
                           children: [
@@ -81,15 +91,18 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
                         Flexible(
                           child: Row(
                             children: [
-                              Expanded( // FIXED: Wrap text in Expanded
+                              Expanded(
+                                // FIXED: Wrap text in Expanded
                                 child: Text(
                                   'Practitioners Management',
                                   style: const TextStyle(
-                                    fontSize: 20, // FIXED: Reduced font size from 24 to 20
+                                    fontSize:
+                                        20, // FIXED: Reduced font size from 24 to 20
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
-                                  overflow: TextOverflow.ellipsis, // FIXED: Add overflow protection
+                                  overflow: TextOverflow
+                                      .ellipsis, // FIXED: Add overflow protection
                                   maxLines: 1,
                                 ),
                               ),
@@ -112,15 +125,18 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
                       Row(
                         children: [
                           Expanded(
-                            child: _buildStatCard('Total', '18', const Color(0xFFF59297)),
+                            child: _buildStatCard(
+                                'Total', '18', const Color(0xFFF59297)),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: _buildStatCard('Active', '15', const Color(0xFF7DA8E6)),
+                            child: _buildStatCard(
+                                'Active', '15', const Color(0xFF7DA8E6)),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: _buildStatCard('Pending', '3', Colors.orange),
+                            child:
+                                _buildStatCard('Pending', '3', Colors.orange),
                           ),
                         ],
                       ),
@@ -131,23 +147,33 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
                         children: [
                           Expanded(
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.grey.withOpacity(0.3)),
+                                border: Border.all(
+                                    color: Colors.grey.withOpacity(0.3)),
                               ),
                               child: DropdownButtonHideUnderline(
                                 child: DropdownButton<String>(
                                   value: _selectedFilter,
-                                  isExpanded: true, // FIXED: Add isExpanded to prevent overflow
-                                  items: ['All', 'Active', 'Pending', 'Obstetricians', 'Midwives', 'Pediatricians']
-                                      .map((String value) {
+                                  isExpanded:
+                                      true, // FIXED: Add isExpanded to prevent overflow
+                                  items: [
+                                    'All',
+                                    'Active',
+                                    'Pending',
+                                    'Obstetricians',
+                                    'Midwives',
+                                    'Pediatricians'
+                                  ].map((String value) {
                                     return DropdownMenuItem<String>(
                                       value: value,
                                       child: Text(
                                         value,
-                                        overflow: TextOverflow.ellipsis, // FIXED: Add overflow protection
+                                        overflow: TextOverflow
+                                            .ellipsis, // FIXED: Add overflow protection
                                       ),
                                     );
                                   }).toList(),
@@ -170,14 +196,18 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                                  colors: [
+                                    Color(0xFFF59297),
+                                    Color(0xFF7DA8E6)
+                                  ],
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: const [
-                                  Icon(Icons.add, color: Colors.white, size: 20),
+                                  Icon(Icons.add,
+                                      color: Colors.white, size: 20),
                                   SizedBox(width: 4),
                                   Text(
                                     'Add',
@@ -322,7 +352,9 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: Icon(
-                    practitioner['specialty']!.contains('Dr.') ? Icons.person : Icons.pregnant_woman,
+                    practitioner['specialty']!.contains('Dr.')
+                        ? Icons.person
+                        : Icons.pregnant_woman,
                     color: const Color(0xFFF59297),
                     size: 24,
                   ),
@@ -339,7 +371,8 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
-                        overflow: TextOverflow.ellipsis, // FIXED: Add overflow protection
+                        overflow: TextOverflow
+                            .ellipsis, // FIXED: Add overflow protection
                         maxLines: 1,
                       ),
                       Text(
@@ -348,14 +381,16 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
                           fontSize: 14,
                           color: Colors.black54,
                         ),
-                        overflow: TextOverflow.ellipsis, // FIXED: Add overflow protection
+                        overflow: TextOverflow
+                            .ellipsis, // FIXED: Add overflow protection
                         maxLines: 1,
                       ),
                     ],
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -386,7 +421,8 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
                   child: _buildInfoItem(Icons.phone, practitioner['phone']!),
                 ),
                 Expanded(
-                  child: _buildInfoItem(Icons.people, '${practitioner['patients']} patients'),
+                  child: _buildInfoItem(
+                      Icons.people, '${practitioner['patients']} patients'),
                 ),
               ],
             ),
@@ -420,7 +456,9 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
                               // View practitioner details
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), // FIXED: Reduced padding
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 6), // FIXED: Reduced padding
                               decoration: BoxDecoration(
                                 color: const Color(0xFF7DA8E6).withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
@@ -443,7 +481,9 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
                               // Edit practitioner
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), // FIXED: Reduced padding
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 6), // FIXED: Reduced padding
                               decoration: BoxDecoration(
                                 color: const Color(0xFFF59297).withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
@@ -466,7 +506,9 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
                               // Approve practitioner
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4), // FIXED: Reduced padding
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 4), // FIXED: Reduced padding
                               decoration: BoxDecoration(
                                 color: Colors.green.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
@@ -489,7 +531,9 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
                               // Reject practitioner
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4), // FIXED: Reduced padding
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 4), // FIXED: Reduced padding
                               decoration: BoxDecoration(
                                 color: Colors.red.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
@@ -546,7 +590,8 @@ class _HospitalPractitionersPageState extends State<HospitalPractitionersPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Add Practitioner'),
-          content: const Text('Add practitioner functionality would be implemented here.'),
+          content: const Text(
+              'Add practitioner functionality would be implemented here.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),

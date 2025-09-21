@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class HospitalProfilePage extends StatelessWidget {
   const HospitalProfilePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       body: Column(
         children: [
           // Custom App Bar Header
@@ -51,7 +57,8 @@ class HospitalProfilePage extends StatelessWidget {
                             // Navigate to edit profile
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
@@ -80,7 +87,7 @@ class HospitalProfilePage extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Hospital info in header
                     Row(
                       children: [
@@ -201,7 +208,8 @@ class HospitalProfilePage extends StatelessWidget {
                           ),
                           const Spacer(),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
                               color: const Color(0xFFF59297).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
@@ -218,7 +226,7 @@ class HospitalProfilePage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // Progress bar
                       Container(
                         height: 8,
@@ -240,18 +248,22 @@ class HospitalProfilePage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // Completion items
-                      _buildCompletionItem('Hospital Details', true, Colors.green),
-                      _buildCompletionItem('Services & Specialties', true, Colors.green),
-                      _buildCompletionItem('Contact Information', true, Colors.green),
-                      _buildCompletionItem('Hospital Photos', false, Colors.orange),
+                      _buildCompletionItem(
+                          'Hospital Details', true, Colors.green),
+                      _buildCompletionItem(
+                          'Services & Specialties', true, Colors.green),
+                      _buildCompletionItem(
+                          'Contact Information', true, Colors.green),
+                      _buildCompletionItem(
+                          'Hospital Photos', false, Colors.orange),
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Statistics cards
                 Row(
                   children: [
@@ -274,9 +286,9 @@ class HospitalProfilePage extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Quick actions
                 Container(
                   padding: const EdgeInsets.all(20),
@@ -322,7 +334,6 @@ class HospitalProfilePage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      
                       _buildActionItem(
                         'Update Hospital Information',
                         'Keep your details current',
@@ -352,9 +363,9 @@ class HospitalProfilePage extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Public profile button
                 GestureDetector(
                   onTap: () {
@@ -436,7 +447,8 @@ class HospitalProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String title, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/custom_app_bar.dart';
 import 'package:obaatanpa_mobile/widgets/navigation/navigation_menu.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NutritionScreen extends StatefulWidget {
@@ -36,8 +38,12 @@ class _NutritionScreenState extends State<NutritionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA),
       body: Stack(
         children: [
           Column(
@@ -48,7 +54,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                 onMenuTap: _toggleMenu,
                 title: 'Nutrition',
               ),
-              
+
               // Nutrition Content
               Expanded(
                 child: SingleChildScrollView(
@@ -57,25 +63,25 @@ class _NutritionScreenState extends State<NutritionScreen> {
                     children: [
                       // Header Section with Trimester Selection
                       _buildHeaderSection(),
-                      
+
                       // Daily Nutrition Goals
                       _buildDailyNutritionGoals(),
-                      
+
                       // Recommended Foods Section
                       _buildRecommendedFoods(),
-                      
+
                       // Meal Planning Section
                       _buildMealPlanningSection(),
-                      
+
                       // Foods to Avoid Section
                       _buildFoodsToAvoid(),
-                      
+
                       // Nutrition Tips Section
                       _buildNutritionTips(),
-                      
+
                       // Supplements Section
                       _buildSupplementsSection(),
-                      
+
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -83,7 +89,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
               ),
             ],
           ),
-          
+
           // Side Navigation Menu
           if (_isMenuOpen) _buildNavigationMenu(),
         ],
@@ -162,7 +168,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
               itemBuilder: (context, index) {
                 final trimester = trimesters[index];
                 final isSelected = trimester == selectedTrimester;
-                
+
                 return GestureDetector(
                   onTap: () {
                     setState(() {
@@ -174,12 +180,16 @@ class _NutritionScreenState extends State<NutritionScreen> {
                       left: index == 0 ? 0 : 8,
                       right: index == trimesters.length - 1 ? 0 : 8,
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFFF59297) : Colors.white,
+                      color:
+                          isSelected ? const Color(0xFFF59297) : Colors.white,
                       borderRadius: BorderRadius.circular(25),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFFF59297) : const Color(0xFFE5E7EB),
+                        color: isSelected
+                            ? const Color(0xFFF59297)
+                            : const Color(0xFFE5E7EB),
                       ),
                       boxShadow: [
                         if (isSelected)
@@ -193,7 +203,8 @@ class _NutritionScreenState extends State<NutritionScreen> {
                     child: Text(
                       trimester,
                       style: TextStyle(
-                        color: isSelected ? Colors.white : const Color(0xFF6B7280),
+                        color:
+                            isSelected ? Colors.white : const Color(0xFF6B7280),
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
@@ -239,13 +250,17 @@ class _NutritionScreenState extends State<NutritionScreen> {
             ),
             child: Column(
               children: [
-                _buildNutritionGoalItem('Calories', '2,200', '2,500 kcal', 0.88, const Color(0xFF10B981)),
+                _buildNutritionGoalItem('Calories', '2,200', '2,500 kcal', 0.88,
+                    const Color(0xFF10B981)),
                 const SizedBox(height: 20),
-                _buildNutritionGoalItem('Protein', '65g', '75g', 0.87, const Color(0xFFF59297)),
+                _buildNutritionGoalItem(
+                    'Protein', '65g', '75g', 0.87, const Color(0xFFF59297)),
                 const SizedBox(height: 20),
-                _buildNutritionGoalItem('Folate', '550μg', '600μg', 0.92, const Color(0xFF7DA8E6)),
+                _buildNutritionGoalItem(
+                    'Folate', '550μg', '600μg', 0.92, const Color(0xFF7DA8E6)),
                 const SizedBox(height: 20),
-                _buildNutritionGoalItem('Iron', '22mg', '27mg', 0.81, const Color(0xFFF59E0B)),
+                _buildNutritionGoalItem(
+                    'Iron', '22mg', '27mg', 0.81, const Color(0xFFF59E0B)),
               ],
             ),
           ),
@@ -254,7 +269,8 @@ class _NutritionScreenState extends State<NutritionScreen> {
     );
   }
 
-  Widget _buildNutritionGoalItem(String nutrient, String current, String target, double progress, Color color) {
+  Widget _buildNutritionGoalItem(String nutrient, String current, String target,
+      double progress, Color color) {
     return Column(
       children: [
         Row(
@@ -289,169 +305,169 @@ class _NutritionScreenState extends State<NutritionScreen> {
     );
   }
 
-Widget _buildRecommendedFoods() {
-  final recommendedFoods = [
-    {
-      'name': 'Leafy Greens',
-      'benefit': 'Rich in folate & iron',
-      'image': 'assets/images/foods/leafy_greens.png', 
-      'color': const Color(0xFF10B981),
-      'examples': 'Spinach, Kale, Broccoli',
-    },
-    {
-      'name': 'Lean Proteins',
-      'benefit': 'Essential for baby growth',
-      'image': 'assets/images/foods/lean_proteins.png', 
-      'color': const Color(0xFFF59297),
-      'examples': 'Fish, Chicken, Beans, Eggs',
-    },
-    {
-      'name': 'Whole Grains',
-      'benefit': 'Energy & fiber',
-      'image': 'assets/images/foods/whole_grains.png', 
-      'color': const Color(0xFFF59E0B),
-      'examples': 'Brown rice, Oats, Quinoa',
-    },
-    {
-      'name': 'Dairy Products',
-      'benefit': 'Calcium for bones',
-      'image': 'assets/images/foods/dairy_products.png', 
-      'color': const Color(0xFF7DA8E6),
-      'examples': 'Milk, Yogurt, Cheese',
-    },
-  ];
+  Widget _buildRecommendedFoods() {
+    final recommendedFoods = [
+      {
+        'name': 'Leafy Greens',
+        'benefit': 'Rich in folate & iron',
+        'image': 'assets/images/foods/leafy_greens.png',
+        'color': const Color(0xFF10B981),
+        'examples': 'Spinach, Kale, Broccoli',
+      },
+      {
+        'name': 'Lean Proteins',
+        'benefit': 'Essential for baby growth',
+        'image': 'assets/images/foods/lean_proteins.png',
+        'color': const Color(0xFFF59297),
+        'examples': 'Fish, Chicken, Beans, Eggs',
+      },
+      {
+        'name': 'Whole Grains',
+        'benefit': 'Energy & fiber',
+        'image': 'assets/images/foods/whole_grains.png',
+        'color': const Color(0xFFF59E0B),
+        'examples': 'Brown rice, Oats, Quinoa',
+      },
+      {
+        'name': 'Dairy Products',
+        'benefit': 'Calcium for bones',
+        'image': 'assets/images/foods/dairy_products.png',
+        'color': const Color(0xFF7DA8E6),
+        'examples': 'Milk, Yogurt, Cheese',
+      },
+    ];
 
-  return Padding(
-    padding: const EdgeInsets.all(20),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Recommended Foods',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF2C2C2C),
-            letterSpacing: -0.3,
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Recommended Foods',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2C2C2C),
+              letterSpacing: -0.3,
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.85,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-          ),
-          itemCount: recommendedFoods.length,
-          itemBuilder: (context, index) {
-            final food = recommendedFoods[index];
-            return Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: (food['color'] as Color).withOpacity(0.2),
+          const SizedBox(height: 16),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.85,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+            ),
+            itemCount: recommendedFoods.length,
+            itemBuilder: (context, index) {
+              final food = recommendedFoods[index];
+              return Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: (food['color'] as Color).withOpacity(0.2),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Image Container
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: (food['color'] as Color).withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        food['image'].toString(),
-                        width: 44,
-                        height: 44,
-                        fit: BoxFit.cover,
-                        // Fallback to icon if image fails to load
-                        errorBuilder: (context, error, stackTrace) {
-                          // Fallback icons based on food type
-                          IconData fallbackIcon;
-                          switch (index) {
-                            case 0:
-                              fallbackIcon = Icons.eco_outlined;
-                              break;
-                            case 1:
-                              fallbackIcon = Icons.food_bank_outlined;
-                              break;
-                            case 2:
-                              fallbackIcon = Icons.grain_outlined;
-                              break;
-                            case 3:
-                              fallbackIcon = Icons.local_drink_outlined;
-                              break;
-                            default:
-                              fallbackIcon = Icons.restaurant_menu;
-                          }
-                          return Icon(
-                            fallbackIcon,
-                            color: food['color'] as Color,
-                            size: 22,
-                          );
-                        },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Image Container
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: (food['color'] as Color).withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          food['image'].toString(),
+                          width: 44,
+                          height: 44,
+                          fit: BoxFit.cover,
+                          // Fallback to icon if image fails to load
+                          errorBuilder: (context, error, stackTrace) {
+                            // Fallback icons based on food type
+                            IconData fallbackIcon;
+                            switch (index) {
+                              case 0:
+                                fallbackIcon = Icons.eco_outlined;
+                                break;
+                              case 1:
+                                fallbackIcon = Icons.food_bank_outlined;
+                                break;
+                              case 2:
+                                fallbackIcon = Icons.grain_outlined;
+                                break;
+                              case 3:
+                                fallbackIcon = Icons.local_drink_outlined;
+                                break;
+                              default:
+                                fallbackIcon = Icons.restaurant_menu;
+                            }
+                            return Icon(
+                              fallbackIcon,
+                              color: food['color'] as Color,
+                              size: 22,
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    food['name'].toString(),
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2C2C2C),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Flexible(
-                    child: Text(
-                      food['benefit'].toString(),
+                    const SizedBox(height: 12),
+                    Text(
+                      food['name'].toString(),
                       style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF6B7280),
-                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2C2C2C),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Flexible(
-                    child: Text(
-                      food['examples'].toString(),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: food['color'] as Color,
-                        fontWeight: FontWeight.w500,
+                    const SizedBox(height: 4),
+                    Flexible(
+                      child: Text(
+                        food['benefit'].toString(),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF6B7280),
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-  );
-}
+                    const SizedBox(height: 6),
+                    Flexible(
+                      child: Text(
+                        food['examples'].toString(),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: food['color'] as Color,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildMealPlanningSection() {
     final mealPlan = [
@@ -614,7 +630,8 @@ Widget _buildRecommendedFoods() {
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('${meal['meal']} marked as completed!'),
+                            content:
+                                Text('${meal['meal']} marked as completed!'),
                             duration: const Duration(seconds: 2),
                             behavior: SnackBarBehavior.floating,
                           ),
@@ -832,7 +849,8 @@ Widget _buildRecommendedFoods() {
                                     return Container(
                                       width: double.infinity,
                                       height: 180,
-                                      color: const Color(0xFF7DA8E6).withOpacity(0.1),
+                                      color: const Color(0xFF7DA8E6)
+                                          .withOpacity(0.1),
                                       child: const Icon(
                                         Icons.play_circle_outline,
                                         size: 50,
@@ -889,7 +907,7 @@ Widget _buildRecommendedFoods() {
   void _launchYouTubeVideo(String videoId) async {
     final youtubeUrl = 'https://www.youtube.com/watch?v=$videoId';
     final youtubeAppUrl = 'youtube://watch?v=$videoId';
-    
+
     try {
       // Try to open in YouTube app first
       if (await canLaunchUrl(Uri.parse(youtubeAppUrl))) {
@@ -990,7 +1008,9 @@ Widget _buildRecommendedFoods() {
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: taken ? (supplement['color'] as Color) : Colors.transparent,
+                          color: taken
+                              ? (supplement['color'] as Color)
+                              : Colors.transparent,
                           border: Border.all(
                             color: supplement['color'] as Color,
                             width: 2,
@@ -1016,8 +1036,11 @@ Widget _buildRecommendedFoods() {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              decoration: taken ? TextDecoration.lineThrough : null,
-                              color: taken ? const Color(0xFF9CA3AF) : const Color(0xFF2C2C2C),
+                              decoration:
+                                  taken ? TextDecoration.lineThrough : null,
+                              color: taken
+                                  ? const Color(0xFF9CA3AF)
+                                  : const Color(0xFF2C2C2C),
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -1114,7 +1137,7 @@ Widget _buildRecommendedFoods() {
                 ],
               ),
             ),
-            
+
             // Menu Items
             Expanded(
               child: Padding(
@@ -1124,7 +1147,8 @@ Widget _buildRecommendedFoods() {
                   children: [
                     NavigationMenuItem(
                       title: 'Dashboard',
-                      onTap: () => _navigateToPage('/dashboard/pregnant-mother'),
+                      onTap: () =>
+                          _navigateToPage('/dashboard/pregnant-mother'),
                       textColor: Colors.black87,
                     ),
                     const SizedBox(height: 32),

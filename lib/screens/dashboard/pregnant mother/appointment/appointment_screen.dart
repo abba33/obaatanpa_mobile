@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/custom_app_bar.dart';
 import 'package:obaatanpa_mobile/widgets/navigation/navigation_menu.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class AppointmentsScreen extends StatefulWidget {
   const AppointmentsScreen({Key? key}) : super(key: key);
@@ -30,7 +32,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
 
   void _navigateToPage(String routeName) {
     _closeMenu();
-    
+
     if (routeName != '/appointments') {
       context.go(routeName);
     }
@@ -38,8 +40,12 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       body: Stack(
         children: [
           GestureDetector(
@@ -52,7 +58,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                   onMenuTap: _toggleMenu,
                   title: 'Appointments',
                 ),
-                
+
                 // Main Content
                 Expanded(
                   child: SingleChildScrollView(
@@ -60,7 +66,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 20),
-                        
+
                         // Search Section
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -79,7 +85,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                             ),
                             child: TextField(
                               decoration: InputDecoration(
-                                hintText: "Search hospitals, doctors, or services",
+                                hintText:
+                                    "Search hospitals, doctors, or services",
                                 hintStyle: TextStyle(
                                   color: Colors.grey[400],
                                   fontSize: 15,
@@ -184,8 +191,10 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                 189,
                                 hospitalData: {
                                   'hospitalName': 'Ridge Hospital',
-                                  'hospitalAddress': 'Castle Road, Ridge, Accra',
-                                  'hospitalImage': 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2053&q=80',
+                                  'hospitalAddress':
+                                      'Castle Road, Ridge, Accra',
+                                  'hospitalImage':
+                                      'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2053&q=80',
                                   'phoneNumber': '+233 30 987 6543',
                                 },
                               ),
@@ -199,8 +208,10 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                 245,
                                 hospitalData: {
                                   'hospitalName': 'Korle-Bu Teaching Hospital',
-                                  'hospitalAddress': 'Guggisberg Avenue, Korle-Bu, Accra',
-                                  'hospitalImage': 'https://images.unsplash.com/photo-1516841273335-e39b37888115?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80',
+                                  'hospitalAddress':
+                                      'Guggisberg Avenue, Korle-Bu, Accra',
+                                  'hospitalImage':
+                                      'https://images.unsplash.com/photo-1516841273335-e39b37888115?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80',
                                   'phoneNumber': '+233 30 202 0820',
                                 },
                               ),
@@ -215,7 +226,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                 hospitalData: {
                                   'hospitalName': 'Trust Hospital',
                                   'hospitalAddress': 'Dzorwulu, Accra',
-                                  'hospitalImage': 'https://images.unsplash.com/photo-1551190822-a9333d879b1f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+                                  'hospitalImage':
+                                      'https://images.unsplash.com/photo-1551190822-a9333d879b1f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
                                   'phoneNumber': '+233 30 278 5555',
                                 },
                               ),
@@ -292,10 +304,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
               ],
             ),
           ),
-          
+
           // Navigation Menu
-          if (isMenuOpen)
-            _buildNavigationMenu(),
+          if (isMenuOpen) _buildNavigationMenu(),
         ],
       ),
     );
@@ -386,7 +397,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                       NavigationMenuItem(
                         title: 'Dashboard',
                         textColor: Colors.black87,
-                        onTap: () => _navigateToPage('/dashboard/pregnant-mother'),
+                        onTap: () =>
+                            _navigateToPage('/dashboard/pregnant-mother'),
                       ),
                       const SizedBox(height: 32),
                       NavigationMenuItem(
@@ -439,13 +451,15 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           border: Border.all(
             color: isSelected ? const Color(0xFF7DA8E6) : Colors.grey[300]!,
           ),
-          boxShadow: isSelected ? [
-            BoxShadow(
-              color: const Color(0xFF7DA8E6).withOpacity(0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ] : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF7DA8E6).withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Text(
           title,
@@ -623,7 +637,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
             ),
           ),
           const SizedBox(width: 16),
-          
+
           // Appointment Info
           Expanded(
             child: Column(
@@ -680,7 +694,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
               ],
             ),
           ),
-          
+
           // Action Buttons
           Column(
             children: [

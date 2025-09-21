@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class HospitalAnalyticsPage extends StatelessWidget {
   const HospitalAnalyticsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       body: Column(
         children: [
           // Custom App Bar Header - Same style as resources page
@@ -47,7 +53,8 @@ class HospitalAnalyticsPage extends StatelessWidget {
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -134,7 +141,7 @@ class HospitalAnalyticsPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // Key metrics
                       _buildMetric(
                         'Patient Engagement',
@@ -159,9 +166,9 @@ class HospitalAnalyticsPage extends StatelessWidget {
                         true,
                         const Color(0xFF7DA8E6),
                       ),
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       // View detailed analytics button
                       GestureDetector(
                         onTap: () {
@@ -246,8 +253,8 @@ class HospitalAnalyticsPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: isPositive 
-                  ? Colors.green.withOpacity(0.1) 
+              color: isPositive
+                  ? Colors.green.withOpacity(0.1)
                   : Colors.red.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),

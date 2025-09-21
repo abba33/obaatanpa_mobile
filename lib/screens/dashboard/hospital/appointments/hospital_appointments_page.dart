@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class HospitalAppointmentsPage extends StatefulWidget {
   const HospitalAppointmentsPage({Key? key}) : super(key: key);
 
   @override
-  State<HospitalAppointmentsPage> createState() => _HospitalAppointmentsPageState();
+  State<HospitalAppointmentsPage> createState() =>
+      _HospitalAppointmentsPageState();
 }
 
-class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> with TickerProviderStateMixin {
+class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage>
+    with TickerProviderStateMixin {
   late TabController _tabController;
-  
+
   @override
   void initState() {
     super.initState();
@@ -25,8 +29,12 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       body: Column(
         children: [
           // Custom App Bar - FIXED: Better height management
@@ -66,7 +74,8 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: Colors.red.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -166,7 +175,7 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
       padding: const EdgeInsets.all(16),
       children: pendingAppointments.map((appointment) {
         final isUrgent = appointment['priority'] == 'urgent';
-        
+
         return Container(
           margin: const EdgeInsets.only(bottom: 16),
           padding: const EdgeInsets.all(16),
@@ -174,7 +183,9 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isUrgent ? Colors.red.withOpacity(0.3) : Colors.grey.withOpacity(0.2),
+              color: isUrgent
+                  ? Colors.red.withOpacity(0.3)
+                  : Colors.grey.withOpacity(0.2),
               width: isUrgent ? 2 : 1,
             ),
             boxShadow: [
@@ -208,7 +219,8 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
                           style: TextStyle(
                             fontSize: 14,
                             color: isUrgent ? Colors.red : Colors.black54,
-                            fontWeight: isUrgent ? FontWeight.w600 : FontWeight.normal,
+                            fontWeight:
+                                isUrgent ? FontWeight.w600 : FontWeight.normal,
                           ),
                         ),
                       ],
@@ -216,7 +228,8 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
                   ),
                   if (isUrgent)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.red.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -418,12 +431,12 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // Appointments list
         ...todayAppointments.map((appointment) {
           Color statusColor;
           String statusText;
-          
+
           switch (appointment['status']) {
             case 'confirmed':
               statusColor = Colors.green;
@@ -437,7 +450,7 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
               statusColor = Colors.orange;
               statusText = 'Pending';
           }
-          
+
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
@@ -496,7 +509,8 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -596,7 +610,7 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
           ),
         ),
         const SizedBox(height: 16),
-        
+
         ...upcomingAppointments.map((appointment) {
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
@@ -759,7 +773,7 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
           ),
         ),
         const SizedBox(height: 16),
-        
+
         ...historyAppointments.map((appointment) {
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
@@ -819,7 +833,8 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.green.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -857,7 +872,8 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
               onPressed: () {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Appointment approved for $patientName')),
+                  SnackBar(
+                      content: Text('Appointment approved for $patientName')),
                 );
               },
               child: const Text('Approve'),
@@ -892,7 +908,9 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
               onPressed: () {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Appointment rescheduled for $patientName')),
+                  SnackBar(
+                      content:
+                          Text('Appointment rescheduled for $patientName')),
                 );
               },
               child: const Text('Reschedule'),
@@ -909,7 +927,8 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Decline Appointment'),
-          content: Text('Are you sure you want to decline the appointment for $patientName?'),
+          content: Text(
+              'Are you sure you want to decline the appointment for $patientName?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),

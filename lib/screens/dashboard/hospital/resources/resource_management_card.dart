@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class HospitalResourcesPage extends StatelessWidget {
   const HospitalResourcesPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       body: Column(
         children: [
           // Custom App Bar Header - Same as appointments page
@@ -47,7 +53,8 @@ class HospitalResourcesPage extends StatelessWidget {
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -146,7 +153,7 @@ class HospitalResourcesPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Resource categories
                 Row(
                   children: [
@@ -170,7 +177,7 @@ class HospitalResourcesPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Recent uploads section
                 const Text(
                   'Recent Uploads',
@@ -181,12 +188,12 @@ class HospitalResourcesPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                
+
                 // Resources list
                 ..._buildResourcesList(),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Upload new resource button
                 GestureDetector(
                   onTap: () {
@@ -220,7 +227,8 @@ class HospitalResourcesPage extends StatelessWidget {
     );
   }
 
-  Widget _buildResourceCount(String title, String count, IconData icon, Color color) {
+  Widget _buildResourceCount(
+      String title, String count, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -296,7 +304,7 @@ class HospitalResourcesPage extends StatelessWidget {
     return resources.map((resource) {
       final isVideo = resource['type'] == 'Video';
       final color = isVideo ? const Color(0xFF7DA8E6) : const Color(0xFFF59297);
-      
+
       return Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -389,7 +397,8 @@ class HospitalResourcesPage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Resource upload feature coming soon')),
+                  const SnackBar(
+                      content: Text('Resource upload feature coming soon')),
                 );
               },
               child: const Text('Upload'),

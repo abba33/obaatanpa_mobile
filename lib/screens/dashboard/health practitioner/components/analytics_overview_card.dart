@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class PractitionerAnalyticsPage extends StatelessWidget {
   const PractitionerAnalyticsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       body: Column(
         children: [
           // Custom App Bar Header
@@ -47,7 +53,8 @@ class PractitionerAnalyticsPage extends StatelessWidget {
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: Colors.green.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -91,28 +98,34 @@ class PractitionerAnalyticsPage extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildQuickStat('Total Patients', '47', const Color(0xFFF59297), Icons.people),
+                        child: _buildQuickStat('Total Patients', '47',
+                            const Color(0xFFF59297), Icons.people),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _buildQuickStat('This Month', '28', const Color(0xFF7DA8E6), Icons.calendar_month),
+                        child: _buildQuickStat('This Month', '28',
+                            const Color(0xFF7DA8E6), Icons.calendar_month),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Main Analytics Card
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [const Color(0xFF7DA8E6).withOpacity(0.1), const Color(0xFFF59297).withOpacity(0.1)],
+                        colors: [
+                          const Color(0xFF7DA8E6).withOpacity(0.1),
+                          const Color(0xFFF59297).withOpacity(0.1)
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFF7DA8E6).withOpacity(0.2)),
+                      border: Border.all(
+                          color: const Color(0xFF7DA8E6).withOpacity(0.2)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,7 +136,10 @@ class PractitionerAnalyticsPage extends StatelessWidget {
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFF7DA8E6), Color(0xFFF59297)],
+                                  colors: [
+                                    Color(0xFF7DA8E6),
+                                    Color(0xFFF59297)
+                                  ],
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -148,10 +164,14 @@ class PractitionerAnalyticsPage extends StatelessWidget {
                                 // Navigate to detailed analytics
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
                                   gradient: const LinearGradient(
-                                    colors: [Color(0xFF7DA8E6), Color(0xFFF59297)],
+                                    colors: [
+                                      Color(0xFF7DA8E6),
+                                      Color(0xFFF59297)
+                                    ],
                                   ),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
@@ -168,16 +188,21 @@ class PractitionerAnalyticsPage extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 20),
-                        
+
                         // Analytics Grid
                         Row(
                           children: [
                             Expanded(
                               child: Column(
                                 children: [
-                                  _buildAnalyticsItem('Total Patients', '47', Icons.people, const Color(0xFFF59297)),
+                                  _buildAnalyticsItem('Total Patients', '47',
+                                      Icons.people, const Color(0xFFF59297)),
                                   const SizedBox(height: 16),
-                                  _buildAnalyticsItem('This Month', '28', Icons.calendar_month, const Color(0xFF7DA8E6)),
+                                  _buildAnalyticsItem(
+                                      'This Month',
+                                      '28',
+                                      Icons.calendar_month,
+                                      const Color(0xFF7DA8E6)),
                                 ],
                               ),
                             ),
@@ -185,17 +210,25 @@ class PractitionerAnalyticsPage extends StatelessWidget {
                             Expanded(
                               child: Column(
                                 children: [
-                                  _buildAnalyticsItem('Completed', '156', Icons.check_circle, const Color(0xFF7DA8E6)),
+                                  _buildAnalyticsItem(
+                                      'Completed',
+                                      '156',
+                                      Icons.check_circle,
+                                      const Color(0xFF7DA8E6)),
                                   const SizedBox(height: 16),
-                                  _buildAnalyticsItem('Success Rate', '94%', Icons.trending_up, const Color(0xFFF59297)),
+                                  _buildAnalyticsItem(
+                                      'Success Rate',
+                                      '94%',
+                                      Icons.trending_up,
+                                      const Color(0xFFF59297)),
                                 ],
                               ),
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 20),
-                        
+
                         // Action Buttons
                         Row(
                           children: [
@@ -205,10 +238,14 @@ class PractitionerAnalyticsPage extends StatelessWidget {
                                   // Export report
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
-                                      colors: [Color(0xFF7DA8E6), Color(0xFFF59297)],
+                                      colors: [
+                                        Color(0xFF7DA8E6),
+                                        Color(0xFFF59297)
+                                      ],
                                     ),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -231,11 +268,13 @@ class PractitionerAnalyticsPage extends StatelessWidget {
                                   // View detailed analytics
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: const Color(0xFF7DA8E6)),
+                                    border: Border.all(
+                                        color: const Color(0xFF7DA8E6)),
                                   ),
                                   child: const Text(
                                     'Detailed View',
@@ -263,7 +302,8 @@ class PractitionerAnalyticsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickStat(String label, String count, Color color, IconData icon) {
+  Widget _buildQuickStat(
+      String label, String count, Color color, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -308,7 +348,8 @@ class PractitionerAnalyticsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAnalyticsItem(String title, String value, IconData icon, Color color) {
+  Widget _buildAnalyticsItem(
+      String title, String value, IconData icon, Color color) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),

@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class HospitalPatientsPage extends StatelessWidget {
   const HospitalPatientsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       body: Column(
         children: [
           // Custom App Bar Header - Same as appointments page
@@ -47,7 +53,8 @@ class HospitalPatientsPage extends StatelessWidget {
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -136,7 +143,7 @@ class HospitalPatientsPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Patient categories
                 Row(
                   children: [
@@ -160,7 +167,7 @@ class HospitalPatientsPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Recent patients section header
                 const Text(
                   'Recent Registrations',
@@ -171,12 +178,12 @@ class HospitalPatientsPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                
+
                 // Recent patients list
                 ..._buildRecentPatientsList(),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Send message to all button
                 GestureDetector(
                   onTap: () {
@@ -282,8 +289,9 @@ class HospitalPatientsPage extends StatelessWidget {
 
     return patients.map((patient) {
       final isPregnant = patient['type'] == 'Pregnant';
-      final color = isPregnant ? const Color(0xFFF59297) : const Color(0xFF7DA8E6);
-      
+      final color =
+          isPregnant ? const Color(0xFFF59297) : const Color(0xFF7DA8E6);
+
       return Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
