@@ -6,7 +6,7 @@ import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/nutrition_this_week_section.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/postpartum_tools_card.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/pregnancy_this_week.dart';
-import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/quick_actions_row.dart';
+import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/quick%20actions/quick_actions_row.dart';
 import 'package:provider/provider.dart';
 import 'components/custom_app_bar.dart';
 import '../../../widgets/navigation/navigation_menu.dart';

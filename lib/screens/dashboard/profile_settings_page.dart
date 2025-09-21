@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:obaatanpa_mobile/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 class ProfileSettingsPage extends StatefulWidget {
@@ -11,16 +12,43 @@ class ProfileSettingsPage extends StatefulWidget {
 
 class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController(text: 'Abba');
-  final _emailController = TextEditingController(text: 'abba@example.com');
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _phoneController = TextEditingController(text: '+233 XX XXX XXXX');
-  final _emergencyContactController = TextEditingController(text: '+233 XX XXX XXXX');
-  
+  final _emergencyContactController =
+      TextEditingController(text: '+233 XX XXX XXXX');
+
   String _selectedBloodType = 'O+';
   DateTime _dueDate = DateTime.now().add(const Duration(days: 90));
   int _currentWeek = 24;
 
-  final List<String> _bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+  final List<String> _bloodTypes = [
+    'A+',
+    'A-',
+    'B+',
+    'B-',
+    'AB+',
+    'AB-',
+    'O+',
+    'O-'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeUserData();
+  }
+
+  void _initializeUserData() {
+    final authProvider = context.read<AuthProvider>();
+    if (authProvider.user != null) {
+      final user = authProvider.user!;
+      _nameController.text = (authProvider.userName?.isNotEmpty == true)
+          ? authProvider.userName!
+          : 'User';
+      _emailController.text = user['email'] ?? 'user@example.com';
+    }
+  }
 
   @override
   void dispose() {
@@ -107,7 +135,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundColor: isDark ? Colors.grey[700] : Colors.grey[300],
+                        backgroundColor:
+                            isDark ? Colors.grey[700] : Colors.grey[300],
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(50),
                           child: Image.asset(
@@ -133,7 +162,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                             // Handle profile picture change
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Profile picture update coming soon!'),
+                                content:
+                                    Text('Profile picture update coming soon!'),
                                 behavior: SnackBarBehavior.floating,
                               ),
                             );
@@ -198,14 +228,15 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
+
                   // Full Name
                   TextFormField(
                     controller: _nameController,
                     style: TextStyle(color: textColor),
                     decoration: InputDecoration(
                       labelText: 'Full Name',
-                      labelStyle: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                      labelStyle: TextStyle(
+                          color: isDark ? Colors.grey[400] : Colors.grey[600]),
                       prefixIcon: Icon(
                         Icons.person_outline,
                         color: isDark ? Colors.grey[400] : Colors.grey[600],
@@ -226,16 +257,17 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       return null;
                     },
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Email
                   TextFormField(
                     controller: _emailController,
                     style: TextStyle(color: textColor),
                     decoration: InputDecoration(
                       labelText: 'Email Address',
-                      labelStyle: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                      labelStyle: TextStyle(
+                          color: isDark ? Colors.grey[400] : Colors.grey[600]),
                       prefixIcon: Icon(
                         Icons.email_outlined,
                         color: isDark ? Colors.grey[400] : Colors.grey[600],
@@ -259,16 +291,17 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       return null;
                     },
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Phone Number
                   TextFormField(
                     controller: _phoneController,
                     style: TextStyle(color: textColor),
                     decoration: InputDecoration(
                       labelText: 'Phone Number',
-                      labelStyle: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                      labelStyle: TextStyle(
+                          color: isDark ? Colors.grey[400] : Colors.grey[600]),
                       prefixIcon: Icon(
                         Icons.phone_outlined,
                         color: isDark ? Colors.grey[400] : Colors.grey[600],
@@ -321,14 +354,15 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
+
                   // Blood Type
                   DropdownButtonFormField<String>(
                     value: _selectedBloodType,
                     style: TextStyle(color: textColor),
                     decoration: InputDecoration(
                       labelText: 'Blood Type',
-                      labelStyle: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                      labelStyle: TextStyle(
+                          color: isDark ? Colors.grey[400] : Colors.grey[600]),
                       prefixIcon: Icon(
                         Icons.bloodtype,
                         color: isDark ? Colors.grey[400] : Colors.grey[600],
@@ -358,9 +392,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       });
                     },
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Current Week
                   Row(
                     children: [
@@ -386,9 +420,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Due Date
                   Row(
                     children: [
@@ -446,13 +480,13 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
                   TextFormField(
                     controller: _emergencyContactController,
                     style: TextStyle(color: textColor),
                     decoration: InputDecoration(
                       labelText: 'Emergency Contact Number',
-                      labelStyle: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                      labelStyle: TextStyle(
+                          color: isDark ? Colors.grey[400] : Colors.grey[600]),
                       prefixIcon: Icon(
                         Icons.emergency,
                         color: Colors.red,

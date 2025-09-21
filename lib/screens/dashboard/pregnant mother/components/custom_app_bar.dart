@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:obaatanpa_mobile/providers/auth_provider.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/help_support_page.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/preferences_page.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/profile_settings_page.dart';
@@ -14,14 +15,14 @@ class CustomAppBar extends StatelessWidget {
   const CustomAppBar({
     Key? key,
     required this.isMenuOpen,
-    required this.onMenuTap, 
+    required this.onMenuTap,
     required String title,
   }) : super(key: key);
 
   void _showProfileMenu(BuildContext context) {
     final themeProvider = context.read<ThemeProvider>();
     final isDark = themeProvider.isDarkMode;
-    
+
     showMenu(
       context: context,
       position: const RelativeRect.fromLTRB(1000, 120, 0, 0),
@@ -168,7 +169,7 @@ class CustomAppBar extends StatelessWidget {
   void _showLogoutDialog(BuildContext context) {
     final themeProvider = context.read<ThemeProvider>();
     final isDark = themeProvider.isDarkMode;
-    
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -234,7 +235,7 @@ class CustomAppBar extends StatelessWidget {
     final isDark = themeProvider.isDarkMode;
     final textColor = isDark ? Colors.white : Colors.black;
     final backgroundColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    
+
     return Container(
       color: backgroundColor,
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
@@ -273,9 +274,7 @@ class CustomAppBar extends StatelessWidget {
                   ),
                 ),
               ),
-              
               const SizedBox(width: 12),
-              
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -313,9 +312,9 @@ class CustomAppBar extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 14),
-          
+
           // Bottom row - Controls and user info
           Row(
             children: [
@@ -330,45 +329,56 @@ class CustomAppBar extends StatelessWidget {
                       size: 24,
                     ),
                   ),
-                  
                   const SizedBox(width: 16),
-                  
-                  Icon(
-                    isDark ? Icons.light_mode : Icons.dark_mode_outlined,
-                    color: isDark ? const Color(0xFFF8BBD9) : textColor,
-                    size: 20,
+                  GestureDetector(
+                    onTap: () {
+                      final themeProvider = context.read<ThemeProvider>();
+                      themeProvider.toggleTheme();
+                    },
+                    child: Icon(
+                      isDark ? Icons.light_mode : Icons.dark_mode_outlined,
+                      color: isDark ? const Color(0xFFF8BBD9) : textColor,
+                      size: 20,
+                    ),
                   ),
                 ],
               ),
-              
+
               const Spacer(),
-              
+
               // Center - Greeting
-              RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Hello, ',
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+              Consumer<AuthProvider>(
+                builder: (context, authProvider, child) {
+                  final userName = (authProvider.userName?.isNotEmpty == true)
+                      ? authProvider.userName!
+                      : 'User';
+                  return RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Hello, ',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        TextSpan(
+                          text: userName,
+                          style: TextStyle(
+                            color: const Color(0xFFF59297),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                    TextSpan(
-                      text: 'Abba',
-                      style: TextStyle(
-                        color: const Color(0xFFF59297),
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
-              
+
               const Spacer(),
-              
+
               // Right side - Notification and profile
               Row(
                 children: [
@@ -380,9 +390,9 @@ class CustomAppBar extends StatelessWidget {
                       size: 22,
                     ),
                   ),
-                  
+
                   const SizedBox(width: 16),
-                  
+
                   // Profile section with dropdown
                   GestureDetector(
                     onTap: () => _showProfileMenu(context),
@@ -391,7 +401,8 @@ class CustomAppBar extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 18,
-                          backgroundColor: isDark ? Colors.grey[700] : Colors.grey[300],
+                          backgroundColor:
+                              isDark ? Colors.grey[700] : Colors.grey[300],
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(18),
                             child: Image.asset(
@@ -402,7 +413,8 @@ class CustomAppBar extends StatelessWidget {
                               errorBuilder: (context, error, stackTrace) {
                                 return Icon(
                                   Icons.person,
-                                  color: isDark ? Colors.white : Colors.grey[600],
+                                  color:
+                                      isDark ? Colors.white : Colors.grey[600],
                                   size: 20,
                                 );
                               },

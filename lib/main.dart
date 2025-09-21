@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 // Core imports
-import 'core/theme/app_theme.dart';
 import 'core/constants/app_colors.dart';
 
 // Provider imports
@@ -65,6 +64,25 @@ class ObaatanpaApp extends StatelessWidget {
 
             // Builder for additional configurations
             builder: (context, child) {
+              // Update system UI overlay style based on theme
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                SystemChrome.setSystemUIOverlayStyle(
+                  themeProvider.isDarkMode
+                      ? const SystemUiOverlayStyle(
+                          statusBarColor: Colors.transparent,
+                          statusBarIconBrightness: Brightness.light,
+                          systemNavigationBarColor: Color(0xFF121212),
+                          systemNavigationBarIconBrightness: Brightness.light,
+                        )
+                      : const SystemUiOverlayStyle(
+                          statusBarColor: Colors.transparent,
+                          statusBarIconBrightness: Brightness.dark,
+                          systemNavigationBarColor: AppColors.white,
+                          systemNavigationBarIconBrightness: Brightness.dark,
+                        ),
+                );
+              });
+
               return MediaQuery(
                 // Ensure text scaling doesn't break layouts
                 data: MediaQuery.of(context).copyWith(
@@ -81,7 +99,6 @@ class ObaatanpaApp extends StatelessWidget {
           );
         },
       ),
-      
     );
   }
 }

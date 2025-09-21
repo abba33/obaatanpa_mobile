@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../providers/pregnancy_data_provider.dart';
+import '../../../../../providers/pregnancy_data_provider.dart';
 
 class PersonalizedQuickActionsRow extends StatefulWidget {
   final int currentWeek;

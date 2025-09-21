@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:obaatanpa_mobile/providers/auth_provider.dart';
 
 class HospitalBookingPage extends StatefulWidget {
   final String hospitalName;
@@ -51,7 +53,7 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
         children: [
           // Custom App Bar with back button
           _buildCustomAppBar(context),
-          
+
           // Main Content
           Expanded(
             child: SingleChildScrollView(
@@ -59,35 +61,35 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),
-                  
+
                   // Hospital Image and Basic Info
                   _buildHospitalHeader(),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Hospital Details
                   _buildHospitalDetails(),
-                  
+
                   const SizedBox(height: 28),
-                  
+
                   // Service Selection
                   _buildServiceSelection(),
-                  
+
                   const SizedBox(height: 28),
-                  
+
                   // Date Selection
                   _buildDateSelection(),
-                  
+
                   const SizedBox(height: 28),
-                  
+
                   // Time Selection
                   _buildTimeSelection(),
-                  
+
                   const SizedBox(height: 40),
-                  
+
                   // Book Appointment Button
                   _buildBookingButton(),
-                  
+
                   const SizedBox(height: 32),
                 ],
               ),
@@ -137,9 +139,7 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
                   ),
                 ),
               ),
-              
               const SizedBox(width: 12),
-              
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -177,9 +177,9 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 14),
-          
+
           // Bottom row - Back button and greeting
           Row(
             children: [
@@ -199,35 +199,42 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
                   ),
                 ),
               ),
-              
+
               const Spacer(),
-              
+
               // Center - Greeting
-              RichText(
-                text: const TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Hello, ',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+              Consumer<AuthProvider>(
+                builder: (context, authProvider, child) {
+                  final userName = (authProvider.userName?.isNotEmpty == true)
+                      ? authProvider.userName!
+                      : 'User';
+                  return RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Hello, ',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        TextSpan(
+                          text: userName,
+                          style: TextStyle(
+                            color: Color(0xFFF59297),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                    TextSpan(
-                      text: 'Abba',
-                      style: TextStyle(
-                        color: Color(0xFFF59297),
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
-              
+
               const Spacer(),
-              
+
               // Profile
               CircleAvatar(
                 radius: 18,
@@ -300,7 +307,7 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
                 ),
               ),
             ),
-            
+
             // Hospital Info
             Padding(
               padding: const EdgeInsets.all(20),
@@ -361,7 +368,8 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
                       ),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: const Color(0xFF7DA8E6).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(6),
@@ -533,7 +541,8 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
                   borderRadius: BorderRadius.circular(8),
                   borderSide: const BorderSide(color: Color(0xFF7DA8E6)),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
               items: services.map((String service) {
                 return DropdownMenuItem<String>(
@@ -597,8 +606,8 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
                     return Theme(
                       data: Theme.of(context).copyWith(
                         colorScheme: Theme.of(context).colorScheme.copyWith(
-                          primary: const Color(0xFF7DA8E6),
-                        ),
+                              primary: const Color(0xFF7DA8E6),
+                            ),
                       ),
                       child: child!,
                     );
@@ -606,7 +615,8 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
                 );
                 if (picked != null) {
                   setState(() {
-                    selectedDate = "${picked.day}/${picked.month}/${picked.year}";
+                    selectedDate =
+                        "${picked.day}/${picked.month}/${picked.year}";
                     _dateController.text = selectedDate!;
                   });
                 }
@@ -630,7 +640,8 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
                   borderRadius: BorderRadius.circular(8),
                   borderSide: const BorderSide(color: Color(0xFF7DA8E6)),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
             ),
           ],
@@ -680,7 +691,7 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
               itemCount: availableSlots.length,
               itemBuilder: (context, index) {
                 final isSelected = selectedTime == availableSlots[index];
-                
+
                 return GestureDetector(
                   onTap: () {
                     setState(() {
@@ -689,11 +700,11 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isSelected 
+                      color: isSelected
                           ? const Color(0xFF7DA8E6).withOpacity(0.1)
                           : Colors.grey[50],
                       border: Border.all(
-                        color: isSelected 
+                        color: isSelected
                             ? const Color(0xFF7DA8E6)
                             : Colors.grey[300]!,
                         width: isSelected ? 2 : 1,
@@ -704,7 +715,7 @@ class _HospitalBookingPageState extends State<HospitalBookingPage> {
                       child: Text(
                         availableSlots[index],
                         style: TextStyle(
-                          color: isSelected 
+                          color: isSelected
                               ? const Color(0xFF7DA8E6)
                               : const Color(0xFF4A5568),
                           fontWeight: FontWeight.w500,
