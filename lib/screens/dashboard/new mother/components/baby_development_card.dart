@@ -161,14 +161,16 @@ class BabyDevelopmentCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: achieved ? const Color(0xFF2D3748) : Colors.grey[600],
+                    color:
+                        achieved ? const Color(0xFF2D3748) : Colors.grey[600],
                   ),
                 ),
                 Text(
                   description,
                   style: TextStyle(
                     fontSize: 12,
-                    color: achieved ? const Color(0xFF718096) : Colors.grey[500],
+                    color:
+                        achieved ? const Color(0xFF718096) : Colors.grey[500],
                   ),
                 ),
               ],

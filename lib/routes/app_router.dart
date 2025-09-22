@@ -34,6 +34,13 @@ import '../screens/dashboard/pregnant mother/components/quick actions/trimester_
 // Notification Page Import
 import '../screens/dashboard/notification_page.dart';
 
+// New Mother Tools
+import '../screens/tools/new_mother/recovery_nutrition_page.dart';
+import '../screens/tools/new_mother/baby_care_page.dart';
+import '../screens/tools/new_mother/sleep_tracker_page.dart';
+import '../screens/tools/new_mother/health_check_page.dart';
+import '../screens/tools/new_mother/new_parent_resources_page.dart';
+
 // Resources
 import '../screens/dashboard/new mother/resources/baby_care_page.dart';
 import '../screens/dashboard/new mother/resources/breastfeeding_page.dart';
@@ -194,6 +201,40 @@ class AppRouter {
         path: '/practitioner/resources',
         name: 'practitioner-resources',
         builder: (context, state) => const PractitionerResourcesPage(),
+      ),
+
+      // ============================================
+      // NEW MOTHER TOOL ROUTES
+      // ============================================
+
+      GoRoute(
+        path: '/recovery-nutrition',
+        name: 'recovery-nutrition',
+        builder: (context, state) => const RecoveryNutritionPage(),
+      ),
+      
+      GoRoute(
+        path: '/baby-care',
+        name: 'baby-care',
+        builder: (context, state) => const BabyCarePage(),
+      ),
+      
+      GoRoute(
+        path: '/sleep-tracker',
+        name: 'sleep-tracker',
+        builder: (context, state) => const SleepTrackerPage(),
+      ),
+      
+      GoRoute(
+        path: '/health-check',
+        name: 'health-check',
+        builder: (context, state) => const HealthCheckPage(),
+      ),
+      
+      GoRoute(
+        path: '/new-parent-resources',
+        name: 'new-parent-resources',
+        builder: (context, state) => const NewParentResourcesPage(),
       ),
 
       // Health Practitioner Analytics

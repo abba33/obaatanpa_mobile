@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/custom_app_bar.dart';
-import 'components/recovery_progress_card.dart';
 import 'components/new_mother_quick_actions_row.dart';
 import 'components/feeding_tracker_card.dart';
 import 'components/mental_wellness_card.dart';
-import 'components/upcoming_appointments_card.dart';
-import 'components/new_mother_tips_section.dart';
+
 import 'components/recovery_nutrition_card.dart';
-import 'components/support_resources_card.dart';
+
 import 'components/baby_development_card.dart';
-import 'components/postpartum_week_card.dart'; // <-- Add this import
+import 'components/postpartum_week_card.dart';
+import 'components/postpartum_daily_tasks.dart';
+import 'components/new_mother_tools_card.dart';
 // ... other component imports
 import '../../../widgets/navigation/navigation_menu.dart';
 
@@ -116,43 +116,27 @@ class _NewMotherDashboardPageState extends State<NewMotherDashboardPage> {
                 NewMotherQuickActionsRow(),
                 const SizedBox(height: 24),
 
-                // Daily progress section
-                const Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: RecoveryProgressCard(),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: FeedingTrackerCard(),
-                    ),
-                  ],
-                ),
+                // Daily tasks tracking
+                const PostpartumDailyTasksCard(
+                    currentWeek: 1), // TODO: Update with actual week
                 const SizedBox(height: 24),
 
                 // Mental wellness tips and mood tracker
                 const MentalWellnessCard(),
                 const SizedBox(height: 24),
 
-                // Health appointments and checkups
-                const UpcomingAppointmentsCard(),
-                const SizedBox(height: 24),
-
                 // Baby development tracker
                 const BabyDevelopmentCard(),
                 const SizedBox(height: 24),
-
-                // New mother tips and articles
-                NewMotherTipsSection(),
-                const SizedBox(height: 20),
 
                 // Recovery nutrition card
                 RecoveryNutritionCard(),
                 const SizedBox(height: 20),
 
-                // Support resources
-                SupportResourcesCard(),
+                // Tools section
+                const NewMotherToolsCard(
+                    currentWeek: 1), // TODO: Update with actual week
+                const SizedBox(height: 20),
               ],
             ),
           ),

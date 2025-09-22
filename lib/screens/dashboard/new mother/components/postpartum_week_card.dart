@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:obaatanpa_mobile/screens/dashboard/new%20mother/components/postpartum_journal.dart';
+
 
 class PostpartumWeekCard extends StatelessWidget {
   final int currentWeek;
@@ -15,6 +17,19 @@ class PostpartumWeekCard extends StatelessWidget {
     this.babyName = "Baby",
     this.onJournalTap,
   }) : super(key: key);
+
+  void _showPostpartumJournalBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => PostpartumJournalBottomSheet(
+        currentWeek: currentWeek,
+        babyName: babyName,
+        daysSinceBirth: daysSinceBirth,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,9 +166,9 @@ class PostpartumWeekCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           
-          // Journal Entry button
+          // Journal Entry button - Updated to use the bottom sheet
           GestureDetector(
-            onTap: onJournalTap,
+            onTap: () => _showPostpartumJournalBottomSheet(context),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
