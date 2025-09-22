@@ -1,7 +1,20 @@
 import 'package:flutter/material.dart';
 
 class PostpartumWeekCard extends StatelessWidget {
-  const PostpartumWeekCard({Key? key}) : super(key: key);
+  final int currentWeek;
+  final String recoveryPhase;
+  final int daysSinceBirth;
+  final String babyName;
+  final VoidCallback? onJournalTap;
+
+  const PostpartumWeekCard({
+    Key? key,
+    this.currentWeek = 4,
+    this.recoveryPhase = "Postpartum",
+    this.daysSinceBirth = 28,
+    this.babyName = "Baby",
+    this.onJournalTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -9,105 +22,345 @@ class PostpartumWeekCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFFB8E6B8), // Soft green for recovery/new life
+            Colors.white,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF9B59B6), Color(0xFF8E44AD)],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header with pink dot and recovery week
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    'Week 8',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF59297),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '$recoveryPhase Week',
+                style: const TextStyle(
+                  color: Colors.black87,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          
+          // Main week number
+          Text(
+            '$currentWeek Weeks',
+            style: const TextStyle(
+              color: Color(0xFF4CAF50), // Green for recovery/growth
+              fontSize: 36,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.5,
+              shadows: [
+                Shadow(
+                  color: Color(0xFF4CAF50),
+                  blurRadius: 0.5,
+                  offset: Offset(0, 0),
+                ),
+              ],
+            ),
+          ),
+          
+          // Days since birth
+          Text(
+            '$daysSinceBirth days since birth',
+            style: const TextStyle(
+              color: Colors.black54,
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          const SizedBox(height: 8),
+          
+          // Recovery info with progress
+          Row(
+            children: [
+              Text(
+                'Postpartum Recovery - ${((currentWeek / 12.0) * 100).round()}% Complete',
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          
+          // Progress bar (12 weeks recovery period)
+          Row(
+            children: [
+              Text(
+                'Week 1',
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  child: FractionallySizedBox(
+                    widthFactor: currentWeek / 12.0, // Progress based on current week out of 12
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFF4CAF50), // Green
+                            Color(0xFFF59297), // Pink
+                          ],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
                     ),
                   ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Week 12',
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          
+          // Journal Entry button
+          GestureDetector(
+            onTap: onJournalTap,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF4CAF50), // Green for recovery
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF4CAF50).withOpacity(0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.book_outlined,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 8),
                   Text(
-                    'Postpartum',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
+                    "Add Week $currentWeek Entry",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          
+          // Bottom section with newborn image and info circles
+          Row(
+            children: [
+              // Newborn baby illustration from assets
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                width: 150,
+                height: 150,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'Recovery Phase',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    'assets/images/dashboard/newborn-baby.png', 
+                    width: 150,
+                    height: 150,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback icon if image not found
+                      return Container(
+                        width: 150,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.child_care,
+                          size: 80,
+                          color: Color(0xFFF59297),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
+              const SizedBox(width: 16),
+              
+              // Info circles in 2x2 grid - Updated for postpartum info
+              Expanded(
+                child: Column(
+                  children: [
+                    // Top row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Baby's age
+                        Container(
+                          width: 45,
+                          height: 45,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFE1BEE7), // Purple circle
+                            shape: BoxShape.circle,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '${(daysSinceBirth / 7).floor()}w',
+                                style: const TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '${daysSinceBirth % 7}d',
+                                style: const TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 8,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                        // Recovery status
+                        Container(
+                          width: 45,
+                          height: 45,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFFF59D), // Yellow circle
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Good',
+                                style: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                'recovery',
+                                style: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 7,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // Bottom row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Sleep hours
+                        Container(
+                          width: 45,
+                          height: 45,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFA5D6A7), // Green circle
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '6hrs',
+                                style: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                'sleep',
+                                style: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 7,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                        // Mood indicator
+                        Container(
+                          width: 45,
+                          height: 45,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF81D4FA), // Light blue circle
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Happy',
+                                style: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ],
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Your body is healing wonderfully! Most mothers feel significantly better by now. Focus on rest, nutrition, and bonding with your baby.',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              _buildProgressIndicator('Physical Recovery', 0.75),
-              const SizedBox(width: 20),
-              _buildProgressIndicator('Energy Levels', 0.60),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProgressIndicator(String label, double progress) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 12,
-            ),
-          ),
-          const SizedBox(height: 4),
-          LinearProgressIndicator(
-            value: progress,
-            backgroundColor: Colors.white.withOpacity(0.3),
-            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-            minHeight: 3,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            '${(progress * 100).toInt()}%',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-            ),
           ),
         ],
       ),

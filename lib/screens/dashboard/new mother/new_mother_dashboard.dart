@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/custom_app_bar.dart';
 import 'components/recovery_progress_card.dart';
-import 'components/baby_care_quick_actions.dart';
-import 'components/postpartum_week_card.dart';
+import 'components/new_mother_quick_actions_row.dart';
 import 'components/feeding_tracker_card.dart';
 import 'components/mental_wellness_card.dart';
 import 'components/upcoming_appointments_card.dart';
@@ -11,6 +10,7 @@ import 'components/new_mother_tips_section.dart';
 import 'components/recovery_nutrition_card.dart';
 import 'components/support_resources_card.dart';
 import 'components/baby_development_card.dart';
+import 'components/postpartum_week_card.dart'; // <-- Add this import
 // ... other component imports
 import '../../../widgets/navigation/navigation_menu.dart';
 
@@ -33,9 +33,10 @@ class _NewMotherDashboardPageState extends State<NewMotherDashboardPage> {
 
   void _navigateToPage(String routeName) {
     _toggleMenu(); // Close menu first
-    
+
     // Use GoRouter navigation instead of Navigator.pushNamed
-    if (routeName != '/new-mother/dashboard') { // ✅ Fixed the dashboard route check
+    if (routeName != '/new-mother/dashboard') {
+      // ✅ Fixed the dashboard route check
       context.go(routeName);
     }
   }
@@ -96,10 +97,10 @@ class _NewMotherDashboardPageState extends State<NewMotherDashboardPage> {
         // Custom App Bar
         CustomAppBar(
           isMenuOpen: _isMenuOpen,
-          onMenuTap: _toggleMenu, 
+          onMenuTap: _toggleMenu,
           title: '',
         ),
-        
+
         // Dashboard Content
         Expanded(
           child: SingleChildScrollView(
@@ -108,13 +109,13 @@ class _NewMotherDashboardPageState extends State<NewMotherDashboardPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Postpartum week card (similar to pregnancy week card)
-                PostpartumWeekCard(),
+                const PostpartumWeekCard(),
                 const SizedBox(height: 20),
-                
+
                 // Quick actions for baby care
-                BabyCareQuickActions(),
+                NewMotherQuickActionsRow(),
                 const SizedBox(height: 24),
-                
+
                 // Daily progress section
                 const Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,15 +142,15 @@ class _NewMotherDashboardPageState extends State<NewMotherDashboardPage> {
                 // Baby development tracker
                 const BabyDevelopmentCard(),
                 const SizedBox(height: 24),
-                
+
                 // New mother tips and articles
                 NewMotherTipsSection(),
                 const SizedBox(height: 20),
-                
+
                 // Recovery nutrition card
                 RecoveryNutritionCard(),
                 const SizedBox(height: 20),
-                
+
                 // Support resources
                 SupportResourcesCard(),
               ],
@@ -189,7 +190,8 @@ class _NewMotherDashboardPageState extends State<NewMotherDashboardPage> {
                     width: 40,
                     height: 40,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF9B59B6), // Purple color for new mother theme
+                      color: Color(
+                          0xFF9B59B6), // Purple color for new mother theme
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -232,7 +234,7 @@ class _NewMotherDashboardPageState extends State<NewMotherDashboardPage> {
                 ],
               ),
             ),
-            
+
             // Menu Items with Navigation - FIXED ROUTES
             Expanded(
               child: Padding(
@@ -243,32 +245,38 @@ class _NewMotherDashboardPageState extends State<NewMotherDashboardPage> {
                     NavigationMenuItem(
                       title: 'Dashboard',
                       isActive: true,
-                      textColor: const Color(0xFF9B59B6), // Active color for Dashboard menu item
-                      onTap: () => _navigateToPage('/new-mother/dashboard'), // ✅ Fixed
+                      textColor: const Color(
+                          0xFF9B59B6), // Active color for Dashboard menu item
+                      onTap: () =>
+                          _navigateToPage('/new-mother/dashboard'), // ✅ Fixed
                     ),
                     const SizedBox(height: 32),
                     NavigationMenuItem(
                       title: 'Resources',
                       textColor: Colors.black87,
-                      onTap: () => _navigateToPage('/new-mother/resources'), // ✅ Fixed
+                      onTap: () =>
+                          _navigateToPage('/new-mother/resources'), // ✅ Fixed
                     ),
                     const SizedBox(height: 32),
                     NavigationMenuItem(
                       title: 'Appointments',
                       textColor: Colors.black87,
-                      onTap: () => _navigateToPage('/new-mother/appointments'), // ✅ Fixed
+                      onTap: () => _navigateToPage(
+                          '/new-mother/appointments'), // ✅ Fixed
                     ),
                     const SizedBox(height: 32),
                     NavigationMenuItem(
                       title: 'Nutrition',
                       textColor: Colors.black87,
-                      onTap: () => _navigateToPage('/new-mother/nutrition'), // ✅ Fixed
+                      onTap: () =>
+                          _navigateToPage('/new-mother/nutrition'), // ✅ Fixed
                     ),
                     const SizedBox(height: 32),
                     NavigationMenuItem(
                       title: 'Health',
                       textColor: Colors.black87,
-                      onTap: () => _navigateToPage('/new-mother/health'), // ✅ Fixed
+                      onTap: () =>
+                          _navigateToPage('/new-mother/health'), // ✅ Fixed
                     ),
                   ],
                 ),
