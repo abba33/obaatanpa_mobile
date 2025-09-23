@@ -4,6 +4,17 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/custom_app_bar.dart';
 import 'package:obaatanpa_mobile/widgets/navigation/navigation_menu.dart';
 
+// Function to open link
+Future<void> _openLink(String url) async {
+  final Uri uri = Uri.parse(url);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } else {
+    throw 'Could not launch $url';
+  }
+}
+
+
 class ResourcesScreen extends StatefulWidget {
   const ResourcesScreen({super.key});
 
@@ -438,25 +449,29 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
         itemCount: 3,
         itemBuilder: (context, index) {
           final resources = [
-            {
-              'title': 'Your Complete Pregnancy Guide',
-              'subtitle': 'Everything you need to know',
-              'imagePath': 'assets/images/resources/pregnancy_guide.png',
-              'overlayColor': const Color(0xFFF59297),
-            },
-            {
-              'title': 'Healthy Pregnancy Diet',
-              'subtitle': 'Nutrition for you and baby',
-              'imagePath': 'assets/images/resources/healthy_diet.png',
-              'overlayColor': const Color(0xFF81C784),
-            },
-            {
-              'title': 'Prenatal Exercise Plan',
-              'subtitle': 'Safe workouts during pregnancy',
-              'imagePath': 'assets/images/resources/prenatal_exercise.png',
-              'overlayColor': const Color(0xFF64B5F6),
-            },
-          ];
+  {
+    'title': 'Your Complete Pregnancy Guide',
+    'subtitle': 'Everything you need to know',
+    'imagePath': 'assets/images/resources/pregnancy_guide.png',
+    'overlayColor': const Color(0xFFF59297),
+    'link': 'https://www.healthline.com/health/pregnancy',
+  },
+  {
+    'title': 'Healthy Pregnancy Diet',
+    'subtitle': 'Nutrition for you and baby',
+    'imagePath': 'assets/images/resources/healthy_diet.png',
+    'overlayColor': const Color(0xFF81C784),
+    'link': 'https://www.mayoclinic.org/healthy-pregnancy-diet',
+  },
+  {
+    'title': 'Prenatal Exercise Plan',
+    'subtitle': 'Safe workouts during pregnancy',
+    'imagePath': 'assets/images/resources/prenatal_exercise.png',
+    'overlayColor': const Color(0xFF64B5F6),
+    'link': 'https://www.acog.org/womens-health/faqs/exercise-during-pregnancy',
+  },
+];
+
 
           final resource = resources[index];
 
@@ -599,47 +614,47 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                         const SizedBox(height: 12),
 
                         // Read More Button
-                        GestureDetector(
-                          onTap: () {
-                            // Navigate to appropriate page based on resource type
-                            _navigateToResource(resource['title'].toString());
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  spreadRadius: 0,
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Read More',
-                                  style: TextStyle(
-                                    color: resource['overlayColor'] as Color,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Icon(
-                                  Icons.arrow_forward,
-                                  size: 14,
-                                  color: resource['overlayColor'] as Color,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                       GestureDetector(
+  onTap: () {
+    final url = resource['link'].toString();
+    _openLink(url);
+  },
+  child: Container(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.1),
+          spreadRadius: 0,
+          blurRadius: 4,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Read More',
+          style: TextStyle(
+            color: resource['overlayColor'] as Color,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Icon(
+          Icons.arrow_forward,
+          size: 14,
+          color: resource['overlayColor'] as Color,
+        ),
+      ],
+    ),
+  ),
+),
+
                       ],
                     ),
                   ),
@@ -654,79 +669,86 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
 
   Widget _buildArticlesList() {
     final articles = [
-      {
-        'title': 'First Trimester Changes: What to Expect',
-        'category': 'Pregnancy',
-        'readTime': '8 min read',
-        'description':
-            'Understanding your body\'s changes, morning sickness, and essential prenatal care during weeks 1-12.',
-        'author': 'Dr. Sarah Mitchell',
-        'publishDate': '2 days ago',
-        'likes': '324',
-        'isBookmarked': false,
-        'categoryColor': const Color(0xFFF59297),
-      },
-      {
-        'title': 'Folic Acid and Iron: Essential Nutrients',
-        'category': 'Nutrition',
-        'readTime': '5 min read',
-        'description':
-            'Why these vitamins are crucial for your baby\'s development and the best food sources.',
-        'author': 'Nutritionist Jane Adams',
-        'publishDate': '1 week ago',
-        'likes': '156',
-        'isBookmarked': true,
-        'categoryColor': const Color(0xFF81C784),
-      },
-      {
-        'title': 'Coping with Pregnancy Anxiety and Stress',
-        'category': 'Mental Health',
-        'readTime': '10 min read',
-        'description':
-            'Practical strategies for managing worries and maintaining emotional wellness during pregnancy.',
-        'author': 'Dr. Michael Chen',
-        'publishDate': '3 days ago',
-        'likes': '89',
-        'isBookmarked': false,
-        'categoryColor': const Color(0xFF64B5F6),
-      },
-      {
-        'title': 'Birth Plan Essentials: What You Need to Know',
-        'category': 'Pregnancy',
-        'readTime': '12 min read',
-        'description':
-            'Creating a flexible birth plan that covers pain management, delivery preferences, and postpartum care.',
-        'author': 'Midwife Emma Thompson',
-        'publishDate': '5 days ago',
-        'likes': '278',
-        'isBookmarked': true,
-        'categoryColor': const Color(0xFFF59297),
-      },
-      {
-        'title': 'Safe Exercise During Each Trimester',
-        'category': 'Exercise',
-        'readTime': '7 min read',
-        'description':
-            'Modified workouts and activities that are safe and beneficial throughout your pregnancy journey.',
-        'author': 'Fitness Coach Lisa Park',
-        'publishDate': '1 week ago',
-        'likes': '201',
-        'isBookmarked': false,
-        'categoryColor': const Color(0xFFFFB74D),
-      },
-      {
-        'title': 'Preparing Your Home for Baby\'s Arrival',
-        'category': 'Baby Care',
-        'readTime': '6 min read',
-        'description':
-            'Essential baby-proofing tips and must-have items for your newborn\'s safety and comfort.',
-        'author': 'Pediatric Nurse Amy Wilson',
-        'publishDate': '4 days ago',
-        'likes': '145',
-        'isBookmarked': false,
-        'categoryColor': const Color(0xFFBA68C8),
-      },
-    ];
+  {
+    'title': 'First Trimester Changes: What to Expect',
+    'category': 'Pregnancy',
+    'readTime': '8 min read',
+    'description':
+        'Understanding your body\'s changes, morning sickness, and essential prenatal care during weeks 1-12.',
+    'author': 'Dr. Sarah Mitchell',
+    'publishDate': '2 days ago',
+    'likes': '324',
+    'isBookmarked': false,
+    'categoryColor': const Color(0xFFF59297),
+    'link': 'https://www.mayoclinic.org/healthy-lifestyle/pregnancy-week-by-week/in-depth/pregnancy/art-20046767',
+  },
+  {
+    'title': 'Folic Acid and Iron: Essential Nutrients',
+    'category': 'Nutrition',
+    'readTime': '5 min read',
+    'description':
+        'Why these vitamins are crucial for your baby\'s development and the best food sources.',
+    'author': 'Nutritionist Jane Adams',
+    'publishDate': '1 week ago',
+    'likes': '156',
+    'isBookmarked': true,
+    'categoryColor': const Color(0xFF81C784),
+    'link': 'https://www.healthline.com/nutrition/folic-acid-foods',
+  },
+  {
+    'title': 'Coping with Pregnancy Anxiety and Stress',
+    'category': 'Mental Health',
+    'readTime': '10 min read',
+    'description':
+        'Practical strategies for managing worries and maintaining emotional wellness during pregnancy.',
+    'author': 'Dr. Michael Chen',
+    'publishDate': '3 days ago',
+    'likes': '89',
+    'isBookmarked': false,
+    'categoryColor': const Color(0xFF64B5F6),
+    'link': 'https://www.acog.org/womens-health/faqs/anxiety-and-pregnancy',
+  },
+  {
+    'title': 'Birth Plan Essentials: What You Need to Know',
+    'category': 'Pregnancy',
+    'readTime': '12 min read',
+    'description':
+        'Creating a flexible birth plan that covers pain management, delivery preferences, and postpartum care.',
+    'author': 'Midwife Emma Thompson',
+    'publishDate': '5 days ago',
+    'likes': '278',
+    'isBookmarked': true,
+    'categoryColor': const Color(0xFFF59297),
+    'link': 'https://www.healthline.com/health/pregnancy/birth-plan',
+  },
+  {
+    'title': 'Safe Exercise During Each Trimester',
+    'category': 'Exercise',
+    'readTime': '7 min read',
+    'description':
+        'Modified workouts and activities that are safe and beneficial throughout your pregnancy journey.',
+    'author': 'Fitness Coach Lisa Park',
+    'publishDate': '1 week ago',
+    'likes': '201',
+    'isBookmarked': false,
+    'categoryColor': const Color(0xFFFFB74D),
+    'link': 'https://www.nhs.uk/pregnancy/keeping-well/exercise/',
+  },
+  {
+    'title': 'Preparing Your Home for Baby\'s Arrival',
+    'category': 'Baby Care',
+    'readTime': '6 min read',
+    'description':
+        'Essential baby-proofing tips and must-have items for your newborn\'s safety and comfort.',
+    'author': 'Pediatric Nurse Amy Wilson',
+    'publishDate': '4 days ago',
+    'likes': '145',
+    'isBookmarked': false,
+    'categoryColor': const Color(0xFFBA68C8),
+    'link': 'https://www.parents.com/pregnancy/preparing-for-baby/preparing-your-home-for-baby/',
+  },
+];
+
 
     // Filter articles based on selected category
     final filteredArticles = selectedCategory == 'All'
@@ -763,9 +785,10 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(16),
                 onTap: () {
-                  // Navigate to appropriate page based on article category
-                  _navigateToArticle(article['category'].toString());
-                },
+  final url = article['link'].toString();
+  _openLink(url);
+},
+
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -1238,27 +1261,32 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
 
   Widget _buildToolsGrid() {
     final tools = [
-      {
-        'title': 'Due Date Calculator',
-        'icon': Icons.calculate,
-        'color': const Color(0xFF81C784),
-      },
-      {
-        'title': 'Weight Tracker',
-        'icon': Icons.monitor_weight,
-        'color': const Color(0xFF64B5F6),
-      },
-      {
-        'title': 'Kick Counter',
-        'icon': Icons.favorite,
-        'color': const Color(0xFFF8BBD9),
-      },
-      {
-        'title': 'Contraction Timer',
-        'icon': Icons.timer,
-        'color': const Color(0xFFFFB74D),
-      },
-    ];
+  {
+    'title': 'Due Date Calculator',
+    'icon': Icons.calculate,
+    'color': const Color(0xFF81C784),
+    'url': 'https://www.whattoexpect.com/due-date-calculator/' // Example
+  },
+  {
+    'title': 'Weight Tracker',
+    'icon': Icons.monitor_weight,
+    'color': const Color(0xFF64B5F6),
+    'url': 'https://www.calculator.net/weight-loss-calculator.html' 
+  },
+  {
+    'title': 'Kick Counter',
+    'icon': Icons.favorite,
+    'color': const Color(0xFFF8BBD9),
+    'url': 'https://www.countthekicks.org/' 
+  },
+  {
+    'title': 'Contraction Timer',
+    'icon': Icons.timer,
+    'color': const Color(0xFFFFB74D),
+    'url': 'https://www.babycenter.com/pregnancy/contraction-timer' 
+  },
+];
+
 
     return GridView.builder(
       shrinkWrap: true,
@@ -1274,10 +1302,15 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
         final tool = tools[index];
 
         return GestureDetector(
-          onTap: () {
-            // Navigate to appropriate page based on tool type
-            _navigateToTool(tool['title'].toString());
-          },
+         onTap: () async {
+  final url = Uri.parse(tool['url'].toString());
+  if (await canLaunchUrl(url)) {
+    await launchUrl(url, mode: LaunchMode.externalApplication);
+  } else {
+    throw 'Could not launch $url';
+  }
+},
+
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
