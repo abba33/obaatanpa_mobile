@@ -414,7 +414,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
 
                   const SizedBox(height: 32),
-
+                  
                   // Mood section
                   const Text(
                     'How are you feeling today?',

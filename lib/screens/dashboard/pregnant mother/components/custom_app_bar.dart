@@ -334,30 +334,14 @@ class CustomAppBar extends StatelessWidget {
           // Bottom row - Controls and user info
           Row(
             children: [
-              // Left side - Menu and dark mode toggle
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: onMenuTap,
-                    child: Icon(
-                      isMenuOpen ? Icons.close : Icons.menu,
-                      color: textColor,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  GestureDetector(
-                    onTap: () {
-                      final themeProvider = context.read<ThemeProvider>();
-                      themeProvider.toggleTheme();
-                    },
-                    child: Icon(
-                      isDark ? Icons.light_mode : Icons.dark_mode_outlined,
-                      color: isDark ? const Color(0xFFF8BBD9) : textColor,
-                      size: 20,
-                    ),
-                  ),
-                ],
+              // Left side - Menu only
+              GestureDetector(
+                onTap: onMenuTap,
+                child: Icon(
+                  isMenuOpen ? Icons.close : Icons.menu,
+                  color: textColor,
+                  size: 24,
+                ),
               ),
 
               const Spacer(),
@@ -415,51 +399,17 @@ class CustomAppBar extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Consumer<AuthProvider>(
-                          builder: (context, authProvider, child) {
-                            final profilePicture = authProvider.profilePicture;
-                            return CircleAvatar(
-                              radius: 18,
-                              backgroundColor:
-                                  isDark ? Colors.grey[700] : Colors.grey[300],
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(18),
-                                child: profilePicture != null
-                                    ? Image.file(
-                                        File(profilePicture),
-                                        fit: BoxFit.cover,
-                                        width: 36,
-                                        height: 36,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Icon(
-                                            Icons.person,
-                                            color: isDark
-                                                ? Colors.white
-                                                : Colors.grey[600],
-                                            size: 20,
-                                          );
-                                        },
-                                      )
-                                    : Image.asset(
-                                        'assets/images/navbar/profile-1.png',
-                                        fit: BoxFit.cover,
-                                        width: 36,
-                                        height: 36,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Icon(
-                                            Icons.person,
-                                            color: isDark
-                                                ? Colors.white
-                                                : Colors.grey[600],
-                                            size: 20,
-                                          );
-                                        },
-                                      ),
-                              ),
-                            );
-                          },
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundColor:
+                              isDark ? Colors.grey[700] : Colors.grey[300],
+                          child: Icon(
+                            Icons.person,
+                            color: isDark
+                                ? Colors.white
+                                : Colors.grey[600],
+                            size: 20,
+                          ),
                         ),
                         const SizedBox(width: 6),
                         Icon(
