@@ -42,9 +42,8 @@ import '../screens/tools/new_mother/health_check_page.dart';
 import '../screens/tools/new_mother/new_parent_resources_page.dart';
 
 // Resources
-import '../screens/dashboard/new mother/resources/baby_care_page.dart';
-import '../screens/dashboard/new mother/resources/breastfeeding_page.dart';
-import '../screens/dashboard/new mother/resources/mental_health_page.dart';
+import '../screens/dashboard/new mother/resources/new_mother_resources_page.dart';
+
 
 // Appointments
 
@@ -212,25 +211,25 @@ class AppRouter {
         name: 'recovery-nutrition',
         builder: (context, state) => const RecoveryNutritionPage(),
       ),
-      
+
       GoRoute(
         path: '/baby-care',
         name: 'baby-care',
         builder: (context, state) => const BabyCarePage(),
       ),
-      
+
       GoRoute(
         path: '/sleep-tracker',
         name: 'sleep-tracker',
         builder: (context, state) => const SleepTrackerPage(),
       ),
-      
+
       GoRoute(
         path: '/health-check',
         name: 'health-check',
         builder: (context, state) => const HealthCheckPage(),
       ),
-      
+
       GoRoute(
         path: '/new-parent-resources',
         name: 'new-parent-resources',
@@ -319,23 +318,9 @@ class AppRouter {
       GoRoute(
         path: '/new-mother/resources',
         name: 'new-mother-resources',
-        builder: (context, state) => const NewMotherResourcesPage(),
+        builder: (context, state) => const NewMotherResourcesScreen(),
       ),
-      GoRoute(
-        path: '/new-mother/resources/baby-care',
-        name: 'new-mother-baby-care',
-        builder: (context, state) => const BabyCareePage(),
-      ),
-      GoRoute(
-        path: '/new-mother/resources/breastfeeding',
-        name: 'new-mother-breastfeeding-resources',
-        builder: (context, state) => const BreastfeedingPage(),
-      ),
-      GoRoute(
-        path: '/new-mother/resources/mental-health',
-        name: 'new-mother-mental-health-resources',
-        builder: (context, state) => const MentalHealthPage(),
-      ),
+
 
       // New Mother Appointments
       GoRoute(
@@ -358,19 +343,7 @@ class AppRouter {
         builder: (context, state) => const NewMotherHealthPage(),
       ),
 
-      // Legacy routes (keeping for backward compatibility)
-      GoRoute(
-        path: '/baby-care',
-        builder: (context, state) => const BabyCareePage(),
-      ),
-      GoRoute(
-        path: '/breastfeeding',
-        builder: (context, state) => const BreastfeedingPage(),
-      ),
-      GoRoute(
-        path: '/mental-health',
-        builder: (context, state) => const MentalHealthPage(),
-      ),
+     
     ],
 
     // Error handling

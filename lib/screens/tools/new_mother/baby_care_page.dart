@@ -88,7 +88,8 @@ class _BabyCarePageState extends State<BabyCarePage> {
       return const Card(
         child: Padding(
           padding: EdgeInsets.all(16.0),
-          child: Text('No feeding logs yet. Start tracking by tapping "Log Feeding"'),
+          child: Text(
+              'No feeding logs yet. Start tracking by tapping "Log Feeding"'),
         ),
       );
     }
@@ -115,7 +116,8 @@ class _BabyCarePageState extends State<BabyCarePage> {
       return const Card(
         child: Padding(
           padding: EdgeInsets.all(16.0),
-          child: Text('No diaper logs yet. Start tracking by tapping "Log Diaper"'),
+          child: Text(
+              'No diaper logs yet. Start tracking by tapping "Log Diaper"'),
         ),
       );
     }
@@ -128,7 +130,8 @@ class _BabyCarePageState extends State<BabyCarePage> {
         final log = _diaperLogs[index];
         return Card(
           child: ListTile(
-            leading: const Icon(Icons.baby_changing_station, color: Color(0xFF9B59B6)),
+            leading: const Icon(Icons.baby_changing_station,
+                color: Color(0xFF9B59B6)),
             title: Text(log.type),
             subtitle: Text(log.time.toString()),
           ),

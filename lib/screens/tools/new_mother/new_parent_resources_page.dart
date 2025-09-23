@@ -80,7 +80,8 @@ class NewParentResourcesPage extends StatelessWidget {
             return Card(
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
-                leading: Icon(guide['icon'] as IconData, color: const Color(0xFF9B59B6)),
+                leading: Icon(guide['icon'] as IconData,
+                    color: const Color(0xFF9B59B6)),
                 title: Text(guide['title'] as String),
                 subtitle: Text(guide['description'] as String),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),

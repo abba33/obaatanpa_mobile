@@ -219,8 +219,8 @@ class PostpartumWeekCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   child: Image.asset(
                     'assets/images/dashboard/newborn-baby.png', 
-                    width: 150,
-                    height: 150,
+                    width: 250,
+                    height: 250,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       // Fallback icon if image not found

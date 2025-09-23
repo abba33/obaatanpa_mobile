@@ -19,17 +19,20 @@ class RecoveryNutritionPage extends StatelessWidget {
             _buildSectionTitle('Postpartum Nutrition Guide'),
             _buildNutritionCard(
               title: 'Essential Nutrients',
-              content: 'Focus on iron-rich foods, protein, calcium, and vitamins to support recovery and breastfeeding.',
+              content:
+                  'Focus on iron-rich foods, protein, calcium, and vitamins to support recovery and breastfeeding.',
               icon: Icons.restaurant_menu,
             ),
             _buildNutritionCard(
               title: 'Hydration',
-              content: 'Stay hydrated by drinking plenty of water, especially if breastfeeding.',
+              content:
+                  'Stay hydrated by drinking plenty of water, especially if breastfeeding.',
               icon: Icons.water_drop,
             ),
             _buildNutritionCard(
               title: 'Meal Planning',
-              content: 'Plan nutrient-rich, easy-to-prepare meals that support healing and energy levels.',
+              content:
+                  'Plan nutrient-rich, easy-to-prepare meals that support healing and energy levels.',
               icon: Icons.calendar_today,
             ),
             _buildSectionTitle('Recommended Foods'),
@@ -94,18 +97,30 @@ class RecoveryNutritionPage extends StatelessWidget {
   Widget _buildFoodList() {
     final recommendedFoods = [
       {'category': 'Proteins', 'foods': 'Lean meats, fish, eggs, legumes'},
-      {'category': 'Iron-Rich Foods', 'foods': 'Dark leafy greens, red meat, fortified cereals'},
-      {'category': 'Calcium Sources', 'foods': 'Dairy products, fortified plant milk, leafy greens'},
-      {'category': 'Healthy Fats', 'foods': 'Avocados, nuts, olive oil, fatty fish'},
+      {
+        'category': 'Iron-Rich Foods',
+        'foods': 'Dark leafy greens, red meat, fortified cereals'
+      },
+      {
+        'category': 'Calcium Sources',
+        'foods': 'Dairy products, fortified plant milk, leafy greens'
+      },
+      {
+        'category': 'Healthy Fats',
+        'foods': 'Avocados, nuts, olive oil, fatty fish'
+      },
     ];
 
     return Column(
-      children: recommendedFoods.map((food) => ListTile(
-        leading: const Icon(Icons.check_circle, color: Color(0xFF9B59B6)),
-        title: Text(food['category']!,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(food['foods']!),
-      )).toList(),
+      children: recommendedFoods
+          .map((food) => ListTile(
+                leading:
+                    const Icon(Icons.check_circle, color: Color(0xFF9B59B6)),
+                title: Text(food['category']!,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(food['foods']!),
+              ))
+          .toList(),
     );
   }
 }

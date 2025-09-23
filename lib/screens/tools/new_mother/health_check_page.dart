@@ -195,7 +195,8 @@ class HealthCheckPage extends StatelessWidget {
             ListTile(
               leading: Icon(Icons.check_circle, color: Color(0xFF9B59B6)),
               title: Text('Gentle exercise'),
-              subtitle: Text('Start with light activities when approved by your doctor'),
+              subtitle: Text(
+                  'Start with light activities when approved by your doctor'),
             ),
           ],
         ),
