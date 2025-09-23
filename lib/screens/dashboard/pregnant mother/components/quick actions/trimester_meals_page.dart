@@ -4,8 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:obaatanpa_mobile/providers/pregnancy_data_provider.dart';
 import 'package:obaatanpa_mobile/providers/theme_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 
 class TrimesterMealsPage extends StatefulWidget {
   const TrimesterMealsPage({Key? key}) : super(key: key);
@@ -29,14 +27,6 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
     _tabController.dispose();
     super.dispose();
   }
-  
-  void _launchURL(String url) async {
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +45,7 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
             elevation: 0,
             leading: IconButton(
               onPressed: () => context.go('/dashboard/pregnant-mother'),
-              icon: Icon(Icons.arrow_back_ios_new,
+              icon: Icon(Icons.arrow_back_ios,
                   color: isDark ? Colors.white : Colors.black87, size: 20),
             ),
             title: Text(
@@ -69,7 +59,7 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
             actions: [
               IconButton(
                 onPressed: () {},
-                icon: Icon(Icons.bookmark_outline,
+                icon: Icon(Icons.bookmark_border,
                     color: isDark ? Colors.white : Colors.black87, size: 22),
               ),
             ],
@@ -77,16 +67,16 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
           body: Column(
             children: [
               _buildTrimesterHeader(trimester, currentWeek, trimesterData),
-              _buildMealTypeTabBar(isDark),
+              _buildMealTypeTabBar(),
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
                   children: [
                     _buildMealsList(
-                        'breakfast', trimesterData['meals']['breakfast'], isDark),
-                    _buildMealsList('lunch', trimesterData['meals']['lunch'], isDark),
-                    _buildMealsList('dinner', trimesterData['meals']['dinner'], isDark),
-                    _buildMealsList('snacks', trimesterData['meals']['snacks'], isDark),
+                        'breakfast', trimesterData['meals']['breakfast']),
+                    _buildMealsList('lunch', trimesterData['meals']['lunch']),
+                    _buildMealsList('dinner', trimesterData['meals']['dinner']),
+                    _buildMealsList('snacks', trimesterData['meals']['snacks']),
                   ],
                 ),
               ),
@@ -105,16 +95,9 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: trimesterColor.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(20),
+        color: trimesterColor.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: trimesterColor.withOpacity(0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: trimesterColor.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,7 +106,7 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
             children: [
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: trimesterColor,
                   borderRadius: BorderRadius.circular(20),
@@ -137,7 +120,7 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Icon(
                 Icons.restaurant_menu,
                 color: trimesterColor,
@@ -145,16 +128,16 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             '$trimester Trimester Nutrition',
             style: GoogleFonts.inter(
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             trimesterData['description'],
             style: GoogleFonts.inter(
@@ -163,32 +146,32 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 16),
-          _buildNutritionHighlights(trimesterData['highlights'], trimesterColor),
+          const SizedBox(height: 12),
+          _buildNutritionHighlights(trimesterData['highlights']),
         ],
       ),
     );
   }
 
-  Widget _buildNutritionHighlights(
-      List<String> highlights, Color trimesterColor) {
+  Widget _buildNutritionHighlights(List<String> highlights) {
     return Wrap(
-      spacing: 10,
-      runSpacing: 10,
+      spacing: 8,
+      runSpacing: 8,
       children: highlights
           .map((highlight) => Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: trimesterColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: trimesterColor.withOpacity(0.3)),
+                  color: const Color(0xFFF59297).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                      color: const Color(0xFFF59297).withOpacity(0.3)),
                 ),
                 child: Text(
                   highlight,
                   style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: trimesterColor,
+                    fontSize: 11,
+                    color: const Color(0xFFF59297),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -197,12 +180,12 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
     );
   }
 
-  Widget _buildMealTypeTabBar(bool isDark) {
+  Widget _buildMealTypeTabBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -214,16 +197,16 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
       child: TabBar(
         controller: _tabController,
         indicator: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(8),
           color: const Color(0xFFF59297),
         ),
         indicatorPadding: const EdgeInsets.all(4),
         labelColor: Colors.white,
-        unselectedLabelColor: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+        unselectedLabelColor: Colors.grey.shade600,
         labelStyle:
-            GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600),
+            GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600),
         unselectedLabelStyle:
-            GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
+            GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w500),
         tabs: const [
           Tab(text: 'Breakfast'),
           Tab(text: 'Lunch'),
@@ -234,56 +217,53 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
     );
   }
 
-  Widget _buildMealsList(String mealType, List<Map<String, dynamic>> meals, bool isDark) {
+  Widget _buildMealsList(String mealType, List<Map<String, dynamic>> meals) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: meals.length,
       itemBuilder: (context, index) {
         final meal = meals[index];
-        return _buildMealCard(meal, mealType, isDark);
+        return _buildMealCard(meal, mealType);
       },
     );
   }
 
-  Widget _buildMealCard(Map<String, dynamic> meal, String mealType, bool isDark) {
-    Color mealColor = _getMealTypeColor(mealType);
-    bool hasVideo = meal['videoUrl'] != null && meal['videoUrl'].isNotEmpty;
-
+  Widget _buildMealCard(Map<String, dynamic> meal, String mealType) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
             blurRadius: 12,
-            offset: const Offset(0, 6),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
+          Container(
+            height: 160,
+            decoration: BoxDecoration(
+              color: _getMealTypeColor(mealType).withOpacity(0.1),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
             ),
-            child: Container(
-              height: 180,
-              color: mealColor.withOpacity(0.2),
-              child: Center(
-                child: Icon(
-                  _getMealTypeIcon(mealType),
-                  size: 60,
-                  color: mealColor.withOpacity(0.8),
-                ),
+            child: Center(
+              child: Icon(
+                _getMealTypeIcon(mealType),
+                size: 48,
+                color: _getMealTypeColor(mealType),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -293,70 +273,70 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
                       child: Text(
                         meal['name'],
                         style: GoogleFonts.inter(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
+                          color: Colors.black87,
                         ),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: mealColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         '${meal['calories']} cal',
                         style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: mealColor.shade700,
+                          fontSize: 11,
+                          color: Colors.green.shade700,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
                   meal['description'],
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: isDark ? Colors.grey.shade400 : Colors.black54,
+                    color: Colors.black54,
                     height: 1.4,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Text(
                   'Key Benefits:',
                   style: GoogleFonts.inter(
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white70 : Colors.black87,
+                    color: Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 ...meal['benefits']
                     .map<Widget>((benefit) => Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
+                          padding: const EdgeInsets.only(bottom: 4),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
                                 margin: const EdgeInsets.only(top: 6, right: 8),
-                                width: 5,
-                                height: 5,
+                                width: 4,
+                                height: 4,
                                 decoration: BoxDecoration(
-                                  color: mealColor,
-                                  borderRadius: BorderRadius.circular(2.5),
+                                  color: const Color(0xFFF59297),
+                                  borderRadius: BorderRadius.circular(2),
                                 ),
                               ),
                               Expanded(
                                 child: Text(
                                   benefit,
                                   style: GoogleFonts.inter(
-                                    fontSize: 13,
-                                    color: isDark ? Colors.grey.shade500 : Colors.black54,
+                                    fontSize: 12,
+                                    color: Colors.black54,
                                   ),
                                 ),
                               ),
@@ -364,68 +344,46 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
                           ),
                         ))
                     .toList(),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () => _showIngredientsDialog(context, meal, isDark),
-                        icon: Icon(Icons.list_alt, size: 18, color: mealColor),
+                        onPressed: () => _showIngredientsDialog(context, meal),
+                        icon: const Icon(Icons.list_alt, size: 16),
                         label: Text(
                           'Ingredients',
-                          style: GoogleFonts.inter(fontSize: 13, color: mealColor),
+                          style: GoogleFonts.inter(fontSize: 12),
                         ),
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: BorderSide(color: mealColor.withOpacity(0.5)),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          side: BorderSide(color: Colors.grey.shade300),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: () => _showRecipeDialog(context, meal, isDark),
-                        icon: const Icon(Icons.restaurant, size: 18),
+                        onPressed: () => _showRecipeDialog(context, meal),
+                        icon: const Icon(Icons.restaurant, size: 16),
                         label: Text(
                           'Recipe',
-                          style: GoogleFonts.inter(fontSize: 13),
+                          style: GoogleFonts.inter(fontSize: 12),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: mealColor,
+                          backgroundColor: const Color(0xFFF59297),
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
                     ),
-                    if (hasVideo) ...[
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () => _launchURL(meal['videoUrl']),
-                          icon: const Icon(Icons.play_circle_outline, size: 18),
-                          label: Text(
-                            'Watch Video',
-                            style: GoogleFonts.inter(fontSize: 13),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ],
@@ -452,13 +410,13 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
   Color _getMealTypeColor(String mealType) {
     switch (mealType.toLowerCase()) {
       case 'breakfast':
-        return const Color(0xFFFF9800); // Orange
+        return const Color(0xFFFF9800);
       case 'lunch':
-        return const Color(0xFF4CAF50); // Green
+        return const Color(0xFF4CAF50);
       case 'dinner':
-        return const Color(0xFF2196F3); // Blue
+        return const Color(0xFF2196F3);
       case 'snacks':
-        return const Color(0xFF9C27B0); // Purple
+        return const Color(0xFF9C27B0);
       default:
         return const Color(0xFFF59297);
     }
@@ -479,51 +437,46 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
     }
   }
 
-  void _showIngredientsDialog(BuildContext context, Map<String, dynamic> meal, bool isDark) {
-    Color mealColor = _getMealTypeColor(meal['type']);
+  void _showIngredientsDialog(BuildContext context, Map<String, dynamic> meal) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(
             '${meal['name']} - Ingredients',
-            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+            style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
           ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: meal['ingredients']
-                  .map<Widget>((ingredient) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('• ',
-                                style: GoogleFonts.inter(
-                                    fontSize: 16,
-                                    color: mealColor)),
-                            Expanded(
-                              child: Text(
-                                ingredient,
-                                style: GoogleFonts.inter(fontSize: 14, color: isDark ? Colors.grey.shade400 : Colors.black87),
-                              ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: meal['ingredients']
+                .map<Widget>((ingredient) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('• ',
+                              style: TextStyle(
+                                  fontSize: 16, color: Color(0xFFF59297))),
+                          Expanded(
+                            child: Text(
+                              ingredient,
+                              style: GoogleFonts.inter(fontSize: 14),
                             ),
-                          ],
-                        ),
-                      ))
-                  .toList(),
-            ),
+                          ),
+                        ],
+                      ),
+                    ))
+                .toList(),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Close',
-                style: GoogleFonts.inter(color: mealColor, fontWeight: FontWeight.w600),
+                style: GoogleFonts.inter(color: const Color(0xFFF59297)),
               ),
             ),
           ],
@@ -532,18 +485,16 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
     );
   }
 
-  void _showRecipeDialog(BuildContext context, Map<String, dynamic> meal, bool isDark) {
-    Color mealColor = _getMealTypeColor(meal['type']);
+  void _showRecipeDialog(BuildContext context, Map<String, dynamic> meal) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(
             '${meal['name']} - Recipe',
-            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+            style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
           ),
           content: SingleChildScrollView(
             child: Column(
@@ -553,31 +504,31 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
                 Text(
                   'Instructions:',
                   style: GoogleFonts.inter(
-                      fontSize: 16, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : Colors.black87),
+                      fontSize: 14, fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 ...meal['recipe']
                     .asMap()
                     .entries
                     .map<Widget>((entry) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.only(bottom: 8),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                margin: const EdgeInsets.only(top: 2, right: 12),
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  color: mealColor,
+                                margin: const EdgeInsets.only(top: 2, right: 8),
+                                width: 20,
+                                height: 20,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFF59297),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Center(
                                   child: Text(
                                     '${entry.key + 1}',
-                                    style: GoogleFonts.inter(
+                                    style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 12,
+                                      fontSize: 10,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -586,7 +537,7 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
                               Expanded(
                                 child: Text(
                                   entry.value,
-                                  style: GoogleFonts.inter(fontSize: 14, color: isDark ? Colors.grey.shade400 : Colors.black87),
+                                  style: GoogleFonts.inter(fontSize: 13),
                                 ),
                               ),
                             ],
@@ -601,7 +552,7 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Close',
-                style: GoogleFonts.inter(color: mealColor, fontWeight: FontWeight.w600),
+                style: GoogleFonts.inter(color: const Color(0xFFF59297)),
               ),
             ),
           ],
@@ -803,8 +754,7 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
               'Add berries and granola',
               'Top with walnuts and chia seeds',
               'Drizzle with honey and serve'
-            ],
-            'videoUrl': 'https://www.youtube.com/watch?v=kYv9R1oR46U',
+            ]
           }
         ],
         'lunch': [
@@ -831,8 +781,7 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
               'Combine spinach, tomatoes, and avocado',
               'Top with flaked salmon',
               'Drizzle with vinaigrette and sprinkle seeds'
-            ],
-            'videoUrl': 'https://www.youtube.com/watch?v=FjIuK5p1o8E',
+            ]
           }
         ],
         'dinner': [
@@ -860,8 +809,7 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
               'Stir-fry beef until browned',
               'Add vegetables and garlic, cook until tender',
               'Serve over rice with soy sauce'
-            ],
-            'videoUrl': 'https://www.youtube.com/watch?v=oV852jY_f7c',
+            ]
           }
         ],
         'snacks': [
@@ -887,8 +835,7 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
               'Add flaxseed, chia seeds, and vanilla',
               'Roll into small balls',
               'Refrigerate for 30 minutes before eating'
-            ],
-            'videoUrl': 'https://www.youtube.com/watch?v=kYv9R1oR46U',
+            ]
           }
         ]
       }
@@ -1021,8 +968,4 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
       }
     };
   }
-}
-
-extension on Color {
-  get shade700 => null;
 }
