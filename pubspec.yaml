@@ -37,7 +37,7 @@ dependencies:
   intl: ^0.18.1
   uuid: ^4.1.0
   url_launcher: ^6.2.1
-  image_picker: ^1.0.4
+  image_picker: ^1.2.0
 
   # Animations
   flutter_staggered_animations: ^1.1.1

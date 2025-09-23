@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:obaatanpa_mobile/screens/auth/components/pregnancy_info_popup.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/baby_this_week.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/daily_tasks_component.dart';
@@ -25,6 +27,12 @@ class _DashboardPageState extends State<DashboardPage> {
   bool _isMenuOpen = false;
   bool _isChatbotVisible = false;
   String _selectedMood = '';
+  Map<String, dynamic> _journalEntry = {
+    'mood': '',
+    'thoughts': '',
+    'date': DateTime.now(),
+    'photos': <String>[],
+  };
 
   @override
   void initState() {
@@ -107,23 +115,47 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  void _navigateToChatTopic(String topic) {
-    // Navigate to appropriate page based on chat topic
-    switch (topic.toLowerCase()) {
-      case 'pregnancy symptoms':
-        context.go('/health');
-        break;
-      case 'nutrition tips':
-        context.go('/nutrition');
-        break;
-      case 'exercise guide':
-        context.go('/health');
-        break;
-      case 'doctor questions':
-        context.go('/appointments');
-        break;
-      default:
-        context.go('/resources');
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: source,
+        imageQuality: 80,
+      );
+
+      if (image != null) {
+        setState(() {
+          _journalEntry['photos'] = [
+            ...(_journalEntry['photos'] as List<String>),
+            image.path
+          ];
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Image added successfully!'),
+              backgroundColor: const Color(0xFF7DA8E6),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to pick image: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -414,7 +446,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
 
                   const SizedBox(height: 32),
-                  
+
                   // Mood section
                   const Text(
                     'How are you feeling today?',
@@ -568,6 +600,68 @@ class _DashboardPageState extends State<DashboardPage> {
                           ),
                         ),
 
+                        // Selected Photos Preview
+                        if ((_journalEntry['photos'] as List<String>)
+                            .isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                            child: SizedBox(
+                              height: 100,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount:
+                                    (_journalEntry['photos'] as List<String>)
+                                        .length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 8),
+                                    child: Stack(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          child: Image.file(
+                                            File((_journalEntry['photos']
+                                                as List<String>)[index]),
+                                            height: 100,
+                                            width: 100,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 4,
+                                          right: 4,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                (_journalEntry['photos']
+                                                        as List<String>)
+                                                    .removeAt(index);
+                                              });
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: BoxDecoration(
+                                                color: Colors.red,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: const Icon(
+                                                Icons.close,
+                                                color: Colors.white,
+                                                size: 16,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+
                         // Photo upload buttons
                         Padding(
                           padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -576,8 +670,8 @@ class _DashboardPageState extends State<DashboardPage> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    // Handle camera
                                     HapticFeedback.lightImpact();
+                                    _pickImage(ImageSource.camera);
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
@@ -621,8 +715,8 @@ class _DashboardPageState extends State<DashboardPage> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    // Handle gallery
                                     HapticFeedback.lightImpact();
+                                    _pickImage(ImageSource.gallery);
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
@@ -682,7 +776,21 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     child: ElevatedButton(
                       onPressed: () {
+                        if (_selectedMood.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'Please select how you\'re feeling today'),
+                              backgroundColor: Colors.orange,
+                            ),
+                          );
+                          return;
+                        }
                         HapticFeedback.mediumImpact();
+
+                        // Here you can save the journal entry to your storage
+                        print('Saving journal entry: $_journalEntry');
+
                         Navigator.of(context).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -748,6 +856,7 @@ class _DashboardPageState extends State<DashboardPage> {
         HapticFeedback.lightImpact();
         setState(() {
           _selectedMood = label;
+          _journalEntry['mood'] = label;
         });
       },
       child: Column(
@@ -992,8 +1101,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildQuickChatButton(String text) {
     return GestureDetector(
       onTap: () {
-        // Navigate to appropriate page based on chat topic
-        _navigateToChatTopic(text);
+        // Handle quick chat button tap
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
