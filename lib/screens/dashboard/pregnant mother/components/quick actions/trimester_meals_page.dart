@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:obaatanpa_mobile/providers/pregnancy_data_provider.dart';
 import 'package:obaatanpa_mobile/providers/theme_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class TrimesterMealsPage extends StatefulWidget {
   const TrimesterMealsPage({Key? key}) : super(key: key);
@@ -26,6 +28,14 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+  
+  void _launchURL(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   @override
@@ -237,6 +247,7 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
 
   Widget _buildMealCard(Map<String, dynamic> meal, String mealType, bool isDark) {
     Color mealColor = _getMealTypeColor(mealType);
+    bool hasVideo = meal['videoUrl'] != null && meal['videoUrl'].isNotEmpty;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -393,6 +404,28 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
                         ),
                       ),
                     ),
+                    if (hasVideo) ...[
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _launchURL(meal['videoUrl']),
+                          icon: const Icon(Icons.play_circle_outline, size: 18),
+                          label: Text(
+                            'Watch Video',
+                            style: GoogleFonts.inter(fontSize: 13),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ],
@@ -770,7 +803,8 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
               'Add berries and granola',
               'Top with walnuts and chia seeds',
               'Drizzle with honey and serve'
-            ]
+            ],
+            'videoUrl': 'https://www.youtube.com/watch?v=kYv9R1oR46U',
           }
         ],
         'lunch': [
@@ -797,7 +831,8 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
               'Combine spinach, tomatoes, and avocado',
               'Top with flaked salmon',
               'Drizzle with vinaigrette and sprinkle seeds'
-            ]
+            ],
+            'videoUrl': 'https://www.youtube.com/watch?v=FjIuK5p1o8E',
           }
         ],
         'dinner': [
@@ -825,7 +860,8 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
               'Stir-fry beef until browned',
               'Add vegetables and garlic, cook until tender',
               'Serve over rice with soy sauce'
-            ]
+            ],
+            'videoUrl': 'https://www.youtube.com/watch?v=oV852jY_f7c',
           }
         ],
         'snacks': [
@@ -851,7 +887,8 @@ class _TrimesterMealsPageState extends State<TrimesterMealsPage>
               'Add flaxseed, chia seeds, and vanilla',
               'Roll into small balls',
               'Refrigerate for 30 minutes before eating'
-            ]
+            ],
+            'videoUrl': 'https://www.youtube.com/watch?v=kYv9R1oR46U',
           }
         ]
       }

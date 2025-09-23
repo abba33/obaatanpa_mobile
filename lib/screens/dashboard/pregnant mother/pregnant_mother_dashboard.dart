@@ -1148,23 +1148,48 @@ class _DashboardPageState extends State<DashboardPage> {
               height: MediaQuery.of(context).padding.top,
               color: Colors.white,
             ),
-            // App Bar in Menu - UPDATED: Removed extra space
+            // App Bar in Menu with actual logo
             Container(
               padding: const EdgeInsets.only(
                   top: 16, left: 16, right: 16, bottom: 16),
               child: Row(
                 children: [
+                  // Replace the placeholder with actual logo
                   Container(
                     width: 40,
                     height: 40,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFF59297),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.favorite,
+                    decoration: BoxDecoration(
                       color: Colors.white,
-                      size: 20,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/images/navbar/maternity-logo.png', // Update this path to your actual logo
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          // Fallback to icon if logo doesn't load
+                          return Container(
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF59297),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.favorite,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
