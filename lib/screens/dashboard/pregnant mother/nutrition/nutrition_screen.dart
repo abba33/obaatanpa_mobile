@@ -154,14 +154,14 @@ class _NutritionScreenState extends State<NutritionScreen> {
 
 Widget _buildDailyNutritionGoals() {
   return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'Daily Nutrition Goals',
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
             color: Color(0xFF2C2C2C),
             letterSpacing: -0.3,
@@ -171,32 +171,32 @@ Widget _buildDailyNutritionGoals() {
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: 8, // tighter spacing
-          mainAxisSpacing: 8,  // tighter spacing
-          childAspectRatio: 1, // makes items more compact
+          crossAxisCount: 4, // 4 items in a row instead of 2
+          crossAxisSpacing: 6,
+          mainAxisSpacing: 6,
+          childAspectRatio: 0.8, // more compact ratio
           children: [
             _buildNutritionGoalItem(
               'Calories',
-              '2,200 / 2,500 kcal',
+              '2,200/2,500',
               0.88,
               const Color(0xFF10B981),
             ),
             _buildNutritionGoalItem(
               'Protein',
-              '65g / 75g',
+              '65g/75g',
               0.87,
               const Color(0xFFF59297),
             ),
             _buildNutritionGoalItem(
               'Folate',
-              '550μg / 600μg',
+              '550μg/600μg',
               0.92,
               const Color(0xFF7DA8E6),
             ),
             _buildNutritionGoalItem(
               'Iron',
-              '22mg / 27mg',
+              '22mg/27mg',
               0.81,
               const Color(0xFFF59E0B),
             ),
@@ -217,8 +217,8 @@ Widget _buildNutritionGoalItem(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       CircularPercentIndicator(
-        radius: 28.0, // smaller circle
-        lineWidth: 5.0,
+        radius: 20.0, // much smaller circle
+        lineWidth: 3.0, // thinner line
         percent: progress,
         progressColor: color,
         backgroundColor: color.withOpacity(0.2),
@@ -226,17 +226,17 @@ Widget _buildNutritionGoalItem(
         center: Text(
           '${(progress * 100).toInt()}%',
           style: const TextStyle(
-            fontSize: 10,
+            fontSize: 8,
             fontWeight: FontWeight.w600,
             color: Color(0xFF2C2C2C),
           ),
         ),
       ),
-      const SizedBox(height: 4), // reduced gap
+      const SizedBox(height: 2), // minimal gap
       Text(
         title,
         style: const TextStyle(
-          fontSize: 12,
+          fontSize: 10,
           fontWeight: FontWeight.w600,
           color: Color(0xFF2C2C2C),
         ),
@@ -244,7 +244,7 @@ Widget _buildNutritionGoalItem(
       Text(
         goal,
         style: const TextStyle(
-          fontSize: 10,
+          fontSize: 8,
           color: Color(0xFF6B7280),
           fontWeight: FontWeight.w500,
         ),
@@ -254,9 +254,7 @@ Widget _buildNutritionGoalItem(
   );
 }
 
-
-
-  Widget _buildRecommendedFoods() {
+Widget _buildRecommendedFoods() {
   final recommendedFoods = [
     {
       'name': 'Leafy Greens',
@@ -264,6 +262,7 @@ Widget _buildNutritionGoalItem(
       'image': 'assets/images/foods/leafy_greens.png',
       'color': const Color(0xFF10B981),
       'examples': 'Spinach, Kale, Broccoli',
+      'infoUrl': 'https://www.mayoclinic.org/healthy-lifestyle/pregnancy-and-parenting/in-depth/pregnancy-nutrition/art-20043844',
     },
     {
       'name': 'Lean Proteins',
@@ -271,6 +270,7 @@ Widget _buildNutritionGoalItem(
       'image': 'assets/images/foods/lean_proteins.png',
       'color': const Color(0xFFF59297),
       'examples': 'Fish, Chicken, Beans, Eggs',
+      'infoUrl': 'https://www.babycenter.com/pregnancy/diet-and-fitness/protein-in-your-pregnancy-diet_1690',
     },
     {
       'name': 'Whole Grains',
@@ -278,6 +278,7 @@ Widget _buildNutritionGoalItem(
       'image': 'assets/images/foods/whole_grains.png',
       'color': const Color(0xFFF59E0B),
       'examples': 'Brown rice, Oats, Quinoa',
+      'infoUrl': 'https://www.healthline.com/health/pregnancy/whole-grains-during-pregnancy',
     },
     {
       'name': 'Dairy Products',
@@ -285,8 +286,26 @@ Widget _buildNutritionGoalItem(
       'image': 'assets/images/foods/dairy_products.png',
       'color': const Color(0xFF7DA8E6),
       'examples': 'Milk, Yogurt, Cheese',
+      'infoUrl': 'https://www.whattoexpect.com/pregnancy/eating-well/nutrients/calcium/',
     },
   ];
+
+  Future<void> _launchInfoPage(String url) async {
+    final Uri uri = Uri.parse(url);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication, // Opens in browser
+        );
+      } else {
+        // Handle error - maybe show a snackbar
+        print('Could not launch $url');
+      }
+    } catch (e) {
+      print('Error launching URL: $e');
+    }
+  }
 
   return Padding(
     padding: const EdgeInsets.all(20),
@@ -315,93 +334,125 @@ Widget _buildNutritionGoalItem(
           itemCount: recommendedFoods.length,
           itemBuilder: (context, index) {
             final food = recommendedFoods[index];
-            return Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Stack(
-                  children: [
-                    // Background image
-                    Positioned.fill(
-                      child: Image.asset(
-                        food['image'].toString(),
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[200],
-                            child: Icon(
-                              Icons.restaurant_menu,
-                              color: food['color'] as Color,
-                              size: 40,
-                            ),
-                          );
-                        },
-                      ),
+            return GestureDetector(
+              onTap: () => _launchInfoPage(food['infoUrl'].toString()),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Stack(
+                    children: [
+                      // Background image
+                      Positioned.fill(
+                        child: Image.asset(
+                          food['image'].toString(),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey[200],
+                              child: Icon(
+                                Icons.restaurant_menu,
+                                color: food['color'] as Color,
+                                size: 40,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
 
-                    // Gradient overlay for readability
-                    Positioned.fill(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.black.withOpacity(0.6),
-                              Colors.transparent,
-                            ],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
+                      // Gradient overlay for readability
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.black.withOpacity(0.6),
+                                Colors.transparent,
+                              ],
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    // Text info
-                    Positioned(
-                      bottom: 12,
-                      left: 12,
-                      right: 12,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            food['name'].toString(),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
+                      // Info icon indicator
+                      Positioned(
+                        top: 12,
+                        right: 12,
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(14),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            food['benefit'].toString(),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white70,
-                            ),
+                          child: Icon(
+                            Icons.info_outline,
+                            color: food['color'] as Color,
+                            size: 16,
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            food['examples'].toString(),
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: food['color'] as Color,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+
+                      // Text info
+                      Positioned(
+                        bottom: 12,
+                        left: 12,
+                        right: 12,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              food['name'].toString(),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              food['benefit'].toString(),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white70,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              food['examples'].toString(),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: food['color'] as Color,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Tap to learn more',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white.withOpacity(0.8),
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -611,52 +662,75 @@ Widget _buildNutritionGoalItem(
 }
 
 
-  Widget _buildFoodsToAvoid() {
-    final avoidFoods = [
-      {
-        'name': 'Raw Fish & Meat',
-        'reason': 'Risk of bacterial infection',
-        'icon': Icons.no_food_outlined,
-        'color': const Color(0xFFDC2626),
-      },
-      {
-        'name': 'High Mercury Fish',
-        'reason': 'Can affect baby\'s development',
-        'icon': Icons.warning_outlined,
-        'color': const Color(0xFFF59E0B),
-      },
-      {
-        'name': 'Alcohol',
-        'reason': 'No safe amount during pregnancy',
-        'icon': Icons.local_bar_outlined,
-        'color': const Color(0xFFDC2626),
-      },
-      {
-        'name': 'Excess Caffeine',
-        'reason': 'Limit to 200mg per day',
-        'icon': Icons.coffee_outlined,
-        'color': const Color(0xFFF59E0B),
-      },
-    ];
+Widget _buildFoodsToAvoid() {
+  final avoidFoods = [
+    {
+      'name': 'Raw Fish & Meat',
+      'reason': 'Risk of bacterial infection',
+      'image': 'assets/images/raw_fish_meat.jpg', // Add your image path
+      'color': const Color(0xFFDC2626),
+      'videoUrl': 'https://www.youtube.com/watch?v=Qf8pAwGsuF4', // Example: pregnancy food safety
+    },
+    {
+      'name': 'High Mercury Fish',
+      'reason': 'Can affect baby\'s development',
+      'image': 'assets/images/mercury_fish.jpg', // Add your image path
+      'color': const Color(0xFFF59E0B),
+      'videoUrl': 'https://www.youtube.com/watch?v=BQHdBkW8paI', // Example: mercury in fish during pregnancy
+    },
+    {
+      'name': 'Alcohol',
+      'reason': 'No safe amount during pregnancy',
+      'image': 'assets/images/alcohol.jpg', // Add your image path
+      'color': const Color(0xFFDC2626),
+      'videoUrl': 'https://www.youtube.com/watch?v=YkEuIvP6bHU', // Example: alcohol during pregnancy
+    },
+    {
+      'name': 'Excess Caffeine',
+      'reason': 'Limit to 200mg per day',
+      'image': 'assets/images/coffee.jpg', // Add your image path
+      'color': const Color(0xFFF59E0B),
+      'videoUrl': 'https://www.youtube.com/watch?v=_YVJEh82PSk', // Example: caffeine during pregnancy
+    },
+  ];
 
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Foods to Limit or Avoid',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF2C2C2C),
-              letterSpacing: -0.3,
-            ),
+  Future<void> _launchYouTubeVideo(String url) async {
+    final Uri uri = Uri.parse(url);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication, // Opens in YouTube app or browser
+        );
+      } else {
+        // Handle error - maybe show a snackbar
+        print('Could not launch $url');
+      }
+    } catch (e) {
+      print('Error launching URL: $e');
+    }
+  }
+
+  return Padding(
+    padding: const EdgeInsets.all(20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Foods to Limit or Avoid',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF2C2C2C),
+            letterSpacing: -0.3,
           ),
-          const SizedBox(height: 16),
-          Column(
-            children: avoidFoods.map((food) {
-              return Container(
+        ),
+        const SizedBox(height: 16),
+        Column(
+          children: avoidFoods.map((food) {
+            return GestureDetector(
+              onTap: () => _launchYouTubeVideo(food['videoUrl'].toString()),
+              child: Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -676,16 +750,59 @@ Widget _buildNutritionGoalItem(
                 child: Row(
                   children: [
                     Container(
-                      width: 44,
-                      height: 44,
+                      width: 60,
+                      height: 60,
                       decoration: BoxDecoration(
-                        color: (food['color'] as Color).withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: (food['color'] as Color).withOpacity(0.3),
+                          width: 2,
+                        ),
                       ),
-                      child: Icon(
-                        food['icon'] as IconData,
-                        color: food['color'] as Color,
-                        size: 20,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Stack(
+                          children: [
+                            // The main image
+                            Image.asset(
+                              food['image'].toString(),
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                // Fallback to a placeholder if image fails to load
+                                return Container(
+                                  width: 60,
+                                  height: 60,
+                                  color: (food['color'] as Color).withOpacity(0.12),
+                                  child: Icon(
+                                    Icons.image_not_supported,
+                                    color: food['color'] as Color,
+                                    size: 24,
+                                  ),
+                                );
+                              },
+                            ),
+                            // Play button overlay
+                            Positioned(
+                              bottom: 4,
+                              right: 4,
+                              child: Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.7),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.play_arrow,
+                                  color: Colors.white,
+                                  size: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -693,13 +810,19 @@ Widget _buildNutritionGoalItem(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            food['name'].toString(),
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF2C2C2C),
-                            ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  food['name'].toString(),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF2C2C2C),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -710,19 +833,29 @@ Widget _buildNutritionGoalItem(
                               fontWeight: FontWeight.w500,
                             ),
                           ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Tap to watch explanation video',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: (food['color'] as Color).withOpacity(0.8),
+                              fontWeight: FontWeight.w500,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    ),
+  );
+}
   Widget _buildNutritionTips() {
     final nutritionVideos = [
       {
