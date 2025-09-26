@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 // Provider imports
 import '../../providers/auth_provider.dart';
 
-// Multi-step Signup Screen
+/// Enhanced Signup Screen - Multi-step with verification
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
@@ -21,20 +22,27 @@ class _SignupScreenState extends State<SignupScreen>
   final _formKey = GlobalKey<FormState>();
   final _specificFormKey = GlobalKey<FormState>();
   final _passwordFormKey = GlobalKey<FormState>();
+  final _verificationFormKey = GlobalKey<FormState>();
 
   // Form controllers
-  final _fullNameController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _locationController = TextEditingController();
+  final _dobController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _verificationCodeController = TextEditingController();
 
   // Additional field controllers
+  final _facilityNameController = TextEditingController();
+  final _workplaceController = TextEditingController();
   final _trimesterController = TextEditingController();
   final _babyAgeController = TextEditingController();
   final _professionController = TextEditingController();
-  final _workplaceController = TextEditingController();
+  
+  String _selectedLanguage = 'English';
 
   String _selectedUserType = '';
   bool _obscurePassword = true;
@@ -99,6 +107,10 @@ class _SignupScreenState extends State<SignupScreen>
       curve: const Interval(0.2, 1.0, curve: Curves.easeOut),
     ));
 
+    _pageController.addListener(() {
+      print('PageController page: ${_pageController.page}');
+    });
+
     _animationController.forward();
   }
 
@@ -106,16 +118,20 @@ class _SignupScreenState extends State<SignupScreen>
   void dispose() {
     _animationController.dispose();
     _pageController.dispose();
-    _fullNameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _locationController.dispose();
+    _dobController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _facilityNameController.dispose();
+    _workplaceController.dispose();
     _trimesterController.dispose();
     _babyAgeController.dispose();
     _professionController.dispose();
-    _workplaceController.dispose();
+    _verificationCodeController.dispose();
     super.dispose();
   }
 
@@ -124,7 +140,8 @@ class _SignupScreenState extends State<SignupScreen>
       setState(() {
         _currentStep++;
       });
-      _pageController.nextPage(
+      _pageController.animateToPage(
+        _currentStep,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
@@ -136,7 +153,8 @@ class _SignupScreenState extends State<SignupScreen>
       setState(() {
         _currentStep--;
       });
-      _pageController.previousPage(
+      _pageController.animateToPage(
+        _currentStep,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
@@ -168,9 +186,9 @@ class _SignupScreenState extends State<SignupScreen>
                       controller: _pageController,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        _buildStep1(), // Choose user type
-                        _buildStep2(), // Basic info + specific info
-                        _buildStep3(), // Password + terms
+                        _buildStep1(),
+                        _buildStep2(),
+                        _buildStep3(),
                       ],
                     ),
                   ),
@@ -187,9 +205,9 @@ class _SignupScreenState extends State<SignupScreen>
     return Container(
       height: 250,
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage("assets/images/auth/pregnant-mother-hero.png"), 
+          image: AssetImage(_getHeroImage()),
           fit: BoxFit.cover,
         ),
       ),
@@ -228,7 +246,7 @@ class _SignupScreenState extends State<SignupScreen>
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       image: const DecorationImage(
-                        image: AssetImage("assets/images/navbar/maternity-logo.png"), // Replace with your logo name
+                        image: AssetImage("assets/images/navbar/maternity-logo.png"),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -269,6 +287,21 @@ class _SignupScreenState extends State<SignupScreen>
     );
   }
 
+  String _getHeroImage() {
+    switch (_selectedUserType) {
+      case 'pregnant':
+        return 'assets/images/auth/pregnant-mother-hero.png';
+      case 'new-mother':
+        return 'assets/images/auth/new-mother-hero.png';
+      case 'hospital':
+        return 'assets/images/auth/hospital.jpg';
+      case 'practitioner':
+        return 'assets/images/auth/health-practitioner.jpg';
+      default:
+        return 'assets/images/auth/pregnant-mother-hero.png';
+    }
+  }
+
   String _getStepDescription() {
     switch (_currentStep) {
       case 0:
@@ -304,7 +337,6 @@ class _SignupScreenState extends State<SignupScreen>
     );
   }
 
-  // STEP 1: Choose User Type
   Widget _buildStep1() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
@@ -339,7 +371,6 @@ class _SignupScreenState extends State<SignupScreen>
     );
   }
 
-  // STEP 2: Basic Info + Specific Info
   Widget _buildStep2() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
@@ -376,7 +407,6 @@ class _SignupScreenState extends State<SignupScreen>
     );
   }
 
-  // STEP 3: Password + Terms
   Widget _buildStep3() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
@@ -409,6 +439,131 @@ class _SignupScreenState extends State<SignupScreen>
           _buildLoginLink(),
         ],
       ),
+    );
+  }
+
+  Widget _buildVerificationStep(BuildContext context) {
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Verify Your Account',
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Enter the verification code sent to your email',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 24),
+              if (authProvider.error != null)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red.withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          authProvider.error!,
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              Form(
+                key: _verificationFormKey,
+                child: Column(
+                  children: [
+                    _buildTextFormField(
+                      controller: _verificationCodeController,
+                      label: 'Verification Code *',
+                      hint: 'Enter your verification code',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the verification code';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed: authProvider.isLoading
+                            ? null
+                            : () => _handleVerification(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          disabledBackgroundColor: Colors.grey[300],
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Ink(
+                          decoration: BoxDecoration(
+                            gradient: authProvider.isLoading
+                                ? null
+                                : const LinearGradient(
+                                    colors: [Color(0xFF7DA8E6), Color(0xFFF8A7AB)],
+                                  ),
+                            color: authProvider.isLoading ? Colors.grey[300] : null,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: authProvider.isLoading
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    'Verify Account',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -456,11 +611,27 @@ class _SignupScreenState extends State<SignupScreen>
   }
 
   bool _canProceedToStep3() {
-    return _fullNameController.text.trim().isNotEmpty &&
-        _emailController.text.trim().isNotEmpty &&
-        _phoneController.text.trim().isNotEmpty &&
-        _locationController.text.trim().isNotEmpty &&
-        _formKey.currentState?.validate() == true;
+    if (_selectedUserType == 'hospital') {
+      return _facilityNameController.text.trim().isNotEmpty &&
+          _emailController.text.trim().isNotEmpty &&
+          _formKey.currentState?.validate() == true;
+    } else if (_selectedUserType == 'practitioner') {
+      return _firstNameController.text.trim().isNotEmpty &&
+          _lastNameController.text.trim().isNotEmpty &&
+          _emailController.text.trim().isNotEmpty &&
+          _workplaceController.text.trim().isNotEmpty &&
+          _phoneController.text.trim().isNotEmpty &&
+          _locationController.text.trim().isNotEmpty &&
+          _formKey.currentState?.validate() == true;
+    } else {
+      return _firstNameController.text.trim().isNotEmpty &&
+          _lastNameController.text.trim().isNotEmpty &&
+          _emailController.text.trim().isNotEmpty &&
+          _phoneController.text.trim().isNotEmpty &&
+          _locationController.text.trim().isNotEmpty &&
+          _dobController.text.trim().isNotEmpty &&
+          _formKey.currentState?.validate() == true;
+    }
   }
 
   Widget _buildUserTypeSelection() {
@@ -485,13 +656,15 @@ class _SignupScreenState extends State<SignupScreen>
                   width: isSelected ? 2 : 1,
                 ),
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: isSelected ? [
-                  BoxShadow(
-                    color: const Color(0xFFF59297).withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ] : null,
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: const Color(0xFFF59297).withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : null,
               ),
               child: Row(
                 children: [
@@ -541,18 +714,32 @@ class _SignupScreenState extends State<SignupScreen>
       key: _formKey,
       child: Column(
         children: [
-          _buildTextFormField(
-            controller: _fullNameController,
-            label: 'Full Name *',
-            hint: 'Enter your full name',
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your full name';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
+          if (_selectedUserType != 'hospital') ...[
+            _buildTextFormField(
+              controller: _firstNameController,
+              label: 'First Name *',
+              hint: 'Enter your first name',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your first name';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildTextFormField(
+              controller: _lastNameController,
+              label: 'Last Name *',
+              hint: 'Enter your last name',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your last name';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
           _buildTextFormField(
             controller: _emailController,
             label: 'Email *',
@@ -593,6 +780,89 @@ class _SignupScreenState extends State<SignupScreen>
               return null;
             },
           ),
+          if (_selectedUserType != 'hospital') ...[
+            const SizedBox(height: 16),
+            _buildTextFormField(
+              controller: _dobController,
+              label: 'Date of Birth *',
+              hint: 'YYYY-MM-DD',
+              readOnly: true,
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                );
+                if (pickedDate != null) {
+                  setState(() {
+                    _dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+                  });
+                }
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select your date of birth';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Language *',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<String>(
+                  value: _selectedLanguage,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[400]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[400]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFFF59297), width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  ),
+                  items: ['English', 'Twi', 'Ga'].map((String language) {
+                    return DropdownMenuItem<String>(
+                      value: language,
+                      child: Text(
+                        language,
+                        style: GoogleFonts.poppins(fontSize: 16, color: Colors.black),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedLanguage = value!;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select a language';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -628,9 +898,9 @@ class _SignupScreenState extends State<SignupScreen>
       case 'new-mother':
         return 'Baby Information (Optional)';
       case 'practitioner':
-        return 'Professional Details (Optional)';
+        return 'Professional Details *';
       case 'hospital':
-        return 'Facility Information (Optional)';
+        return 'Facility Information *';
       default:
         return 'Additional Information';
     }
@@ -654,26 +924,44 @@ class _SignupScreenState extends State<SignupScreen>
             hint: 'e.g., 3 months',
           ),
         ];
+      case 'hospital':
+        return [
+          _buildTextFormField(
+            controller: _facilityNameController,
+            label: 'Facility Name *',
+            hint: 'e.g., A.M.E Zion Clinic',
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter the facility name';
+              }
+              return null;
+            },
+          ),
+        ];
       case 'practitioner':
         return [
           _buildTextFormField(
             controller: _professionController,
-            label: 'Profession',
+            label: 'Profession *',
             hint: 'e.g., Midwife, Obstetrician',
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your profession';
+              }
+              return null;
+            },
           ),
           const SizedBox(height: 16),
           _buildTextFormField(
             controller: _workplaceController,
-            label: 'Workplace',
-            hint: 'Hospital or clinic name',
-          ),
-        ];
-      case 'hospital':
-        return [
-          _buildTextFormField(
-            controller: _workplaceController,
-            label: 'Facility Name',
-            hint: 'Hospital or clinic name',
+            label: 'Workplace *',
+            hint: 'e.g., A.M.E Zion Clinic',
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your workplace';
+              }
+              return null;
+            },
           ),
         ];
       default:
@@ -735,66 +1023,6 @@ class _SignupScreenState extends State<SignupScreen>
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildTextFormField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    bool obscureText = false,
-    TextInputType? keyboardType,
-    Widget? suffixIcon,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          obscureText: obscureText,
-          keyboardType: keyboardType,
-          validator: validator,
-          onChanged: (value) => setState(() {}), // Trigger rebuild for button state
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
-            suffixIcon: suffixIcon,
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[400]!),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[400]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFF59297), width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.red),
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          ),
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            color: Colors.black,
-          ),
-        ),
-      ],
     );
   }
 
@@ -863,7 +1091,6 @@ class _SignupScreenState extends State<SignupScreen>
 
         return Column(
           children: [
-            // Error message
             if (authProvider.error != null)
               Container(
                 width: double.infinity,
@@ -895,7 +1122,7 @@ class _SignupScreenState extends State<SignupScreen>
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
-                onPressed: (canSubmit && !authProvider.isLoading) ? _handleSignup : null,
+                onPressed: (canSubmit && !authProvider.isLoading) ? () => _handleSignup(context) : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
                   disabledBackgroundColor: Colors.grey[300],
@@ -971,50 +1198,301 @@ class _SignupScreenState extends State<SignupScreen>
     );
   }
 
-  Future<void> _handleSignup() async {
-    // Validate all forms
-    if (!_passwordFormKey.currentState!.validate()) return;
-    if (!_agreeToTerms) return;
-
-    final authProvider = context.read<AuthProvider>();
-
-    // Create account without auto-login
-    final success = await authProvider.registerWithoutLogin(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-      firstName: _fullNameController.text.split(' ').first,
-      lastName: _fullNameController.text.split(' ').skip(1).join(' '),
-      userType: _selectedUserType,
-      additionalData: {
-        'phone': _phoneController.text.trim(),
-        'location': _locationController.text.trim(),
-        'trimester': _trimesterController.text.trim(),
-        'babyAge': _babyAgeController.text.trim(),
-        'profession': _professionController.text.trim(),
-        'workplace': _workplaceController.text.trim(),
-        'receiveUpdates': _receiveUpdates,
-      },
+  Widget _buildTextFormField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    bool obscureText = false,
+    TextInputType? keyboardType,
+    Widget? suffixIcon,
+    String? Function(String?)? validator,
+    VoidCallback? onTap,
+    bool readOnly = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          validator: validator,
+          readOnly: readOnly,
+          onTap: onTap,
+          onChanged: (value) => setState(() {}),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
+            suffixIcon: suffixIcon,
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[400]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[400]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFF59297), width: 2),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          ),
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            color: Colors.black,
+          ),
+        ),
+      ],
     );
+  }
 
-    if (success && mounted) {
-      // Show success message and redirect to login
+  Future<void> _handleSignup(BuildContext context) async {
+    if (!_passwordFormKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            '🎉 Account created successfully! Please log in with your credentials.',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: Colors.white,
-            ),
+            'Please correct the errors in the form.',
+            style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: Colors.red,
           duration: const Duration(seconds: 3),
           behavior: SnackBarBehavior.floating,
         ),
       );
+      return;
+    }
+    
+    if (!_agreeToTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Please agree to the Terms of Service and Privacy Policy.',
+            style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
 
-      // Navigate to login page
-      context.go('/auth/login');
+    // Validate specific forms for certain user types
+    if ((_selectedUserType == 'hospital' || _selectedUserType == 'practitioner') && 
+        _specificFormKey.currentState?.validate() != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Please provide all required professional information.',
+            style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    final authProvider = context.read<AuthProvider>();
+
+    // Prepare additional data based on user type
+    Map<String, dynamic> additionalData = {
+      'phone': _phoneController.text.trim(),
+      'location': _locationController.text.trim(),
+      'receiveUpdates': _receiveUpdates,
+    };
+
+    if (_selectedUserType == 'hospital') {
+      additionalData['name'] = _facilityNameController.text.trim();
+    } else if (_selectedUserType == 'practitioner') {
+      additionalData['workplace'] = _workplaceController.text.trim();
+      additionalData['profession'] = _professionController.text.trim();
+    } else {
+      additionalData.addAll({
+        'dob': _dobController.text.trim(),
+        'language': _selectedLanguage.toLowerCase(),
+        'trimester': _trimesterController.text.trim(),
+        'babyAge': _babyAgeController.text.trim(),
+      });
+    }
+
+    try {
+      final success = await authProvider.register(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        firstName: _selectedUserType == 'hospital' 
+            ? _facilityNameController.text.trim()
+            : _firstNameController.text.trim(),
+        lastName: _selectedUserType == 'hospital' 
+            ? ''
+            : _lastNameController.text.trim(),
+        userType: _selectedUserType,
+        additionalData: additionalData,
+      );
+
+      print('Registration success: $success');
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Registration successful! Please enter the verification code sent to your email.',
+              style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            content: _buildVerificationStep(context),
+            contentPadding: EdgeInsets.zero,
+          ),
+        );
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                authProvider.error ?? 'Registration failed. Please try again.',
+                style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'An error occurred: $e',
+              style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleVerification(BuildContext context) async {
+    if (!_verificationFormKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Please enter a valid verification code.',
+            style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    final authProvider = context.read<AuthProvider>();
+
+    Map<String, dynamic>? practitionerData;
+    if (_selectedUserType == 'practitioner') {
+      practitionerData = {
+        'fullName': '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}',
+        'email': _emailController.text.trim(),
+        'hospital': _workplaceController.text.trim(),
+        'hospitalId': 'hospital_${_workplaceController.text.trim().toLowerCase().replaceAll(' ', '')}',
+        'practitionerType': _professionController.text.trim(),
+        'specialization': _professionController.text.trim(),
+        'licenseNumber': '',
+      };
+    }
+
+    try {
+      final success = await authProvider.verifyAccount(
+        email: _emailController.text.trim(),
+        verificationCode: _verificationCodeController.text.trim(),
+        userType: _selectedUserType,
+        practitionerData: practitionerData,
+      );
+
+      if (success && mounted) {
+        Navigator.of(context).pop(); // Close the dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              _selectedUserType == 'practitioner'
+                  ? 'Account verified! Welcome to your dashboard.'
+                  : 'Account verified! Please log in to continue.',
+              style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+
+        if (_selectedUserType == 'practitioner') {
+          context.go('/dashboard/practitioner');
+        } else {
+          context.go('/auth/login');
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                authProvider.error ?? 'Verification failed. Please try again.',
+                style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'An error occurred: $e',
+              style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 }

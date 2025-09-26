@@ -611,9 +611,11 @@ class _LoginScreenState extends State<LoginScreen>
     if (!_formKey.currentState!.validate()) return;
 
     final authProvider = context.read<AuthProvider>();
+    // FIX: Add the missing userType parameter
     final success = await authProvider.login(
       _emailController.text.trim(),
       _passwordController.text,
+      _selectedUserType, // This was missing!
     );
 
     if (success && mounted) {
