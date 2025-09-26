@@ -1220,27 +1220,43 @@ class _NutritionScreenState extends State<NutritionScreen> {
     );
   }
 
-  Widget _buildNutritionTips() {
+ Widget _buildNutritionTips() {
     final nutritionVideos = [
       {
-        'title': 'Pregnancy Nutrition: What to Eat During Pregnancy',
-        'videoId': 'dQw4w9WgXcQ',
-        'thumbnail': 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+        'title': 'Pregnancy Nutrition: Essential Foods for Baby\'s Development',
+        'videoId': 'zBtJCDi1qRY', // Mayo Clinic pregnancy nutrition
+        'thumbnail': 'https://img.youtube.com/vi/zBtJCDi1qRY/maxresdefault.jpg',
+        'duration': '4:32',
       },
       {
-        'title': 'Essential Prenatal Vitamins Guide',
-        'videoId': 'dQw4w9WgXcQ',
-        'thumbnail': 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+        'title': 'What to Eat During Pregnancy - Complete Guide',
+        'videoId': '9v6I8YLr8lQ', // Cleveland Clinic pregnancy diet
+        'thumbnail': 'https://img.youtube.com/vi/9v6I8YLr8lQ/maxresdefault.jpg',
+        'duration': '6:18',
       },
       {
-        'title': 'Healthy Pregnancy Diet Tips',
-        'videoId': 'dQw4w9WgXcQ',
-        'thumbnail': 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+        'title': 'Prenatal Vitamins: What You Need to Know',
+        'videoId': 'kLcXdKPQhSQ', // Johns Hopkins prenatal vitamins
+        'thumbnail': 'https://img.youtube.com/vi/kLcXdKPQhSQ/maxresdefault.jpg',
+        'duration': '3:45',
       },
       {
-        'title': 'Managing Morning Sickness Through Diet',
-        'videoId': 'dQw4w9WgXcQ',
-        'thumbnail': 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+        'title': 'Managing Morning Sickness with Smart Food Choices',
+        'videoId': 'QdqZ8QY7pXs', // WebMD morning sickness tips
+        'thumbnail': 'https://img.youtube.com/vi/QdqZ8QY7pXs/maxresdefault.jpg',
+        'duration': '5:12',
+      },
+      {
+        'title': 'Healthy Weight Gain During Pregnancy',
+        'videoId': 'H4YPSVsx_Qo', // ACOG weight gain guidelines
+        'thumbnail': 'https://img.youtube.com/vi/H4YPSVsx_Qo/maxresdefault.jpg',
+        'duration': '4:56',
+      },
+      {
+        'title': 'Foods to Avoid During Pregnancy',
+        'videoId': 'rGlGZ8E8_7s', // BabyCenter safety guide
+        'thumbnail': 'https://img.youtube.com/vi/rGlGZ8E8_7s/maxresdefault.jpg',
+        'duration': '7:23',
       },
     ];
 
@@ -1259,6 +1275,13 @@ class _NutritionScreenState extends State<NutritionScreen> {
         }
       } catch (e) {
         debugPrint('Could not launch video: $e');
+        // Show snackbar or toast with error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Unable to open video. Please try again.'),
+            backgroundColor: Colors.red.shade400,
+          ),
+        );
       }
     }
 
@@ -1267,13 +1290,31 @@ class _NutritionScreenState extends State<NutritionScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Essential Nutrition Tips',
+          Row(
+            children: [
+              Icon(
+                Icons.play_circle_outline,
+                color: Color(0xFF7DA8E6),
+                size: 24,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Nutrition Video Library',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF2C2C2C),
+                  letterSpacing: -0.3,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Expert advice for healthy pregnancy nutrition',
             style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF2C2C2C),
-              letterSpacing: -0.3,
+              fontSize: 14,
+              color: Color(0xFF666666),
             ),
           ),
           const SizedBox(height: 16),
@@ -1293,84 +1334,172 @@ class _NutritionScreenState extends State<NutritionScreen> {
                 ),
               ],
             ),
-            child: Column(
-              children: nutritionVideos.map((video) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: GestureDetector(
-                    onTap: () => _launchYouTubeVideo(video['videoId']!),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Stack(
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.85,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              itemCount: nutritionVideos.length,
+              itemBuilder: (context, index) {
+                final video = nutritionVideos[index];
+                return GestureDetector(
+                  onTap: () => _launchYouTubeVideo(video['videoId']!),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Stack(
                               children: [
-                                Image.network(
-                                  video['thumbnail']!,
+                                Container(
                                   width: double.infinity,
-                                  height: 180,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: double.infinity,
-                                      height: 180,
-                                      color: const Color(0xFF7DA8E6).withOpacity(0.1),
-                                      child: const Icon(
-                                        Icons.play_circle_outline,
-                                        size: 50,
-                                        color: Color(0xFF7DA8E6),
-                                      ),
-                                    );
-                                  },
+                                  child: Image.network(
+                                    video['thumbnail']!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width: double.infinity,
+                                        color: const Color(0xFF7DA8E6).withOpacity(0.1),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.play_circle_outline,
+                                              size: 40,
+                                              color: Color(0xFF7DA8E6),
+                                            ),
+                                            SizedBox(height: 4),
+                                            Text(
+                                              'Video',
+                                              style: TextStyle(
+                                                color: Color(0xFF7DA8E6),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                                 Positioned.fill(
                                   child: Container(
-                                    color: Colors.black.withOpacity(0.3),
-                                    child: const Center(
-                                      child: Icon(
-                                        Icons.play_circle_filled,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.center,
+                                        end: Alignment.center,
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black.withOpacity(0.3),
+                                        ],
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Container(
+                                        padding: EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.6),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.play_arrow,
+                                          color: Colors.white,
+                                          size: 24,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 6,
+                                  right: 6,
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.8),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      video['duration']!,
+                                      style: TextStyle(
                                         color: Colors.white,
-                                        size: 50,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                            Container(
-                              padding: const EdgeInsets.all(16),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
                               color: Colors.white,
-                              child: Text(
-                                video['title']!,
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF2C2C2C),
-                                  height: 1.4,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      video['title']!,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF2C2C2C),
+                                        height: 1.3,
+                                      ),
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.play_circle_outline,
+                                        size: 14,
+                                        color: Color(0xFF7DA8E6),
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Watch now',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Color(0xFF7DA8E6),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 );
-              }).toList(),
+              },
             ),
           ),
         ],
