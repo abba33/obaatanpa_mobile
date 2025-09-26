@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class UpcomingAppointmentsCard extends StatelessWidget {
-  const UpcomingAppointmentsCard({Key? key}) : super(key: key);
+  const UpcomingAppointmentsCard({super.key});
 
   @override
   Widget build(BuildContext context) {

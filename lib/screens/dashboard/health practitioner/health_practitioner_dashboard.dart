@@ -13,7 +13,7 @@ import '../../../widgets/navigation/navigation_menu.dart';
 
 // Main Health Practitioner Dashboard Page
 class HealthPractitionerDashboardPage extends StatefulWidget {
-  const HealthPractitionerDashboardPage({Key? key}) : super(key: key);
+  const HealthPractitionerDashboardPage({super.key});
 
   @override
   State<HealthPractitionerDashboardPage> createState() =>

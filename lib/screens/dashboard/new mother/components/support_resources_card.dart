@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SupportResourcesCard extends StatelessWidget {
-  const SupportResourcesCard({Key? key}) : super(key: key);
+  const SupportResourcesCard({super.key});
 
   @override
   Widget build(BuildContext context) {

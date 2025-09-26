@@ -5,10 +5,10 @@ class DailyTasksCard extends StatefulWidget {
   final String trimester;
 
   const DailyTasksCard({
-    Key? key,
+    super.key,
     required this.currentWeek,
     required this.trimester,
-  }) : super(key: key);
+  });
 
   @override
   State<DailyTasksCard> createState() => _DailyTasksCardState();

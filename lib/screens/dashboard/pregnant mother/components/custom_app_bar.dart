@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:obaatanpa_mobile/providers/theme_provider.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/help_support_page.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/preferences_page.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/profile_settings_page.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/notification_page.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Custom App Bar Component with Dark Mode Support and Profile Dropdown
 class CustomAppBar extends StatelessWidget {
   final bool isMenuOpen;
   final VoidCallback onMenuTap;
+  final String title;
 
   const CustomAppBar({
-    Key? key,
+    super.key,
     required this.isMenuOpen,
-    required this.onMenuTap, 
-    required String title,
-  }) : super(key: key);
+    required this.onMenuTap,
+    required this.title,
+  });
 
   void _showProfileMenu(BuildContext context) {
     final themeProvider = context.read<ThemeProvider>();
     final isDark = themeProvider.isDarkMode;
-    
+
     showMenu(
       context: context,
       position: const RelativeRect.fromLTRB(1000, 120, 0, 0),
@@ -168,7 +171,8 @@ class CustomAppBar extends StatelessWidget {
   void _showLogoutDialog(BuildContext context) {
     final themeProvider = context.read<ThemeProvider>();
     final isDark = themeProvider.isDarkMode;
-    
+    final storage = FlutterSecureStorage();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -203,15 +207,21 @@ class CustomAppBar extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                // Clear auth token
+                await storage.delete(key: 'auth_token');
+                // Close dialog
                 Navigator.of(context).pop();
+                // Show snackbar
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Logged out successfully'),
-                    duration: Duration(milliseconds: 1000),
+                    duration: Duration(seconds: 1),
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
+                // Redirect to login screen and clear navigation stack
+                context.go('/auth/login');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
@@ -234,7 +244,7 @@ class CustomAppBar extends StatelessWidget {
     final isDark = themeProvider.isDarkMode;
     final textColor = isDark ? Colors.white : Colors.black;
     final backgroundColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    
+
     return Container(
       color: backgroundColor,
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
@@ -273,9 +283,7 @@ class CustomAppBar extends StatelessWidget {
                   ),
                 ),
               ),
-              
               const SizedBox(width: 12),
-              
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -313,9 +321,7 @@ class CustomAppBar extends StatelessWidget {
               ),
             ],
           ),
-          
           const SizedBox(height: 14),
-          
           // Bottom row - Controls and user info
           Row(
             children: [
@@ -330,9 +336,7 @@ class CustomAppBar extends StatelessWidget {
                       size: 24,
                     ),
                   ),
-                  
                   const SizedBox(width: 16),
-                  
                   Icon(
                     isDark ? Icons.light_mode : Icons.dark_mode_outlined,
                     color: isDark ? const Color(0xFFF8BBD9) : textColor,
@@ -340,9 +344,7 @@ class CustomAppBar extends StatelessWidget {
                   ),
                 ],
               ),
-              
               const Spacer(),
-              
               // Center - Greeting
               RichText(
                 text: TextSpan(
@@ -356,7 +358,7 @@ class CustomAppBar extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: 'Abba',
+                      text: 'MAMA',
                       style: TextStyle(
                         color: const Color(0xFFF59297),
                         fontSize: 18,
@@ -366,9 +368,7 @@ class CustomAppBar extends StatelessWidget {
                   ],
                 ),
               ),
-              
               const Spacer(),
-              
               // Right side - Notification and profile
               Row(
                 children: [
@@ -380,9 +380,7 @@ class CustomAppBar extends StatelessWidget {
                       size: 22,
                     ),
                   ),
-                  
                   const SizedBox(width: 16),
-                  
                   // Profile section with dropdown
                   GestureDetector(
                     onTap: () => _showProfileMenu(context),

@@ -3,7 +3,7 @@ import 'package:obaatanpa_mobile/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class ProfileSettingsPage extends StatefulWidget {
-  const ProfileSettingsPage({Key? key}) : super(key: key);
+  const ProfileSettingsPage({super.key});
 
   @override
   State<ProfileSettingsPage> createState() => _ProfileSettingsPageState();
@@ -17,8 +17,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   final _emergencyContactController = TextEditingController(text: '+233 XX XXX XXXX');
   
   String _selectedBloodType = 'O+';
-  DateTime _dueDate = DateTime.now().add(const Duration(days: 90));
-  int _currentWeek = 24;
+  final DateTime _dueDate = DateTime.now().add(const Duration(days: 90));
+  final int _currentWeek = 24;
 
   final List<String> _bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
@@ -324,7 +324,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   
                   // Blood Type
                   DropdownButtonFormField<String>(
-                    value: _selectedBloodType,
+                    initialValue: _selectedBloodType,
                     style: TextStyle(color: textColor),
                     decoration: InputDecoration(
                       labelText: 'Blood Type',

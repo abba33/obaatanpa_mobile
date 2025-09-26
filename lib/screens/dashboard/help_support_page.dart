@@ -3,7 +3,7 @@ import 'package:obaatanpa_mobile/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class HelpSupportPage extends StatefulWidget {
-  const HelpSupportPage({Key? key}) : super(key: key);
+  const HelpSupportPage({super.key});
 
   @override
   State<HelpSupportPage> createState() => _HelpSupportPageState();

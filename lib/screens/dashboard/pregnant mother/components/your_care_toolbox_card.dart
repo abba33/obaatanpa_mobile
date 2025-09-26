@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 // Your Care Toolbox Card Component
 class YourCareToolboxCard extends StatelessWidget {
+  const YourCareToolboxCard({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(

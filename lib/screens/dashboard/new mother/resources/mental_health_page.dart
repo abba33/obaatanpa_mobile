@@ -5,7 +5,7 @@ import 'package:obaatanpa_mobile/widgets/navigation/navigation_menu.dart';
 
 
 class MentalHealthPage extends StatefulWidget {
-  const MentalHealthPage({Key? key}) : super(key: key);
+  const MentalHealthPage({super.key});
 
   @override
   State<MentalHealthPage> createState() => _NewMotherHealthPageState();

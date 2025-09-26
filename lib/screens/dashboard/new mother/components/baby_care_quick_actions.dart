@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BabyCareQuickActions extends StatelessWidget {
-  const BabyCareQuickActions({Key? key}) : super(key: key);
+  const BabyCareQuickActions({super.key});
 
   @override
   Widget build(BuildContext context) {

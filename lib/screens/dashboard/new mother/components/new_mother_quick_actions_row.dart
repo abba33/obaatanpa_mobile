@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NewMotherQuickActionsRow extends StatelessWidget {
-  const NewMotherQuickActionsRow({Key? key}) : super(key: key);
+  const NewMotherQuickActionsRow({super.key});
 
   @override
   Widget build(BuildContext context) {

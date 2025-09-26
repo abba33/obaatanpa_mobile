@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NewMotherTipsSection extends StatelessWidget {
-  const NewMotherTipsSection({Key? key}) : super(key: key);
+  const NewMotherTipsSection({super.key});
 
   @override
   Widget build(BuildContext context) {

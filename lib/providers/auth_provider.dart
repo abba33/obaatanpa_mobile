@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Authentication Provider - Manages user authentication state
-/// Connects to the same backend API as the web app
+/// Connects to the Obaatanpa backend API
 class AuthProvider extends ChangeNotifier {
   static const String _tokenKey = 'auth_token';
   static const String _userKey = 'user_data';
-  // Standalone mode - no backend required
+  static const String _firstNameKey = 'firstName'; // Key for SharedPreferences
 
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
-
   bool _isAuthenticated = false;
   bool _isLoading = false;
   String? _token;
@@ -23,34 +24,14 @@ class AuthProvider extends ChangeNotifier {
   String? get token => _token;
   Map<String, dynamic>? get user => _user;
   String? get error => _error;
-  String? get userType => _user?['user_type'];
+  String? get userType => _user?['userType'];
   String? get userId => _user?['id']?.toString();
   String? get userEmail => _user?['email'];
   String? get userName =>
-      '${_user?['first_name'] ?? ''} ${_user?['last_name'] ?? ''}'.trim();
+      '${_user?['firstName'] ?? ''} ${_user?['lastName'] ?? ''}'.trim();
 
   AuthProvider() {
     _initializeAuth();
-  }
-
-  /// Auto-login for testing purposes
-  Future<void> autoLoginForTesting() async {
-    _token = 'test_token_${DateTime.now().millisecondsSinceEpoch}';
-    _user = {
-      'id': 1,
-      'email': 'abba@test.com',
-      'first_name': 'Abba',
-      'last_name': 'Test',
-      'user_type': 'pregnant',
-      'created_at': DateTime.now().toIso8601String(),
-    };
-    _isAuthenticated = true;
-
-    // Store auth data securely
-    await _storage.write(key: _tokenKey, value: _token);
-    await _storage.write(key: _userKey, value: json.encode(_user));
-
-    notifyListeners();
   }
 
   /// Initialize authentication state from stored data
@@ -77,58 +58,98 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Verify if stored token is still valid (mock implementation)
+  /// Verify if stored token is still valid
   Future<void> _verifyToken() async {
     try {
-      // Mock verification - always valid for demo
+      // Implement token verification if the backend provides an endpoint
+      // For now, assume token is valid as per web implementation
       await Future.delayed(const Duration(milliseconds: 500));
-      // Token is always valid in standalone mode
     } catch (e) {
       debugPrint('Error verifying token: $e');
       await _clearAuthData();
     }
   }
 
-  /// Login user with email and password (mock implementation)
-  Future<bool> login(String email, String password) async {
+  /// Login user with email and password
+  Future<bool> login(String email, String password, String userType) async {
     try {
       _setLoading(true);
       _clearError();
 
-      // Mock API delay
-      await Future.delayed(const Duration(seconds: 1));
+      // Determine login endpoint based on user type
+      final loginEndpoint = userType == 'hospital'
+          ? 'https://obaatanpa-backend.onrender.com/health_facility/login'
+          : userType == 'practitioner'
+              ? 'https://obaatanpa-backend.onrender.com/health_worker/login'
+              : 'https://obaatanpa-backend.onrender.com/login';
 
-      // Mock validation
-      if (email.isEmpty || password.isEmpty) {
-        _setError('Please enter both email and password');
+      final response = await http.post(
+        Uri.parse(loginEndpoint),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'email': email,
+          'password': password,
+        }),
+      );
+
+      final result = json.decode(response.body);
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        _token = result['token'];
+        _user = {
+          'email': email,
+          'userType': userType,
+          'isAuthenticated': true,
+          'loginDate': DateTime.now().toIso8601String(),
+          'firstName': result['first_name'] ?? result['firstName'] ?? '', // Retrieve first name
+        };
+
+        if (userType == 'hospital') {
+          if (result['hospital_id'] != null) {
+            _user!['hospital_id'] = result['hospital_id'];
+          }
+          if (result['hospital_name'] != null) {
+            _user!['hospital_name'] = result['hospital_name'];
+          }
+        } else if (userType == 'practitioner') {
+          if (result['id'] != null) {
+            _user!['id'] = result['id'];
+          }
+          _user!['fullName'] = result['fullName'] ?? result['firstName'] ?? 'Health Practitioner';
+          _user!['practitionerType'] = result['practitionerType'] ?? 'Doctor';
+          _user!['specialization'] = result['specialization'] ?? 'General Practice';
+          _user!['licenseNumber'] = result['licenseNumber'] ?? '';
+          _user!['hospital'] = result['hospital'] ?? 'Unknown Hospital';
+          _user!['hospitalId'] = result['hospitalId'] ?? '';
+          _user!['verificationStatus'] = result['verificationStatus'] ?? 'pending';
+          _user!['profilePicture'] = result['profilePicture'] ?? '';
+          _user!['phoneNumber'] = result['phoneNumber'] ?? '';
+          _user!['yearsOfExperience'] = result['yearsOfExperience'] ?? 0;
+          _user!['qualifications'] = result['qualifications'] ?? [];
+        } else {
+          _user!['care_type'] = result['care_type'];
+          _user!['language'] = result['language'];
+        }
+
+        _isAuthenticated = true;
+
+        // Store auth data securely
+        await _storage.write(key: _tokenKey, value: _token);
+        await _storage.write(key: _userKey, value: json.encode(_user));
+
+        // Store first name in SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(_firstNameKey, _user!['firstName'] ?? '');
+
+        notifyListeners();
+        debugPrint('AuthProvider: Login successful for userType=$userType, firstName=${_user!['firstName']}');
+        return true;
+      } else {
+        _setError(result['message'] ?? 'Login failed. Please try again.');
         return false;
       }
-
-      if (password.length < 6) {
-        _setError('Password must be at least 6 characters');
-        return false;
-      }
-
-      // Mock successful login
-      _token = 'mock_token_${DateTime.now().millisecondsSinceEpoch}';
-      _user = {
-        'id': 1,
-        'email': email,
-        'first_name': 'Demo',
-        'last_name': 'User',
-        'user_type': _getUserTypeFromEmail(email),
-        'created_at': DateTime.now().toIso8601String(),
-      };
-      _isAuthenticated = true;
-
-      // Store auth data securely
-      await _storage.write(key: _tokenKey, value: _token);
-      await _storage.write(key: _userKey, value: json.encode(_user));
-
-      notifyListeners();
-      return true;
     } catch (e) {
-      _setError('Login error occurred');
+      _setError('Error connecting to backend: ${e.toString()}');
       debugPrint('Login error: $e');
       return false;
     } finally {
@@ -136,19 +157,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Determine user type from email for demo purposes
-  String _getUserTypeFromEmail(String email) {
-    if (email.contains('pregnant') || email.contains('mother')) {
-      return 'pregnant';
-    } else if (email.contains('new') || email.contains('baby')) {
-      return 'new_mother';
-    } else if (email.contains('doctor') || email.contains('practitioner')) {
-      return 'practitioner';
-    }
-    return 'pregnant'; // Default
-  }
-
-  /// Register new user (mock implementation)
+  /// Register new user
   Future<bool> register({
     required String email,
     required String password,
@@ -161,32 +170,64 @@ class AuthProvider extends ChangeNotifier {
       _setLoading(true);
       _clearError();
 
-      // Mock API delay
-      await Future.delayed(const Duration(seconds: 1));
+      // Prepare payload based on user type
+      Map<String, dynamic> payload;
+      String registerEndpoint;
 
-      // Mock validation
-      if (email.isEmpty ||
-          password.isEmpty ||
-          firstName.isEmpty ||
-          lastName.isEmpty) {
-        _setError('Please fill in all required fields');
-        return false;
+      if (userType == 'hospital') {
+        payload = {
+          'name': additionalData?['name'] ?? '',
+          'email': email,
+          'password': password,
+        };
+        registerEndpoint =
+            'https://obaatanpa-backend.onrender.com/health_facility/signup';
+      } else if (userType == 'practitioner') {
+        payload = {
+          'first_name': firstName,
+          'last_name': lastName,
+          'email': email,
+          'password': password,
+          'hospital_name': additionalData?['workplace'] ?? '',
+        };
+        registerEndpoint =
+            'https://obaatanpa-backend.onrender.com/health_worker/signup';
+      } else {
+        payload = {
+          'first_name': firstName,
+          'last_name': lastName,
+          'email': email,
+          'care_type': userType == 'pregnant' ? 'prenatal' : 'postnatal',
+          'dob': additionalData?['dob'] ?? '',
+          'password': password,
+          'language': additionalData?['language'] ?? '',
+        };
+        registerEndpoint = 'https://obaatanpa-backend.onrender.com/signup';
       }
 
-      if (password.length < 6) {
-        _setError('Password must be at least 6 characters');
+      final response = await http.post(
+        Uri.parse(registerEndpoint),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(payload),
+      );
+
+      final result = json.decode(response.body);
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        // Store first name in SharedPreferences immediately after registration
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(_firstNameKey, firstName);
+
+        // Registration successful, but requires verification
+        // Do not auto-login; instead, wait for verification
+        debugPrint('Registration successful: ${result['message']}, firstName=$firstName');
+        return true;
+      } else {
+        _setError(result['message'] ?? 'Registration failed');
         return false;
       }
-
-      if (!email.contains('@')) {
-        _setError('Please enter a valid email address');
-        return false;
-      }
-
-      // Mock successful registration - auto-login
-      return await login(email, password);
     } catch (e) {
-      _setError('Registration error occurred');
+      _setError('Error connecting to backend: ${e.toString()}');
       debugPrint('Registration error: $e');
       return false;
     } finally {
@@ -194,69 +235,90 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Register new user without auto-login (mock implementation)
-  Future<bool> registerWithoutLogin({
+  /// Verify user account with verification code
+  Future<bool> verifyAccount({
     required String email,
-    required String password,
-    required String firstName,
-    required String lastName,
+    required String verificationCode,
     required String userType,
-    Map<String, dynamic>? additionalData,
+    Map<String, dynamic>? practitionerData,
   }) async {
     try {
       _setLoading(true);
       _clearError();
 
-      // Mock API delay
-      await Future.delayed(const Duration(seconds: 1));
+      final verifyEndpoint = userType == 'hospital'
+          ? 'https://obaatanpa-backend.onrender.com/health_facility/verify'
+          : userType == 'practitioner'
+              ? 'https://obaatanpa-backend.onrender.com/health_worker/verify'
+              : 'https://obaatanpa-backend.onrender.com/verify';
 
-      // Mock validation
-      if (email.isEmpty ||
-          password.isEmpty ||
-          firstName.isEmpty ||
-          lastName.isEmpty) {
-        _setError('Please fill in all required fields');
+      final payload = {
+        'email': email,
+        'verification_code': verificationCode,
+      };
+
+      final response = await http.post(
+        Uri.parse(verifyEndpoint),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(payload),
+      );
+
+      final result = json.decode(response.body);
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        if (userType == 'practitioner') {
+          // Construct practitioner user data
+          _user = {
+            'id': result['id'] ?? 'temp-id-${DateTime.now().millisecondsSinceEpoch}',
+            'fullName': practitionerData?['fullName'] ?? 'Unknown',
+            'email': email,
+            'userType': userType,
+            'practitionerType': practitionerData?['practitionerType'] ?? 'General Practitioner',
+            'specialization': practitionerData?['specialization'] ?? 'General',
+            'licenseNumber': practitionerData?['licenseNumber'] ?? '',
+            'hospital': practitionerData?['hospital'] ?? 'Unknown',
+            'hospitalId': practitionerData?['hospitalId'] ?? 'unknown-hospital-id',
+            'verificationStatus': 'verified',
+            'profilePicture': practitionerData?['profilePicture'],
+            'phoneNumber': practitionerData?['phoneNumber'],
+            'yearsOfExperience': practitionerData?['yearsOfExperience'],
+            'qualifications': practitionerData?['qualifications'],
+            'isAuthenticated': true,
+            'loginDate': DateTime.now().toIso8601String(),
+            'firstName': practitionerData?['firstName'] ?? 'Unknown', // Ensure firstName is set
+          };
+
+          _isAuthenticated = true;
+
+          // Store user data securely
+          await _storage.write(key: _userKey, value: json.encode(_user));
+
+          // Store first name in SharedPreferences
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString(_firstNameKey, _user!['firstName'] ?? '');
+        }
+        // For other user types, verification may lead to login prompt (handled in UI)
+        debugPrint('Verification successful: ${result['message']}');
+        return true;
+      } else {
+        _setError(result['message'] ?? 'Verification failed');
         return false;
       }
-
-      if (password.length < 6) {
-        _setError('Password must be at least 6 characters');
-        return false;
-      }
-
-      if (!email.contains('@')) {
-        _setError('Please enter a valid email address');
-        return false;
-      }
-
-      // Mock successful registration - DO NOT auto-login
-      // In a real app, this would create the account on the server
-      // but not return authentication tokens
-
-      debugPrint('Mock account created for: $email');
-      debugPrint('User type: $userType');
-      debugPrint('Name: $firstName $lastName');
-      debugPrint('Additional data: $additionalData');
-
-      return true; // Account created successfully
     } catch (e) {
-      _setError('Registration error occurred');
-      debugPrint('Registration error: $e');
+      _setError('Error verifying account: ${e.toString()}');
+      debugPrint('Verification error: $e');
       return false;
     } finally {
       _setLoading(false);
     }
   }
 
-  /// Logout user (mock implementation)
+  /// Logout user
   Future<void> logout() async {
     try {
       _setLoading(true);
 
-      // Mock API delay
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // Clear all data
+      // Clear all data, including SharedPreferences first name
       await _clearAuthData();
     } catch (e) {
       debugPrint('Logout error: $e');
@@ -274,6 +336,10 @@ class AuthProvider extends ChangeNotifier {
 
     await _storage.delete(key: _tokenKey);
     await _storage.delete(key: _userKey);
+
+    // Clear first name from SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_firstNameKey);
 
     notifyListeners();
   }
@@ -315,4 +381,7 @@ class AuthProvider extends ChangeNotifier {
 
   /// Check if user is health practitioner
   bool get isHealthPractitioner => hasRole('practitioner');
+
+  /// Check if user is hospital
+  bool get isHospital => hasRole('hospital');
 }

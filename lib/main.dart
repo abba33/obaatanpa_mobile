@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 // Core imports
-import 'core/theme/app_theme.dart';
 import 'core/constants/app_colors.dart';
 
 // Provider imports

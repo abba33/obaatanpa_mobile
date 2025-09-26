@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/custom_app_bar.dart';
 
 
 class BreastfeedingPage extends StatefulWidget {
-  const BreastfeedingPage({Key? key}) : super(key: key);
+  const BreastfeedingPage({super.key});
 
   @override
   State<BreastfeedingPage> createState() => _BreastfeedingPageState();
@@ -373,7 +372,7 @@ class _BreastfeedingPageState extends State<BreastfeedingPage> {
                 ),
               ],
             ),
-          )).toList(),
+          )),
         ],
       ),
     );

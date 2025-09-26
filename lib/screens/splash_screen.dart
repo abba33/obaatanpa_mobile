@@ -133,7 +133,7 @@ class _SplashScreenState extends State<SplashScreen>
                   scale: _logoScaleAnimation,
                   child: FadeTransition(
                     opacity: _logoFadeAnimation,
-                    child: Container(
+                    child: SizedBox(
                       width: 200,
                       height: 200,
                       child: ClipRRect(

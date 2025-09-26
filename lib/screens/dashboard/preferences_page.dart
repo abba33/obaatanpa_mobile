@@ -3,7 +3,7 @@ import 'package:obaatanpa_mobile/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class PreferencesPage extends StatefulWidget {
-  const PreferencesPage({Key? key}) : super(key: key);
+  const PreferencesPage({super.key});
 
   @override
   State<PreferencesPage> createState() => _PreferencesPageState();
@@ -397,7 +397,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: const Color(0xFFF8BBD9),
+        activeThumbColor: const Color(0xFFF8BBD9),
       ),
     );
   }

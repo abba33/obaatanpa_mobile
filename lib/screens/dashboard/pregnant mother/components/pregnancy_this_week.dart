@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../../providers/pregnancy_data_provider.dart';
 
 // Personalized Pregnancy Week Card
 class PersonalizedPregnancyWeekCard extends StatelessWidget {
@@ -11,13 +9,13 @@ class PersonalizedPregnancyWeekCard extends StatelessWidget {
   final VoidCallback? onJournalTap; // Add callback for journal
 
   const PersonalizedPregnancyWeekCard({
-    Key? key,
+    super.key,
     required this.currentWeek,
     required this.trimester,
     required this.daysUntilDue,
     required this.pregnancyPhase,
     this.onJournalTap, // Optional callback
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

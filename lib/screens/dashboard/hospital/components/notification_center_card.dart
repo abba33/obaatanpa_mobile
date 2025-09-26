@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NotificationCenterCard extends StatelessWidget {
-  const NotificationCenterCard({Key? key}) : super(key: key);
+  const NotificationCenterCard({super.key});
 
   @override
   Widget build(BuildContext context) {

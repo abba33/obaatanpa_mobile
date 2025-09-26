@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/hospital/analytics/analytics_summary_card.dart';
-import 'package:obaatanpa_mobile/screens/dashboard/hospital/components/hospital_custom_app_bar.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/hospital/patients/patient_list_card.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/hospital/profile/hospital_profile_card.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/hospital/resources/resource_management_card.dart';
@@ -10,10 +9,9 @@ import 'components/practitioner_management_card.dart';
 import 'components/appointment_requests_card.dart';
 import 'components/notification_center_card.dart';
 import 'components/quick_actions_card.dart';
-import '../../../widgets/navigation/navigation_menu.dart';
 
 class HospitalDashboardPage extends StatefulWidget {
-  const HospitalDashboardPage({Key? key}) : super(key: key);
+  const HospitalDashboardPage({super.key});
 
   @override
   State<HospitalDashboardPage> createState() => _HospitalDashboardPageState();

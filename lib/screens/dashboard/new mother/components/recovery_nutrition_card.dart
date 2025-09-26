@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class RecoveryNutritionCard extends StatelessWidget {
-  const RecoveryNutritionCard({Key? key}) : super(key: key);
+  const RecoveryNutritionCard({super.key});
 
   @override
   Widget build(BuildContext context) {

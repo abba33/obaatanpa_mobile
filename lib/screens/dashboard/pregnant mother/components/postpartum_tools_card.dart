@@ -7,10 +7,10 @@ class PersonalizedToolsCard extends StatelessWidget {
   final int currentWeek;
 
   const PersonalizedToolsCard({
-    Key? key,
+    super.key,
     required this.trimester,
     required this.currentWeek,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class PersonalizedToolsCard extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                '${trimester} Trimester Tools',
+                '$trimester Trimester Tools',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -99,7 +99,7 @@ class PersonalizedToolsCard extends StatelessWidget {
           child: Stack(
             children: [
               // Background image
-              Container(
+              SizedBox(
                 width: double.infinity,
                 height: double.infinity,
                 child: Image.asset(

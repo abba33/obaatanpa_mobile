@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../../providers/pregnancy_data_provider.dart';
 
 class PersonalizedNutritionSection extends StatelessWidget {
   final List<String> nutritionTips;
   final int currentWeek;
 
   const PersonalizedNutritionSection({
-    Key? key,
+    super.key,
     required this.nutritionTips,
     required this.currentWeek,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -169,12 +167,12 @@ class PersonalizedNutritionSection extends StatelessWidget {
                 ),
               ],
             ),
-          )).toList(),
+          )),
           
           const SizedBox(height: 20),
           
           // CTA Button
-          Container(
+          SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
@@ -227,10 +225,10 @@ class PersonalizedArticlesSection extends StatelessWidget {
   final int currentWeek;
 
   const PersonalizedArticlesSection({
-    Key? key,
+    super.key,
     required this.trimester,
     required this.currentWeek,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +272,7 @@ class PersonalizedArticlesSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${trimester} Trimester Reads',
+                      '$trimester Trimester Reads',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

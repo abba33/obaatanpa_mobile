@@ -6,10 +6,10 @@ class PersonalizedBabyThisWeekCard extends StatelessWidget {
   final int currentWeek;
 
   const PersonalizedBabyThisWeekCard({
-    Key? key,
+    super.key,
     required this.weekInfo,
     required this.currentWeek,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

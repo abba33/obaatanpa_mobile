@@ -12,7 +12,7 @@ import 'package:obaatanpa_mobile/screens/dashboard/hospital/hospital_dashboard.d
 import 'package:obaatanpa_mobile/screens/dashboard/hospital/patients/patient_list_card.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/hospital/profile/hospital_profile_card.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/hospital/resources/resource_management_card.dart';
-import 'package:obaatanpa_mobile/screens/dashboard/new mother/new_mother_dashboard.dart';
+import 'package:obaatanpa_mobile/screens/dashboard/new%20mother/new_mother_dashboard.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/new%20mother/appointment/new_mother_appointments_page.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/new%20mother/resources/new_mother_resources_page.dart';
 import 'package:obaatanpa_mobile/screens/splash_screen.dart';
@@ -20,37 +20,35 @@ import 'package:obaatanpa_mobile/screens/splash_screen.dart';
 // Screen imports
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
-import '../screens/auth/onboarding_screen.dart'; // Add this import for your onboarding screen
-import '../screens/dashboard/pregnant mother/pregnant_mother_dashboard.dart';
+import '../screens/auth/onboarding_screen.dart';
+import '../screens/dashboard/pregnant%20mother/pregnant_mother_dashboard.dart';
 import '../screens/test/test_dashboard_screen.dart';
 
-// ✅ Import your existing screens
-import '../screens/dashboard/pregnant mother/appointment/appointment_screen.dart';
-import '../screens/dashboard/pregnant mother/resources/resources_page.dart';
-import '../screens/dashboard/pregnant mother/nutrition/nutrition_screen.dart';
-import '../screens/dashboard/pregnant mother/health/health_screen.dart';
+// Import existing screens
+import '../screens/dashboard/pregnant%20mother/appointment/appointment_screen.dart';
+import '../screens/dashboard/pregnant%20mother/resources/resources_page.dart';
+import '../screens/dashboard/pregnant%20mother/nutrition/nutrition_screen.dart';
+import '../screens/dashboard/pregnant%20mother/health/health_screen.dart';
 
 // Notification Page Import
 import '../screens/dashboard/notification_page.dart';
 
 // Resources
-import '../screens/dashboard/new mother/resources/baby_care_page.dart';
-import '../screens/dashboard/new mother/resources/breastfeeding_page.dart';
-import '../screens/dashboard/new mother/resources/mental_health_page.dart';
-
-// Appointments
+import '../screens/dashboard/new%20mother/resources/baby_care_page.dart';
+import '../screens/dashboard/new%20mother/resources/breastfeeding_page.dart';
+import '../screens/dashboard/new%20mother/resources/mental_health_page.dart';
 
 // Nutrition
-import '../screens/dashboard/new mother/nutrition/new_mother_nutrition_page.dart';
+import '../screens/dashboard/new%20mother/nutrition/new_mother_nutrition_page.dart';
 
 // Health
-import '../screens/dashboard/new mother/health/new_mother_health_page.dart';
+import '../screens/dashboard/new%20mother/health/new_mother_health_page.dart';
 
-// ✅ Hospital Screen Imports
+// Hospital Screen Imports
 import '../screens/dashboard/hospital/practitioners/hospital_practitioners_page.dart';
 import '../screens/dashboard/hospital/appointments/hospital_appointments_page.dart';
 
-// ✅ Health Practitioner Screen Imports
+// Health Practitioner Screen Imports
 
 /// App Router - Navigation configuration for the app
 class AppRouter {
@@ -102,7 +100,7 @@ class AppRouter {
       ),
 
       // ============================================
-      // PREGNANT MOTHER ROUTES (existing)
+      // PREGNANT MOTHER ROUTES
       // ============================================
       
       GoRoute(
@@ -130,15 +128,7 @@ class AppRouter {
       GoRoute(
         path: '/hospital-booking',
         name: 'hospital-booking',
-        builder: (context, state) {
-          final extra = state.extra as Map<String, String>;
-          return HospitalBookingPage(
-            hospitalName: extra['hospitalName']!,
-            hospitalAddress: extra['hospitalAddress']!,
-            hospitalImage: extra['hospitalImage']!,
-            phoneNumber: extra['phoneNumber']!,
-          );
-        },
+        builder: (context, state) => const HospitalBookingPage(),
       ),
 
       // Dashboard Routes
@@ -151,11 +141,6 @@ class AppRouter {
         path: '/test/pregnant-dashboard',
         name: 'test-pregnant-dashboard',
         builder: (context, state) => const DashboardPage(),
-      ),
-      GoRoute(
-        path: '/test/dashboard',
-        name: 'test-dashboard',
-        builder: (context, state) => const TestDashboardScreen(),
       ),
 
       // ============================================
@@ -261,7 +246,7 @@ class AppRouter {
       // NEW MOTHER ROUTES
       // ============================================
       
-      // New Mother Dashboard - KEEP THIS ONE
+      // New Mother Dashboard
       GoRoute(
         path: '/new-mother/dashboard',
         name: 'new-mother-dashboard',

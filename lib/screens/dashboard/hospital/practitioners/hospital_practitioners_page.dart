@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class HospitalPractitionersPage extends StatefulWidget {
-  const HospitalPractitionersPage({Key? key}) : super(key: key);
+  const HospitalPractitionersPage({super.key});
 
   @override
   State<HospitalPractitionersPage> createState() => _HospitalPractitionersPageState();

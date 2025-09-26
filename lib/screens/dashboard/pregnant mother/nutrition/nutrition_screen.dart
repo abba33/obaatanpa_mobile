@@ -1,10 +1,20 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/custom_app_bar.dart';
 import 'package:obaatanpa_mobile/widgets/navigation/navigation_menu.dart';
 
 class NutritionScreen extends StatefulWidget {
-  const NutritionScreen({super.key});
+  final int pregnancyWeek;
+  final String trimester;
+
+  const NutritionScreen({
+    super.key,
+    this.pregnancyWeek = 20,
+    this.trimester = '2nd Trimester',
+  });
 
   @override
   State<NutritionScreen> createState() => _NutritionScreenState();
@@ -19,6 +29,46 @@ class _NutritionScreenState extends State<NutritionScreen> {
     '3rd Trimester',
     'Postpartum',
   ];
+  String? authToken;
+  bool isLoading = false;
+  String? error;
+  List<Meal> todaysMeals = [];
+  List<Recipe> recipes = [];
+  bool recipesLoading = false;
+  String? recipesError;
+  String searchTerm = '';
+  String searchType = 'name'; // Options: name, ingredient, section
+  int currentPage = 1;
+  int totalPages = 1;
+  String? nextUrl;
+  String? previousUrl;
+  Recipe? selectedRecipe;
+  bool showRecipeModal = false;
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+
+  @override
+  void initState() {
+    super.initState();
+    selectedTrimester = widget.trimester;
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final token = await _storage.read(key: 'auth_token');
+    setState(() {
+      authToken = token;
+      debugPrint('Auth Token: $authToken');
+    });
+    if (authToken != null) {
+      fetchMealPlan();
+      fetchRecipes();
+    } else {
+      setState(() {
+        error = 'Please log in to access nutrition data.';
+      });
+      context.go('/login');
+    }
+  }
 
   void _toggleMenu() {
     setState(() {
@@ -33,6 +83,314 @@ class _NutritionScreenState extends State<NutritionScreen> {
     }
   }
 
+  String _getApiTrimester() {
+    switch (selectedTrimester) {
+      case '1st Trimester':
+        return 'first';
+      case '2nd Trimester':
+        return 'second';
+      case '3rd Trimester':
+        return 'third';
+      default:
+        return 'second';
+    }
+  }
+
+  Future<void> fetchMealPlan() async {
+    if (authToken == null) {
+      setState(() {
+        error = 'Please log in to fetch meal plan.';
+      });
+      context.go('/login');
+      return;
+    }
+    setState(() {
+      isLoading = true;
+      error = null;
+    });
+    try {
+      final response = await http.get(
+        Uri.parse('https://obaatanpa-backend.onrender.com/recipes/meal/plan/daily'),
+        headers: {'Authorization': 'Bearer $authToken'},
+      );
+      debugPrint('Meal Plan API response status: ${response.statusCode}');
+      debugPrint('Meal Plan API response body: ${response.body}');
+      if (response.statusCode == 200) {
+        final mealData = jsonDecode(response.body);
+        setState(() {
+          todaysMeals = [
+            Meal(
+              time: 'Breakfast',
+              recipe: Recipe.fromJson(mealData['breakfast']),
+            ),
+            Meal(
+              time: 'Snack',
+              recipe: Recipe.fromJson(mealData['snack']),
+            ),
+            Meal(
+              time: 'Lunch',
+              recipe: Recipe.fromJson(mealData['lunch']),
+            ),
+            Meal(
+              time: 'Snack',
+              recipe: Recipe.fromJson(mealData['snack']),
+            ),
+            Meal(
+              time: 'Dinner',
+              recipe: Recipe.fromJson(mealData['dinner']),
+            ),
+          ];
+          error = null;
+        });
+      } else {
+        setState(() {
+          error = response.statusCode == 401
+              ? 'Unauthorized access. Please log in again.'
+              : response.statusCode == 404
+                  ? 'Meal plan service not found.'
+                  : 'Failed to fetch meal plan.';
+        });
+        if (response.statusCode == 401) context.go('/login');
+      }
+    } catch (e) {
+      setState(() {
+        error = 'Failed to fetch meal plan: $e';
+      });
+      debugPrint('Error fetching meal plan: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> fetchRecipes({int page = 1}) async {
+    if (authToken == null) {
+      setState(() {
+        recipesError = 'Please log in to fetch recipes.';
+      });
+      context.go('/login');
+      return;
+    }
+    setState(() {
+      recipesLoading = true;
+      recipesError = null;
+    });
+    try {
+      debugPrint('Fetching recipes for page $page, trimester: ${_getApiTrimester()}');
+      final response = await http.get(
+        Uri.parse('https://obaatanpa-backend.onrender.com/recipes/all?page=$page&per_page=5&trimester=${_getApiTrimester()}'),
+        headers: {'Authorization': 'Bearer $authToken'},
+      );
+      debugPrint('Recipes API response status: ${response.statusCode}');
+      debugPrint('Recipes API response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          recipes = (data['recipes'] as List)
+              .map((r) => Recipe.fromJson(r))
+              .toList();
+          currentPage = data['page'];
+          totalPages = (data['total'] / 5).ceil();
+          nextUrl = data['next'];
+          previousUrl = data['previous'];
+        });
+        debugPrint('Successfully fetched ${recipes.length} recipes');
+      } else {
+        setState(() {
+          recipesError = response.statusCode == 401
+              ? 'Unauthorized access. Please log in again.'
+              : response.statusCode == 404
+                  ? 'Recipes service not found.'
+                  : response.statusCode == 422
+                      ? 'Invalid request parameters.'
+                      : 'Failed to fetch recipes.';
+        });
+        if (response.statusCode == 401) context.go('/login');
+      }
+    } catch (e) {
+      setState(() {
+        recipesError = 'Failed to fetch recipes: $e';
+      });
+      debugPrint('Error fetching recipes: $e');
+    } finally {
+      setState(() {
+        recipesLoading = false;
+      });
+    }
+  }
+
+  Future<void> handleSearch() async {
+    if (authToken == null) {
+      setState(() {
+        recipesError = 'Please log in to search for recipes.';
+      });
+      context.go('/login');
+      return;
+    }
+    if (searchTerm.trim().isEmpty) {
+      setState(() {
+        recipesError = 'Please enter a search term.';
+      });
+      return;
+    }
+    setState(() {
+      recipesLoading = true;
+      recipesError = null;
+    });
+    try {
+      String url;
+      Map<String, String> params = {'page': '1', 'per_page': searchType == 'section' ? '3' : '5'};
+      if (searchType == 'name') {
+        url = 'https://obaatanpa-backend.onrender.com/recipes/search/name/${Uri.encodeComponent(searchTerm)}';
+      } else if (searchType == 'ingredient') {
+        url = 'https://obaatanpa-backend.onrender.com/recipes/search/ingredient';
+        params['items'] = searchTerm;
+      } else {
+        url = 'https://obaatanpa-backend.onrender.com/recipes/search/section/${Uri.encodeComponent(searchTerm)}';
+      }
+      debugPrint('Searching recipes with type: $searchType, term: $searchTerm, url: $url');
+      final response = await http.get(
+        Uri.parse(url).replace(queryParameters: params),
+        headers: {'Authorization': 'Bearer $authToken'},
+      );
+      debugPrint('Search API response status: ${response.statusCode}');
+      debugPrint('Search API response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          recipes = (data['recipes'] as List)
+              .map((r) => Recipe.fromJson(r))
+              .toList();
+          currentPage = data['page'];
+          totalPages = (data['total'] / (searchType == 'section' ? 3 : 5)).ceil();
+          nextUrl = data['next'];
+          previousUrl = data['previous'];
+        });
+        debugPrint('Successfully fetched ${recipes.length} search results');
+      } else {
+        setState(() {
+          recipesError = response.statusCode == 401
+              ? 'Unauthorized access. Please log in again.'
+              : response.statusCode == 404
+                  ? 'Search service not found.'
+                  : response.statusCode == 422
+                      ? 'Invalid search parameters.'
+                      : 'Failed to search recipes.';
+          recipes = [];
+        });
+        if (response.statusCode == 401) context.go('/login');
+      }
+    } catch (e) {
+      setState(() {
+        recipesError = 'Failed to search recipes: $e';
+        recipes = [];
+      });
+      debugPrint('Error searching recipes: $e');
+    } finally {
+      setState(() {
+        recipesLoading = false;
+      });
+    }
+  }
+
+  Future<void> handlePreviousPage() async {
+    if (previousUrl == null || authToken == null) return;
+    setState(() {
+      recipesLoading = true;
+      recipesError = null;
+    });
+    try {
+      debugPrint('Fetching previous page: $previousUrl');
+      final response = await http.get(
+        Uri.parse(previousUrl!),
+        headers: {'Authorization': 'Bearer $authToken'},
+      );
+      debugPrint('Previous page API response status: ${response.statusCode}');
+      debugPrint('Previous page API response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          recipes = (data['recipes'] as List)
+              .map((r) => Recipe.fromJson(r))
+              .toList();
+          currentPage = data['page'];
+          totalPages = (data['total'] / (searchType == 'section' ? 3 : 5)).ceil();
+          nextUrl = data['next'];
+          previousUrl = data['previous'];
+        });
+        debugPrint('Successfully fetched ${recipes.length} recipes for previous page');
+      } else {
+        setState(() {
+          recipesError = 'Failed to fetch previous page.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        recipesError = 'Failed to fetch previous page: $e';
+      });
+      debugPrint('Error fetching previous page: $e');
+    } finally {
+      setState(() {
+        recipesLoading = false;
+      });
+    }
+  }
+
+  Future<void> handleNextPage() async {
+    if (nextUrl == null || authToken == null) return;
+    setState(() {
+      recipesLoading = true;
+      recipesError = null;
+    });
+    try {
+      debugPrint('Fetching next page: $nextUrl');
+      final response = await http.get(
+        Uri.parse(nextUrl!),
+        headers: {'Authorization': 'Bearer $authToken'},
+      );
+      debugPrint('Next page API response status: ${response.statusCode}');
+      debugPrint('Next page API response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          recipes = (data['recipes'] as List)
+              .map((r) => Recipe.fromJson(r))
+              .toList();
+          currentPage = data['page'];
+          totalPages = (data['total'] / (searchType == 'section' ? 3 : 5)).ceil();
+          nextUrl = data['next'];
+          previousUrl = data['previous'];
+        });
+        debugPrint('Successfully fetched ${recipes.length} recipes for next page');
+      } else {
+        setState(() {
+          recipesError = 'Failed to fetch next page.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        recipesError = 'Failed to fetch next page: $e';
+      });
+      debugPrint('Error fetching next page: $e');
+    } finally {
+      setState(() {
+        recipesLoading = false;
+      });
+    }
+  }
+
+  void showRecipeDialog(Recipe recipe) {
+    setState(() {
+      selectedRecipe = recipe;
+      showRecipeModal = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,50 +399,34 @@ class _NutritionScreenState extends State<NutritionScreen> {
         children: [
           Column(
             children: [
-              // Custom App Bar
               CustomAppBar(
                 isMenuOpen: _isMenuOpen,
                 onMenuTap: _toggleMenu,
                 title: 'Nutrition',
               ),
-              
-              // Nutrition Content
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header Section with Trimester Selection
                       _buildHeaderSection(),
-                      
-                      // Daily Nutrition Goals
+                      if (error != null) _buildErrorMessage(error!),
                       _buildDailyNutritionGoals(),
-                      
-                      // Recommended Foods Section
+                      _buildRecipeSearchSection(),
+                      if (recipesError != null) _buildErrorMessage(recipesError!),
                       _buildRecommendedFoods(),
-                      
-                      // Meal Planning Section
                       _buildMealPlanningSection(),
-                      
-                      // Foods to Avoid Section
                       _buildFoodsToAvoid(),
-                      
-                      // Nutrition Tips Section
                       _buildNutritionTips(),
-                      
-                      // Supplements Section
-                      _buildSupplementsSection(),
-                      
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 80),
                     ],
                   ),
                 ),
               ),
             ],
           ),
-          
-          // Side Navigation Menu
           if (_isMenuOpen) _buildNavigationMenu(),
+          if (showRecipeModal && selectedRecipe != null) _buildRecipeDialog(),
         ],
       ),
     );
@@ -124,11 +466,11 @@ class _NutritionScreenState extends State<NutritionScreen> {
                 ),
               ),
               const SizedBox(width: 20),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Healthy Nutrition for You & Baby',
                       style: TextStyle(
                         fontSize: 20,
@@ -137,10 +479,10 @@ class _NutritionScreenState extends State<NutritionScreen> {
                         letterSpacing: -0.3,
                       ),
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     Text(
-                      'Personalized guidance for your pregnancy journey',
-                      style: TextStyle(
+                      'Week ${widget.pregnancyWeek} • $selectedTrimester',
+                      style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF6B7280),
                         fontWeight: FontWeight.w500,
@@ -152,7 +494,6 @@ class _NutritionScreenState extends State<NutritionScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          // Trimester Selection
           SizedBox(
             height: 50,
             child: ListView.builder(
@@ -161,12 +502,13 @@ class _NutritionScreenState extends State<NutritionScreen> {
               itemBuilder: (context, index) {
                 final trimester = trimesters[index];
                 final isSelected = trimester == selectedTrimester;
-                
                 return GestureDetector(
                   onTap: () {
                     setState(() {
                       selectedTrimester = trimester;
                     });
+                    fetchMealPlan();
+                    fetchRecipes();
                   },
                   child: Container(
                     margin: EdgeInsets.only(
@@ -200,6 +542,30 @@ class _NutritionScreenState extends State<NutritionScreen> {
                   ),
                 );
               },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorMessage(String message) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.red[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.red[200]!),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: Colors.red, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.red, fontSize: 14),
             ),
           ),
         ],
@@ -288,214 +654,262 @@ class _NutritionScreenState extends State<NutritionScreen> {
     );
   }
 
-Widget _buildRecommendedFoods() {
-  final recommendedFoods = [
-    {
-      'name': 'Leafy Greens',
-      'benefit': 'Rich in folate & iron',
-      'image': 'assets/images/foods/leafy_greens.png', // Add your image path
-      'color': const Color(0xFF10B981),
-      'examples': 'Spinach, Kale, Broccoli',
-    },
-    {
-      'name': 'Lean Proteins',
-      'benefit': 'Essential for baby growth',
-      'image': 'assets/images/foods/lean_proteins.png', // Add your image path
-      'color': const Color(0xFFF59297),
-      'examples': 'Fish, Chicken, Beans, Eggs',
-    },
-    {
-      'name': 'Whole Grains',
-      'benefit': 'Energy & fiber',
-      'image': 'assets/images/foods/whole_grains.png', // Add your image path
-      'color': const Color(0xFFF59E0B),
-      'examples': 'Brown rice, Oats, Quinoa',
-    },
-    {
-      'name': 'Dairy Products',
-      'benefit': 'Calcium for bones',
-      'image': 'assets/images/foods/dairy_products.png', // Add your image path
-      'color': const Color(0xFF7DA8E6),
-      'examples': 'Milk, Yogurt, Cheese',
-    },
-  ];
-
-  return Padding(
-    padding: const EdgeInsets.all(20),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Recommended Foods',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF2C2C2C),
-            letterSpacing: -0.3,
+  Widget _buildRecipeSearchSection() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Recipe Suggestions',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2C2C2C),
+              letterSpacing: -0.3,
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.85,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-          ),
-          itemCount: recommendedFoods.length,
-          itemBuilder: (context, index) {
-            final food = recommendedFoods[index];
-            return Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: (food['color'] as Color).withOpacity(0.2),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+              ],
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        onChanged: (value) => setState(() => searchTerm = value),
+                        decoration: InputDecoration(
+                          hintText: 'Search by ${searchType.capitalize()}',
+                          prefixIcon: const Icon(Icons.search, color: Color(0xFF6B7280)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    DropdownButton<String>(
+                      value: searchType,
+                      items: ['name', 'ingredient', 'section']
+                          .map((type) => DropdownMenuItem(
+                                value: type,
+                                child: Text(type.capitalize()),
+                              ))
+                          .toList(),
+                      onChanged: (value) => setState(() => searchType = value!),
+                      style: const TextStyle(color: Color(0xFF2C2C2C), fontSize: 14),
+                      underline: const SizedBox(),
+                      dropdownColor: Colors.white,
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: recipesLoading ? null : handleSearch,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFF59297),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      child: recipesLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text('Search'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: recipesLoading ? null : () => fetchRecipes(page: 1),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFF59297),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    minimumSize: const Size(double.infinity, 0),
+                  ),
+                  child: recipesLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Browse All Recipes', style: TextStyle(fontSize: 16)),
+                ),
+                if (recipes.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: previousUrl != null && !recipesLoading ? handlePreviousPage : null,
+                        icon: const Icon(Icons.chevron_left, color: Color(0xFFF59297)),
+                        disabledColor: Colors.grey,
+                      ),
+                      Text(
+                        'Page $currentPage of $totalPages',
+                        style: const TextStyle(color: Color(0xFF6B7280)),
+                      ),
+                      IconButton(
+                        onPressed: nextUrl != null && !recipesLoading ? handleNextPage : null,
+                        icon: const Icon(Icons.chevron_right, color: Color(0xFFF59297)),
+                        disabledColor: Colors.grey,
+                      ),
+                    ],
                   ),
                 ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Image Container
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: (food['color'] as Color).withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        food['image'].toString(),
-                        width: 44,
-                        height: 44,
-                        fit: BoxFit.cover,
-                        // Fallback to icon if image fails to load
-                        errorBuilder: (context, error, stackTrace) {
-                          // Fallback icons based on food type
-                          IconData fallbackIcon;
-                          switch (index) {
-                            case 0:
-                              fallbackIcon = Icons.eco_outlined;
-                              break;
-                            case 1:
-                              fallbackIcon = Icons.food_bank_outlined;
-                              break;
-                            case 2:
-                              fallbackIcon = Icons.grain_outlined;
-                              break;
-                            case 3:
-                              fallbackIcon = Icons.local_drink_outlined;
-                              break;
-                            default:
-                              fallbackIcon = Icons.restaurant_menu;
-                          }
-                          return Icon(
-                            fallbackIcon,
-                            color: food['color'] as Color,
-                            size: 22,
-                          );
-                        },
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecommendedFoods() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Recommended Recipes',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2C2C2C),
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 16),
+          recipesLoading
+              ? const Center(
+                  child: CircularProgressIndicator(color: Color(0xFFF59297)),
+                )
+              : recipes.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No recipes available. Try searching or browsing all recipes.',
+                        style: TextStyle(color: Color(0xFF6B7280)),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    food['name'].toString(),
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2C2C2C),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Flexible(
-                    child: Text(
-                      food['benefit'].toString(),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF6B7280),
-                        fontWeight: FontWeight.w500,
+                    )
+                  : GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.85,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
                       ),
+                      itemCount: recipes.length,
+                      itemBuilder: (context, index) {
+                        final recipe = recipes[index];
+                        debugPrint('Rendering recipe: ${recipe.name}, section: ${recipe.section}, name length: ${recipe.name.length}, section length: ${recipe.section.length}');
+                        return GestureDetector(
+                          onTap: () => showRecipeDialog(recipe),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: const Color(0xFFF59297).withOpacity(0.3),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.06),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    recipe.name,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF2C2C2C),
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.restaurant_menu, color: Color(0xFFF59297), size: 16),
+                                    const SizedBox(width: 4),
+                                    Flexible(
+                                      child: Text(
+                                        recipe.servings ?? 'N/A servings',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Color(0xFF6B7280),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Spacer(),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    onPressed: () => showRecipeDialog(recipe),
+                                    child: const Text(
+                                      'View Recipe',
+                                      style: TextStyle(
+                                        color: Color(0xFFF59297),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Flexible(
-                    child: Text(
-                      food['examples'].toString(),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: food['color'] as Color,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   Widget _buildMealPlanningSection() {
-    final mealPlan = [
-      {
-        'meal': 'Breakfast',
-        'time': '7:00 AM',
-        'suggestion': 'Oatmeal with berries and nuts',
-        'calories': '350 cal',
-        'color': const Color(0xFFF59E0B),
-        'icon': Icons.wb_sunny_outlined,
-      },
-      {
-        'meal': 'Mid-Morning',
-        'time': '10:00 AM',
-        'suggestion': 'Greek yogurt with fruit',
-        'calories': '150 cal',
-        'color': const Color(0xFF10B981),
-        'icon': Icons.local_cafe_outlined,
-      },
-      {
-        'meal': 'Lunch',
-        'time': '1:00 PM',
-        'suggestion': 'Grilled chicken salad',
-        'calories': '450 cal',
-        'color': const Color(0xFFF59297),
-        'icon': Icons.lunch_dining_outlined,
-      },
-      {
-        'meal': 'Snack',
-        'time': '4:00 PM',
-        'suggestion': 'Hummus with vegetables',
-        'calories': '200 cal',
-        'color': const Color(0xFF7DA8E6),
-        'icon': Icons.cookie_outlined,
-      },
-      {
-        'meal': 'Dinner',
-        'time': '7:00 PM',
-        'suggestion': 'Salmon with quinoa',
-        'calories': '500 cal',
-        'color': const Color(0xFF8B5CF6),
-        'icon': Icons.dinner_dining_outlined,
-      },
-    ];
-
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -514,11 +928,9 @@ Widget _buildRecommendedFoods() {
                 ),
               ),
               TextButton.icon(
-                onPressed: () {
-                  context.go('/meal-planner');
-                },
-                icon: const Icon(Icons.edit_outlined, size: 16),
-                label: const Text('Edit Plan'),
+                onPressed: isLoading ? null : fetchMealPlan,
+                icon: const Icon(Icons.refresh, size: 16),
+                label: const Text('Refresh'),
                 style: TextButton.styleFrom(
                   foregroundColor: const Color(0xFF7DA8E6),
                 ),
@@ -526,105 +938,99 @@ Widget _buildRecommendedFoods() {
             ],
           ),
           const SizedBox(height: 16),
-          Column(
-            children: mealPlan.map((meal) {
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: (meal['color'] as Color).withOpacity(0.2),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 4,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: (meal['color'] as Color).withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        meal['icon'] as IconData,
-                        color: meal['color'] as Color,
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                meal['meal'].toString(),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF2C2C2C),
-                                ),
-                              ),
-                              Text(
-                                meal['time'].toString(),
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Color(0xFF6B7280),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+          isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(color: Color(0xFFF59297)),
+                )
+              : Column(
+                  children: todaysMeals.map((meal) {
+                    return GestureDetector(
+                      onTap: () => showRecipeDialog(meal.recipe),
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: const Color(0xFFF59297).withOpacity(0.2),
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            meal['suggestion'].toString(),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF4B5563),
-                              fontWeight: FontWeight.w500,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            meal['calories'].toString(),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: meal['color'] as Color,
-                              fontWeight: FontWeight.w600,
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF59297).withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.restaurant_menu,
+                                color: Color(0xFFF59297),
+                                size: 22,
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        meal.time,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF2C2C2C),
+                                        ),
+                                      ),
+                                      Flexible(
+                                        child: Text(
+                                          meal.recipe.description ?? 'No description available',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            color: Color(0xFFF59297),
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    meal.recipe.name,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xFF4B5563),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios,
+                              color: Color(0xFFF59297),
+                              size: 16,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.check_circle_outline, size: 20),
-                      color: const Color(0xFF10B981),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${meal['meal']} marked as completed!'),
-                            duration: const Duration(seconds: 2),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                    );
+                  }).toList(),
                 ),
-              );
-            }).toList(),
-          ),
         ],
       ),
     );
@@ -633,27 +1039,33 @@ Widget _buildRecommendedFoods() {
   Widget _buildFoodsToAvoid() {
     final avoidFoods = [
       {
-        'name': 'Raw Fish & Meat',
-        'reason': 'Risk of bacterial infection',
+        'name': 'Raw Meat',
+        'reason': 'Risk of toxoplasmosis',
         'icon': Icons.no_food_outlined,
         'color': const Color(0xFFDC2626),
       },
       {
-        'name': 'High Mercury Fish',
-        'reason': 'Can affect baby\'s development',
-        'icon': Icons.warning_outlined,
-        'color': const Color(0xFFF59E0B),
-      },
-      {
-        'name': 'Alcohol',
-        'reason': 'No safe amount during pregnancy',
-        'icon': Icons.local_bar_outlined,
+        'name': 'Unpasteurized Milk',
+        'reason': 'Can contain harmful bacteria',
+        'icon': Icons.local_drink_outlined,
         'color': const Color(0xFFDC2626),
       },
       {
         'name': 'Excess Caffeine',
-        'reason': 'Limit to 200mg per day',
+        'reason': 'May affect baby\'s development',
         'icon': Icons.coffee_outlined,
+        'color': const Color(0xFFF59E0B),
+      },
+      {
+        'name': 'Alcohol',
+        'reason': 'Can lead to birth defects',
+        'icon': Icons.local_bar_outlined,
+        'color': const Color(0xFFDC2626),
+      },
+      {
+        'name': 'Certain Herbs',
+        'reason': 'E.g., aloe vera can cause contractions',
+        'icon': Icons.eco_outlined,
         'color': const Color(0xFFF59E0B),
       },
     ];
@@ -664,7 +1076,7 @@ Widget _buildRecommendedFoods() {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Foods to Limit or Avoid',
+            'Foods to Avoid',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -826,137 +1238,157 @@ Widget _buildRecommendedFoods() {
     );
   }
 
-  Widget _buildSupplementsSection() {
-    final supplements = [
-      {
-        'name': 'Prenatal Vitamin',
-        'dosage': '1 tablet daily',
-        'time': 'With breakfast',
-        'color': const Color(0xFFF59297),
-        'taken': true,
-      },
-      {
-        'name': 'Iron Supplement',
-        'dosage': '30mg daily',
-        'time': 'Between meals',
-        'color': const Color(0xFFF59E0B),
-        'taken': false,
-      },
-      {
-        'name': 'Omega-3 (DHA)',
-        'dosage': '200mg daily',
-        'time': 'With dinner',
-        'color': const Color(0xFF7DA8E6),
-        'taken': true,
-      },
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Daily Supplements',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF2C2C2C),
-              letterSpacing: -0.3,
+  Widget _buildRecipeDialog() {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: Colors.transparent,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.9, // Limit to 90% of screen height
             ),
-          ),
-          const SizedBox(height: 16),
-          Column(
-            children: supplements.map((supplement) {
-              final taken = supplement['taken'] as bool;
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(20),
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: (supplement['color'] as Color).withOpacity(0.2),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 4,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: Row(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          supplement['taken'] = !taken;
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              taken
-                                  ? '${supplement['name']} unmarked'
-                                  : '${supplement['name']} marked as taken!',
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            selectedRecipe!.name,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
                             ),
-                            duration: const Duration(seconds: 2),
-                            behavior: SnackBarBehavior.floating,
                           ),
-                        );
-                      },
-                      child: Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          color: taken ? (supplement['color'] as Color) : Colors.transparent,
-                          border: Border.all(
-                            color: supplement['color'] as Color,
-                            width: 2,
-                          ),
-                          borderRadius: BorderRadius.circular(6),
                         ),
-                        child: taken
-                            ? const Icon(
-                                Icons.check,
-                                color: Colors.white,
-                                size: 14,
-                              )
-                            : null,
-                      ),
+                        IconButton(
+                          onPressed: () => setState(() => showRecipeModal = false),
+                          icon: const Icon(Icons.close, color: Colors.white),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            supplement['name'].toString(),
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              decoration: taken ? TextDecoration.lineThrough : null,
-                              color: taken ? const Color(0xFF9CA3AF) : const Color(0xFF2C2C2C),
+                          if (selectedRecipe!.section.isNotEmpty) ...[
+                            const Text(
+                              'Section',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${supplement['dosage']} • ${supplement['time']}',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF6B7280),
-                              fontWeight: FontWeight.w500,
+                            Text(
+                              selectedRecipe!.section.capitalize(),
+                              style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
                             ),
-                          ),
+                            const SizedBox(height: 16),
+                          ],
+                          if (selectedRecipe!.description != null) ...[
+                            const Text(
+                              'Description',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                            ),
+                            Text(
+                              selectedRecipe!.description!,
+                              style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                          if (selectedRecipe!.servings != null) ...[
+                            const Text(
+                              'Servings',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                            ),
+                            Text(
+                              selectedRecipe!.servings!,
+                              style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                          if (selectedRecipe!.ingredients != null) ...[
+                            const Text(
+                              'Ingredients',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                            ),
+                            if (selectedRecipe!.ingredients is List)
+                              ...List.generate(
+                                (selectedRecipe!.ingredients as List).length,
+                                (index) => Text(
+                                  '• ${(selectedRecipe!.ingredients as List)[index]}',
+                                  style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+                                ),
+                              )
+                            else if (selectedRecipe!.ingredients is String)
+                              ...[
+                                Text(
+                                  (selectedRecipe!.ingredients as String).split('\n').map((e) => '• $e').join('\n'),
+                                  style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+                                ),
+                              ],
+                            const SizedBox(height: 16),
+                          ],
+                          if (selectedRecipe!.directions != null) ...[
+                            const Text(
+                              'Directions',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                            ),
+                            if (selectedRecipe!.directions is List)
+                              ...List.generate(
+                                (selectedRecipe!.directions as List).length,
+                                (index) => Text(
+                                  '${index + 1}. ${(selectedRecipe!.directions as List)[index]}',
+                                  style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+                                ),
+                              )
+                            else if (selectedRecipe!.directions is String)
+                              ...[
+                                Text(
+                                  (selectedRecipe!.directions as String).split('\n').asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n'),
+                                  style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+                                ),
+                              ],
+                          ],
                         ],
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => setState(() => showRecipeModal = false),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFFF59297),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        minimumSize: const Size(double.infinity, 0),
+                      ),
+                      child: const Text('Close', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    ),
                   ],
                 ),
-              );
-            }).toList(),
-          ),
-        ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -980,21 +1412,23 @@ Widget _buildRecommendedFoods() {
         ),
         child: Column(
           children: [
-            // App Bar in Menu
             Container(
-              height: 120,
-              padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
+              height: MediaQuery.of(context).padding.top,
+              color: Colors.white,
+            ),
+            Container(
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   Container(
                     width: 40,
                     height: 40,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF7DA8E6),
+                      color: Color(0xFFF59297),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
-                      Icons.pregnant_woman,
+                      Icons.favorite,
                       color: Colors.white,
                       size: 20,
                     ),
@@ -1013,7 +1447,7 @@ Widget _buildRecommendedFoods() {
                         ),
                       ),
                       Text(
-                        'Pregnancy Dashboard',
+                        'Your Pregnancy Dashboard',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey,
@@ -1033,8 +1467,6 @@ Widget _buildRecommendedFoods() {
                 ],
               ),
             ),
-            
-            // Menu Items
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
@@ -1043,33 +1475,33 @@ Widget _buildRecommendedFoods() {
                   children: [
                     NavigationMenuItem(
                       title: 'Dashboard',
-                      onTap: () => _navigateToPage('/dashboard/pregnant-mother'),
                       textColor: Colors.black87,
+                      onTap: () => _navigateToPage('/dashboard'),
                     ),
                     const SizedBox(height: 32),
                     NavigationMenuItem(
                       title: 'Resources',
-                      onTap: () => _navigateToPage('/resources'),
                       textColor: Colors.black87,
+                      onTap: () => _navigateToPage('/resources'),
                     ),
                     const SizedBox(height: 32),
                     NavigationMenuItem(
                       title: 'Appointments',
-                      onTap: () => _navigateToPage('/appointments'),
                       textColor: Colors.black87,
+                      onTap: () => _navigateToPage('/appointments'),
                     ),
                     const SizedBox(height: 32),
                     NavigationMenuItem(
                       title: 'Nutrition',
                       isActive: true,
+                      textColor: const Color(0xFFF59297),
                       onTap: () => _navigateToPage('/nutrition'),
-                      textColor: const Color(0xFF7DA8E6),
                     ),
                     const SizedBox(height: 32),
                     NavigationMenuItem(
                       title: 'Health',
-                      onTap: () => _navigateToPage('/health'),
                       textColor: Colors.black87,
+                      onTap: () => _navigateToPage('/health'),
                     ),
                   ],
                 ),
@@ -1079,5 +1511,71 @@ Widget _buildRecommendedFoods() {
         ),
       ),
     );
+  }
+}
+
+class Meal {
+  final String time;
+  final Recipe recipe;
+
+  Meal({required this.time, required this.recipe});
+}
+
+class Recipe {
+  final String name;
+  final String? description;
+  final List<String>? ingredients;
+  final List<String>? directions;
+  final String? servings;
+  final String section;
+
+  Recipe({
+    required this.name,
+    this.description,
+    this.ingredients,
+    this.directions,
+    this.servings,
+    required this.section,
+  });
+
+  factory Recipe.fromJson(Map<String, dynamic> json) {
+    List<String>? ingredients;
+    if (json['ingredients'] is List) {
+      ingredients = (json['ingredients'] as List).map((e) => e.toString()).toList();
+    } else if (json['ingredients'] is String) {
+      ingredients = (json['ingredients'] as String)
+          .split('\n')
+          .where((e) => e.trim().isNotEmpty)
+          .toList();
+    } else {
+      ingredients = null;
+    }
+
+    List<String>? directions;
+    if (json['directions'] is List) {
+      directions = (json['directions'] as List).map((e) => e.toString()).toList();
+    } else if (json['directions'] is String) {
+      directions = (json['directions'] as String)
+          .split('\n')
+          .where((e) => e.trim().isNotEmpty)
+          .toList();
+    } else {
+      directions = null;
+    }
+
+    return Recipe(
+      name: json['name']?.toString() ?? '',
+      description: json['description']?.toString(),
+      ingredients: ingredients,
+      directions: directions,
+      servings: json['servings']?.toString(),
+      section: json['section']?.toString() ?? '',
+    );
+  }
+}
+
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${substring(1)}";
   }
 }

@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../../providers/pregnancy_data_provider.dart';
 
 class PersonalizedQuickActionsRow extends StatefulWidget {
   final int currentWeek;
   final String trimester;
 
   const PersonalizedQuickActionsRow({
-    Key? key,
+    super.key,
     required this.currentWeek,
     required this.trimester,
-  }) : super(key: key);
+  });
 
   @override
   State<PersonalizedQuickActionsRow> createState() => _PersonalizedQuickActionsRowState();
@@ -40,7 +38,7 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Horizontal Scrollable Cards - Personalized based on pregnancy stage
-        Container(
+        SizedBox(
           height: 140,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
@@ -252,7 +250,7 @@ class _PersonalizedQuickActionsRowState extends State<PersonalizedQuickActionsRo
     actions.addAll([
       {
         'icon': Icons.restaurant_menu,
-        'title': "${trimester} Meals",
+        'title': "$trimester Meals",
         'subtitle': 'Trimester-specific nutrition',
         'color': const Color(0xFFFF6B6B),
         'onTap': () {},

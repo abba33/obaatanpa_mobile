@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class HospitalProfilePage extends StatelessWidget {
-  const HospitalProfilePage({Key? key}) : super(key: key);
+  const HospitalProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {

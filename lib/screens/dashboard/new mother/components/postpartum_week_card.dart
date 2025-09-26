@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PostpartumWeekCard extends StatelessWidget {
-  const PostpartumWeekCard({Key? key}) : super(key: key);
+  const PostpartumWeekCard({super.key});
 
   @override
   Widget build(BuildContext context) {

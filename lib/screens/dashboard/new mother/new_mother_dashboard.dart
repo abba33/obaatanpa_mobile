@@ -15,7 +15,7 @@ import '../../../widgets/navigation/navigation_menu.dart';
 
 // Main New Mother Dashboard Page
 class NewMotherDashboardPage extends StatefulWidget {
-  const NewMotherDashboardPage({Key? key}) : super(key: key);
+  const NewMotherDashboardPage({super.key});
 
   @override
   State<NewMotherDashboardPage> createState() => _NewMotherDashboardPageState();

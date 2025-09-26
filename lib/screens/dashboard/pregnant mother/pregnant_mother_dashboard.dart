@@ -7,15 +7,14 @@ import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/postpartum_tools_card.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/pregnancy_this_week.dart';
 import 'package:obaatanpa_mobile/screens/dashboard/pregnant%20mother/components/quick_actions_row.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
 import 'components/custom_app_bar.dart';
 import '../../../widgets/navigation/navigation_menu.dart';
-import '../../../providers/pregnancy_data_provider.dart';
-import 'package:flutter/services.dart';
 
 // Main Dashboard Page
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({Key? key}) : super(key: key);
+  const DashboardPage({super.key});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -25,16 +24,54 @@ class _DashboardPageState extends State<DashboardPage> {
   bool _isMenuOpen = false;
   bool _isChatbotVisible = false;
   String _selectedMood = '';
+  int _pregnancyWeek = 20; // Default week
+  String _trimester = '2nd Trimester'; // Default trimester
+  bool _isDataSet = false;
+  DateTime? _dueDate;
 
   @override
   void initState() {
     super.initState();
-    // Check if pregnancy data is available, if not, show setup dialog
+    // Load pregnancy data from SharedPreferences
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final pregnancyProvider = context.read<PregnancyDataProvider>();
-      if (!pregnancyProvider.isDataSet) {
-        _showPregnancySetupDialog();
-      }
+      _loadPregnancyData();
+    });
+  }
+
+  Future<void> _loadPregnancyData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _pregnancyWeek = prefs.getInt('pregnancyWeek') ?? 20;
+      _trimester = prefs.getString('trimester') ?? _calculateTrimester(_pregnancyWeek);
+      _isDataSet = prefs.getBool('isPregnancyDataSet') ?? false;
+      final dueDateString = prefs.getString('dueDate');
+      _dueDate = dueDateString != null ? DateTime.tryParse(dueDateString) : null;
+    });
+    if (!_isDataSet) {
+      _showPregnancySetupDialog();
+    }
+  }
+
+  String _calculateTrimester(int week) {
+    if (week <= 13) return '1st Trimester';
+    if (week <= 27) return '2nd Trimester';
+    return '3rd Trimester';
+  }
+
+  Future<void> _savePregnancyData(Map<String, dynamic> data) async {
+    final prefs = await SharedPreferences.getInstance();
+    final week = (data['pregnancyWeek'] ?? data['currentWeek'] ?? 20) as int;
+    await prefs.setInt('pregnancyWeek', week);
+    await prefs.setString('trimester', _calculateTrimester(week));
+    await prefs.setBool('isPregnancyDataSet', true);
+    if (data['dueDate'] != null) {
+      await prefs.setString('dueDate', data['dueDate'].toString());
+    }
+    setState(() {
+      _pregnancyWeek = week;
+      _trimester = _calculateTrimester(week);
+      _isDataSet = true;
+      _dueDate = data['dueDate'] != null ? DateTime.parse(data['dueDate'].toString()) : null;
     });
   }
 
@@ -69,16 +106,14 @@ class _DashboardPageState extends State<DashboardPage> {
         return PregnancyInfoPopup(
           onComplete: (pregnancyData) {
             Navigator.of(context).pop();
-            context
-                .read<PregnancyDataProvider>()
-                .setPregnancyData(pregnancyData);
+            _savePregnancyData(pregnancyData);
           },
           onClose: () {
             Navigator.of(context).pop();
             // Set default data if user closes without completing
-            context.read<PregnancyDataProvider>().setPregnancyData({
-              'calculationType': 'current_week',
-              'currentWeek': 20,
+            _savePregnancyData({
+              'calculationType': 'current-week',
+              'pregnancyWeek': 20,
               'dueDate': DateTime.now().add(const Duration(days: 140)),
             });
           },
@@ -101,7 +136,6 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void _navigateToPage(String routeName) {
     _toggleMenu();
-
     if (routeName != '/dashboard/pregnant_mother_dashboard') {
       context.go(routeName);
     }
@@ -142,79 +176,163 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildDashboardContent() {
-    return Consumer<PregnancyDataProvider>(
-      builder: (context, pregnancyProvider, child) {
-        return Column(
-          children: [
-            // Custom App Bar
-            CustomAppBar(
-              isMenuOpen: _isMenuOpen,
-              onMenuTap: _toggleMenu,
-              title: '',
-            ),
+    return Column(
+      children: [
+        // Custom App Bar
+        CustomAppBar(
+          isMenuOpen: _isMenuOpen,
+          onMenuTap: _toggleMenu,
+          title: '',
+        ),
 
-            // Dashboard Content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Personalized Pregnancy Week Card with Journal
-                    PersonalizedPregnancyWeekCard(
-                      currentWeek: pregnancyProvider.currentWeek,
-                      trimester: pregnancyProvider.trimester,
-                      daysUntilDue: pregnancyProvider.daysUntilDue,
-                      pregnancyPhase: pregnancyProvider.pregnancyPhase,
-                      onJournalTap: _showJournalBottomSheet,
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Personalized Quick Actions
-                    PersonalizedQuickActionsRow(
-                      currentWeek: pregnancyProvider.currentWeek,
-                      trimester: pregnancyProvider.trimester,
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Daily Tasks Card - NEW COMPONENT
-                    DailyTasksCard(
-                      currentWeek: pregnancyProvider.currentWeek,
-                      trimester: pregnancyProvider.trimester,
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Tools Card (now takes full width)
-                    PersonalizedToolsCard(
-                      trimester: pregnancyProvider.trimester,
-                      currentWeek: pregnancyProvider.currentWeek,
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Personalized Baby Development Card
-                    PersonalizedBabyThisWeekCard(
-                      weekInfo: pregnancyProvider.currentWeekInfo,
-                      currentWeek: pregnancyProvider.currentWeek,
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Personalized nutrition section
-                    PersonalizedNutritionSection(
-                      nutritionTips: pregnancyProvider.currentNutritionTips,
-                      currentWeek: pregnancyProvider.currentWeek,
-                    ),
-                    
-                    // Add bottom padding to account for floating buttons
-                    const SizedBox(height: 80),
-                  ],
+        // Dashboard Content
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Personalized Pregnancy Week Card with Journal
+                PersonalizedPregnancyWeekCard(
+                  currentWeek: _pregnancyWeek,
+                  trimester: _trimester,
+                  daysUntilDue: _dueDate != null ? _dueDate!.difference(DateTime.now()).inDays : 0,
+                  pregnancyPhase: _getPregnancyPhase(_pregnancyWeek),
+                  onJournalTap: _showJournalBottomSheet,
                 ),
-              ),
+                const SizedBox(height: 20),
+
+                // Personalized Quick Actions
+                PersonalizedQuickActionsRow(
+                  currentWeek: _pregnancyWeek,
+                  trimester: _trimester,
+                ),
+                const SizedBox(height: 24),
+
+                // Daily Tasks Card
+                DailyTasksCard(
+                  currentWeek: _pregnancyWeek,
+                  trimester: _trimester,
+                ),
+                const SizedBox(height: 24),
+
+                // Tools Card
+                PersonalizedToolsCard(
+                  trimester: _trimester,
+                  currentWeek: _pregnancyWeek,
+                ),
+                const SizedBox(height: 20),
+
+                // Personalized Baby Development Card
+                PersonalizedBabyThisWeekCard(
+                  weekInfo: _getWeekInfo(_pregnancyWeek),
+                  currentWeek: _pregnancyWeek,
+                ),
+                const SizedBox(height: 24),
+
+                // Personalized nutrition section
+                PersonalizedNutritionSection(
+                  nutritionTips: _getNutritionTips(_pregnancyWeek),
+                  currentWeek: _pregnancyWeek,
+                ),
+
+                // Add bottom padding to account for floating buttons
+                const SizedBox(height: 80),
+              ],
             ),
-          ],
-        );
-      },
+          ),
+        ),
+      ],
     );
   }
+
+  String _getPregnancyPhase(int week) {
+    if (week <= 4) return 'Early Pregnancy';
+    if (week <= 13) return 'First Trimester';
+    if (week <= 27) return 'Second Trimester';
+    if (week <= 36) return 'Third Trimester';
+    return 'Term';
+  }
+
+  Map<String, dynamic> _getWeekInfo(int week) {
+    return _weeklyInformation[week] ?? _getDefaultWeekInfo(week);
+  }
+
+  Map<String, dynamic> _getDefaultWeekInfo(int week) {
+    return {
+      'babySize': 'Growing',
+      'babyDevelopment': 'Your baby is developing beautifully this week.',
+      'motherChanges': 'Your body continues to adapt to support your growing baby.',
+      'tips': ['Stay hydrated', 'Get plenty of rest', 'Eat nutritious foods'],
+      'appointments': 'Regular check-up recommended',
+      'nutrition': [
+        'Balanced diet with fruits and vegetables',
+        'Adequate protein intake',
+        'Stay hydrated',
+      ],
+    };
+  }
+
+  List<String> _getNutritionTips(int week) {
+    final weekInfo = _getWeekInfo(week);
+    return List<String>.from(weekInfo['nutrition'] ?? [
+      'Balanced diet with fruits and vegetables',
+      'Adequate protein intake',
+      'Stay hydrated',
+    ]);
+  }
+
+  // Weekly information database (from original PregnancyDataProvider)
+  static const Map<int, Map<String, dynamic>> _weeklyInformation = {
+    10: {
+      'babySize': 'Strawberry (1.2 inches)',
+      'babyDevelopment': 'Your baby\'s fingers and toes are forming, and tiny nails are beginning to grow.',
+      'motherChanges': 'You may start experiencing morning sickness relief soon.',
+      'tips': [
+        'Continue taking prenatal vitamins',
+        'Stay hydrated with plenty of water',
+        'Light exercise like walking is beneficial',
+      ],
+      'appointments': 'First prenatal appointment if not done already',
+      'nutrition': [
+        'Folic acid rich foods',
+        'Lean proteins',
+        'Dairy products for calcium',
+      ],
+    },
+    20: {
+      'babySize': 'Banana (6.5 inches)',
+      'babyDevelopment': 'Your baby can hear sounds and may respond to your voice. Hair and eyebrows are growing.',
+      'motherChanges': 'You might feel the first movements (quickening). Your belly is showing more.',
+      'tips': [
+        'Talk and sing to your baby',
+        'Consider prenatal yoga',
+        'Start sleeping on your side',
+      ],
+      'appointments': 'Anatomy scan ultrasound around this time',
+      'nutrition': [
+        'Iron-rich foods',
+        'Omega-3 fatty acids',
+        'Colorful fruits and vegetables',
+      ],
+    },
+    30: {
+      'babySize': 'Cabbage (15.7 inches)',
+      'babyDevelopment': 'Your baby\'s brain is developing rapidly. They can open and close their eyes.',
+      'motherChanges': 'You may experience shortness of breath and heartburn as baby grows.',
+      'tips': [
+        'Practice breathing exercises',
+        'Eat smaller, frequent meals',
+        'Consider childbirth classes',
+      ],
+      'appointments': 'Regular prenatal visits every 2-3 weeks',
+      'nutrition': [
+        'Complex carbohydrates',
+        'Protein for baby\'s growth',
+        'Calcium for bone development',
+      ],
+    },
+  };
 
   Widget _buildFloatingButtons() {
     return Positioned(
@@ -223,7 +341,6 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Chatbot floating button
           Container(
             height: 56,
             width: 56,
@@ -257,6 +374,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildJournalBottomSheet() {
+    // Unchanged from original
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: const BoxDecoration(
@@ -268,7 +386,6 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       child: Column(
         children: [
-          // Handle bar
           Container(
             width: 50,
             height: 5,
@@ -278,8 +395,6 @@ class _DashboardPageState extends State<DashboardPage> {
               borderRadius: BorderRadius.circular(3),
             ),
           ),
-          
-          // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             child: Row(
@@ -346,15 +461,12 @@ class _DashboardPageState extends State<DashboardPage> {
               ],
             ),
           ),
-          
-          // Form content
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Date display
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -392,10 +504,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ],
                     ),
                   ),
-                  
                   const SizedBox(height: 32),
-                  
-                  // Mood section
                   const Text(
                     'How are you feeling today?',
                     style: TextStyle(
@@ -405,7 +514,6 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -430,10 +538,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ],
                     ),
                   ),
-                  
                   const SizedBox(height: 32),
-                  
-                  // Journal entry section
                   const Text(
                     'Share your thoughts',
                     style: TextStyle(
@@ -443,7 +548,6 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
                   Container(
                     height: 200,
                     decoration: BoxDecoration(
@@ -481,10 +585,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                     ),
                   ),
-                  
                   const SizedBox(height: 24),
-                  
-                  // Photo section
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -541,8 +642,6 @@ class _DashboardPageState extends State<DashboardPage> {
                             ],
                           ),
                         ),
-                        
-                        // Photo upload buttons
                         Padding(
                           padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                           child: Row(
@@ -550,7 +649,6 @@ class _DashboardPageState extends State<DashboardPage> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    // Handle camera
                                     HapticFeedback.lightImpact();
                                   },
                                   child: Container(
@@ -592,7 +690,6 @@ class _DashboardPageState extends State<DashboardPage> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    // Handle gallery
                                     HapticFeedback.lightImpact();
                                   },
                                   child: Container(
@@ -632,10 +729,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ],
                     ),
                   ),
-                  
                   const SizedBox(height: 32),
-                  
-                  // Save button
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -699,7 +793,6 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                     ),
                   ),
-                  
                   const SizedBox(height: 20),
                 ],
               ),
@@ -732,19 +825,21 @@ class _DashboardPageState extends State<DashboardPage> {
                 color: isSelected ? color : color.withOpacity(0.3),
                 width: 2,
               ),
-              boxShadow: isSelected ? [
-                BoxShadow(
-                  color: color.withOpacity(0.4),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ] : [
-                BoxShadow(
-                  color: color.withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: color.withOpacity(0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: color.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
             ),
             child: Center(
               child: Text(
@@ -770,8 +865,18 @@ class _DashboardPageState extends State<DashboardPage> {
   String _formatCurrentDate() {
     final now = DateTime.now();
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
     ];
     return '${now.day} ${months[now.month - 1]} ${now.year}';
   }
@@ -796,7 +901,6 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
         child: Column(
           children: [
-            // Chatbot header
             Container(
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
@@ -850,14 +954,11 @@ class _DashboardPageState extends State<DashboardPage> {
                 ],
               ),
             ),
-            
-            // Chat messages area
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    // Welcome message
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
@@ -874,8 +975,6 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ),
                     ),
-                    
-                    // Quick action buttons
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -886,14 +985,11 @@ class _DashboardPageState extends State<DashboardPage> {
                         _buildQuickChatButton('Doctor questions'),
                       ],
                     ),
-                    
                     const Spacer(),
                   ],
                 ),
               ),
             ),
-            
-            // Chat input
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -990,12 +1086,10 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
         child: Column(
           children: [
-            // Status bar area - to cover any background color from app bar
             Container(
               height: MediaQuery.of(context).padding.top,
               color: Colors.white,
             ),
-            // App Bar in Menu - UPDATED: Removed extra space
             Container(
               padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
               child: Row(
@@ -1047,8 +1141,6 @@ class _DashboardPageState extends State<DashboardPage> {
                 ],
               ),
             ),
-
-            // Menu Items
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(24.0),

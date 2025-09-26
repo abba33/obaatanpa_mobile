@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class HospitalAppointmentsPage extends StatefulWidget {
-  const HospitalAppointmentsPage({Key? key}) : super(key: key);
+  const HospitalAppointmentsPage({super.key});
 
   @override
   State<HospitalAppointmentsPage> createState() => _HospitalAppointmentsPageState();
@@ -513,7 +513,7 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -675,7 +675,7 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -836,7 +836,7 @@ class _HospitalAppointmentsPageState extends State<HospitalAppointmentsPage> wit
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }

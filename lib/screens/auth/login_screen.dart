@@ -3,14 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-// Core imports
-
 // Provider imports
 import '../../providers/auth_provider.dart';
-import 'components/pregnancy_info_popup.dart';
-import '../../providers/pregnancy_data_provider.dart';
 
-/// Login Screen - Using original UI design with modern functionality
+/// Login Screen - Using original UI design with updated functionality
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -106,6 +102,10 @@ class _LoginScreenState extends State<LoginScreen>
       width: MediaQuery.of(context).size.width,
       height: 375,
       decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(_getHeroImage()),
+          fit: BoxFit.cover,
+        ),
         gradient: LinearGradient(
           begin: const Alignment(0.50, 0.00),
           end: const Alignment(0.50, 1.00),
@@ -114,7 +114,6 @@ class _LoginScreenState extends State<LoginScreen>
             Colors.black.withOpacity(0.9),
           ],
         ),
-        color: Colors.transparent,
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 23),
@@ -210,6 +209,21 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  String _getHeroImage() {
+    switch (_selectedUserType) {
+      case 'pregnant':
+        return 'assets/images/auth/pregnant-mother-hero.png';
+      case 'new-mother':
+        return 'assets/images/auth/new-mother-hero.png';
+      case 'hospital':
+        return 'assets/images/auth/hospital-hero.jpg';
+      case 'practitioner':
+        return 'assets/images/auth/health-practitioner-hero.jpg';
+      default:
+        return 'assets/images/auth/pregnant-mother-hero.png';
+    }
+  }
+
   Widget _buildMainContent() {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
@@ -262,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen>
           // Pregnant Mother option
           _buildUserTypeOption(
             'pregnant',
-            '🤰Pregnant Mother',
+            '🤰 Pregnant Mother',
             isFirst: true,
           ),
           const SizedBox(height: 16),
@@ -593,7 +607,7 @@ class _LoginScreenState extends State<LoginScreen>
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: authProvider.isLoading ? null : _handleLogin,
+          onTap: authProvider.isLoading ? null : () => _handleLogin(context),
           borderRadius: BorderRadius.circular(10),
           child: Container(
             alignment: Alignment.center,
@@ -655,22 +669,23 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleLogin(BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
 
     final authProvider = context.read<AuthProvider>();
     final success = await authProvider.login(
       _emailController.text.trim(),
       _passwordController.text,
+      _selectedUserType, // Pass userType to login method
     );
 
     if (success && mounted) {
-      // Navigate directly to appropriate dashboard without any popup
+      // Navigate directly to appropriate dashboard
       _navigateToUserDashboard();
     }
   }
 
-  void _navigateToUserDashboard() {
+void _navigateToUserDashboard() {
     switch (_selectedUserType) {
       case 'pregnant':
         context.goNamed('pregnant-dashboard');

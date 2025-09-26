@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class RecoveryProgressCard extends StatelessWidget {
-  const RecoveryProgressCard({Key? key}) : super(key: key);
+  const RecoveryProgressCard({super.key});
 
   @override
   Widget build(BuildContext context) {

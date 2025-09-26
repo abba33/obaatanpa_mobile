@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:intl/intl.dart';
 
 class PregnancyInfoPopup extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
@@ -15,331 +19,682 @@ class PregnancyInfoPopup extends StatefulWidget {
   State<PregnancyInfoPopup> createState() => _PregnancyInfoPopupState();
 }
 
-class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProviderStateMixin {
-  String selectedTab = 'due_date';
-  DateTime? selectedDate;
-  int? selectedWeek;
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
+class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> {
+  String? _selectedMethod;
+  final _formData = {
+    'dueDate': '',
+    'lastMenstrualPeriod': '',
+    'currentWeek': '',
+    'cycleLength': '28', // Default cycle length for LMP
+  };
+  bool _showResponse = false;
+  String _responseMessage = '';
+  Map<String, dynamic>? _pregnancyData;
+  bool _isLoading = false;
 
-  final TextEditingController dueDateController = TextEditingController();
-  final TextEditingController lastPeriodController = TextEditingController();
+  final _storage = const FlutterSecureStorage();
 
-  // Enhanced color scheme
-  static const Color primaryColor = Color(0xFFF59297);
-  static const Color secondaryColor = Color(0xFF7DA8E6);
-  static const Color lightPrimary = Color(0xFFFFF8F9);
-  static const Color lightSecondary = Color(0xFFF5F9FF);
-  static const Color accentGradientStart = Color(0xFFF59297);
-  static const Color accentGradientEnd = Color(0xFF7DA8E6);
+  int _calculatePregnancyWeekLocally(String method, Map<String, dynamic> data) {
+    final today = DateTime.now();
 
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _scaleAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutBack,
-    );
-    _animationController.forward();
+    switch (method) {
+      case 'due-date':
+        final dueDate = DateTime.tryParse(data['dueDate']!);
+        if (dueDate == null) return 1;
+        final daysDiff = dueDate.difference(today).inDays;
+        final weeksRemaining = (daysDiff / 7).floor();
+        return (40 - weeksRemaining).clamp(1, 40);
+
+      case 'lmp':
+        final lmpDate = DateTime.tryParse(data['lastMenstrualPeriod']!);
+        if (lmpDate == null) return 1;
+        final daysSinceLMP = today.difference(lmpDate).inDays;
+        return (daysSinceLMP / 7).floor().clamp(1, 40);
+
+      case 'current-week':
+        final week = int.tryParse(data['currentWeek']!) ?? 1;
+        return week.clamp(1, 40);
+
+      default:
+        return 1;
+    }
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    dueDateController.dispose();
-    lastPeriodController.dispose();
-    super.dispose();
+  String _getTrimesterFromWeek(int week) {
+    if (week <= 13) return 'first';
+    if (week <= 27) return 'second';
+    return 'third';
+  }
+
+  Future<void> _handleSubmit() async {
+    if (_selectedMethod == null) {
+      setState(() {
+        _responseMessage = 'Please select a calculation method.';
+        _showResponse = true;
+      });
+      return;
+    }
+
+    // Validate input fields
+    if (_selectedMethod == 'due-date') {
+      if (_formData['dueDate']!.isEmpty) {
+        setState(() {
+          _responseMessage = 'Please enter your expected due date.';
+          _showResponse = true;
+        });
+        return;
+      }
+      final dueDate = DateTime.tryParse(_formData['dueDate']!);
+      final today = DateTime.now();
+      final maxDate = today.add(const Duration(days: 280));
+      if (dueDate == null || dueDate.isBefore(today) || dueDate.isAfter(maxDate)) {
+        setState(() {
+          _responseMessage = 'Please enter a valid due date between today and 40 weeks from now.';
+          _showResponse = true;
+        });
+        return;
+      }
+    }
+    if (_selectedMethod == 'lmp') {
+      if (_formData['lastMenstrualPeriod']!.isEmpty) {
+        setState(() {
+          _responseMessage = 'Please enter the first day of your last menstrual period.';
+          _showResponse = true;
+        });
+        return;
+      }
+      final cycleLength = int.tryParse(_formData['cycleLength']!) ?? 0;
+      if (cycleLength < 21 || cycleLength > 35) {
+        setState(() {
+          _responseMessage = 'Please enter a valid cycle length between 21 and 35 days.';
+          _showResponse = true;
+        });
+        return;
+      }
+      final lmpDate = DateTime.tryParse(_formData['lastMenstrualPeriod']!);
+      final today = DateTime.now();
+      if (lmpDate == null || lmpDate.isAfter(today)) {
+        setState(() {
+          _responseMessage = 'Please enter a valid last menstrual period date before today.';
+          _showResponse = true;
+        });
+        return;
+      }
+    }
+    if (_selectedMethod == 'current-week' && _formData['currentWeek']!.isEmpty) {
+      setState(() {
+        _responseMessage = 'Please select your current pregnancy week.';
+        _showResponse = true;
+      });
+      return;
+    }
+
+    final token = await _storage.read(key: 'authToken');
+    if (token == null && _selectedMethod != 'current-week') {
+      setState(() {
+        _responseMessage = 'Authentication token is missing. Please log in first.';
+        _showResponse = true;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      int pregnancyWeek = 1;
+      String trimester = 'first';
+      Map<String, dynamic> result = {};
+
+      if (_selectedMethod == 'due-date') {
+        final response = await http.post(
+          Uri.parse('https://obaatanpa-backend.onrender.com/info/pw/conception_date/calculate'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode({'conception_date': _formData['dueDate']!}),
+        );
+        if (response.statusCode == 200 || response.statusCode == 201) { // Updated to check 200 or 201
+          result = jsonDecode(response.body);
+          pregnancyWeek = result['current_week'] ?? _calculatePregnancyWeekLocally('due-date', _formData);
+          trimester = _getTrimesterFromWeek(pregnancyWeek);
+        } else {
+          final errorData = jsonDecode(response.body);
+          if (response.statusCode == 401) {
+            throw Exception('Unauthorized: Invalid or expired token. Please log in again.');
+          }
+          throw Exception(errorData['message'] ?? 'Failed to calculate pregnancy week.');
+        }
+      } else if (_selectedMethod == 'lmp') {
+        final response = await http.post(
+          Uri.parse('https://obaatanpa-backend.onrender.com/info/pw/menstrual_date/calculate'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode({
+            'last_period_date': _formData['lastMenstrualPeriod']!,
+            'cycle_length': int.parse(_formData['cycleLength']!),
+          }),
+        );
+        if (response.statusCode == 200 || response.statusCode == 201) { // Updated to check 200 or 201
+          result = jsonDecode(response.body);
+          pregnancyWeek = result['current_week'] ?? _calculatePregnancyWeekLocally('lmp', _formData);
+          trimester = _getTrimesterFromWeek(pregnancyWeek);
+        } else {
+          final errorData = jsonDecode(response.body);
+          if (response.statusCode == 401) {
+            throw Exception('Unauthorized: Invalid or expired token. Please log in again.');
+          }
+          throw Exception(errorData['message'] ?? 'Failed to calculate pregnancy week.');
+        }
+      } else {
+        pregnancyWeek = _calculatePregnancyWeekLocally('current-week', _formData);
+        trimester = _getTrimesterFromWeek(pregnancyWeek);
+        result = {
+          'common_symptoms': 'Week $pregnancyWeek of pregnancy.',
+          'current_day': 1,
+          'current_week': pregnancyWeek,
+          'fetal_development': 'Development details for week $pregnancyWeek.',
+          'milestones': 'Milestones for week $pregnancyWeek.',
+        };
+      }
+
+      final dueDate = _selectedMethod == 'due-date'
+          ? DateTime.parse(_formData['dueDate']!)
+          : _selectedMethod == 'lmp'
+              ? DateTime.parse(_formData['lastMenstrualPeriod']!).add(const Duration(days: 280))
+              : DateTime.now().add(Duration(days: (40 - pregnancyWeek) * 7));
+
+      final data = {
+        'calculationType': _selectedMethod,
+        'currentWeek': pregnancyWeek,
+        'dueDate': dueDate,
+        'trimester': trimester,
+        'commonSymptoms': result['common_symptoms'],
+        'currentDay': result['current_day'],
+        'fetalDevelopment': result['fetal_development'],
+        'milestones': result['milestones'],
+        if (_selectedMethod == 'lmp') 'lastMenstrualPeriod': _formData['lastMenstrualPeriod']!,
+      };
+
+      setState(() {
+        _pregnancyData = data;
+        _responseMessage = '''
+Week ${result['current_week']}, Day ${result['current_day']} ($trimester trimester)
+Symptoms: ${result['common_symptoms']}
+Fetal Development: ${result['fetal_development']}
+Milestones: ${result['milestones']}
+''';
+        _showResponse = true;
+      });
+    } catch (e) {
+      setState(() {
+        _responseMessage = 'Error calculating pregnancy week: $e';
+        _showResponse = true;
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _handleResponseClose() {
+    setState(() {
+      _showResponse = false;
+    });
+    if (_pregnancyData != null) {
+      widget.onComplete(_pregnancyData!);
+      widget.onClose();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: AnimatedBuilder(
-        animation: _scaleAnimation,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.92,
-              height: MediaQuery.of(context).size.height * 0.78,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(28),
-                boxShadow: [
-                  BoxShadow(
-                    color: primaryColor.withOpacity(0.2),
-                    blurRadius: 30,
-                    spreadRadius: 0,
-                    offset: const Offset(0, 15),
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 15,
-                    spreadRadius: 0,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  _buildEnhancedHeader(),
-                  _buildEnhancedTabBar(),
-                  Expanded(child: _buildTabContent()),
-                  _buildEnhancedActionButtons(),
-                ],
-              ),
+    return Stack(
+      children: [
+        AlertDialog(
+          backgroundColor: Colors.transparent,
+          contentPadding: EdgeInsets.zero,
+          content: Container(
+            constraints: BoxConstraints(
+              maxWidth: 600,
+              maxHeight: MediaQuery.of(context).size.height * 0.9,
             ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildEnhancedHeader() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(28, 28, 28, 24),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [accentGradientStart, accentGradientEnd],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(28),
-          topRight: Radius.circular(28),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.25),
-              borderRadius: BorderRadius.circular(20),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.black.withOpacity(0.2),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: const Text(
-              '🤰',
-              style: TextStyle(fontSize: 32),
-            ),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
               children: [
-                Text(
-                  'Pregnancy Journey',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.5,
+                // Main content
+                SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Header
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Text(
+                                '🤰',
+                                style: TextStyle(fontSize: 24),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Help us know you better',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Choose how you\'d like to calculate your pregnancy week',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Method selection or input form
+                        if (_selectedMethod == null)
+                          Column(
+                            children: [
+                              _buildMethodButton(
+                                id: 'due-date',
+                                icon: Icons.calendar_today,
+                                title: 'Due Date',
+                                description: 'I know my expected delivery date',
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF7DA8E6), Color(0xFF7DA8E6)],
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              _buildMethodButton(
+                                id: 'lmp',
+                                icon: Icons.access_time,
+                                title: 'Last Menstrual Period',
+                                description: 'I know the first day of my last period',
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFF8A7AB), Color(0xFFF8A7AB)],
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              _buildMethodButton(
+                                id: 'current-week',
+                                icon: Icons.pregnant_woman,
+                                title: 'Current Pregnancy Week',
+                                description: 'I know how many weeks pregnant I am',
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFCE93D8), Color(0xFFCE93D8)],
+                                ),
+                              ),
+                            ],
+                          )
+                        else
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _selectedMethod == 'due-date'
+                                    ? 'Due Date'
+                                    : _selectedMethod == 'lmp'
+                                        ? 'Last Menstrual Period'
+                                        : 'Current Pregnancy Week',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              Text(
+                                _selectedMethod == 'due-date'
+                                    ? 'I know my expected delivery date'
+                                    : _selectedMethod == 'lmp'
+                                        ? 'I know the first day of my last period'
+                                        : 'I know how many weeks pregnant I am',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+
+                              // Input fields based on method
+                              if (_selectedMethod == 'due-date')
+                                _buildDateField(
+                                  label: 'Expected Due Date *',
+                                  onTap: () async {
+                                    final pickedDate = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime.now(),
+                                      lastDate: DateTime.now().add(const Duration(days: 280)),
+                                    );
+                                    if (pickedDate != null) {
+                                      setState(() {
+                                        _formData['dueDate'] = DateFormat('yyyy-MM-dd').format(pickedDate);
+                                      });
+                                    }
+                                  },
+                                  value: _formData['dueDate']!,
+                                ),
+
+                              if (_selectedMethod == 'lmp') ...[
+                                _buildDateField(
+                                  label: 'First Day of Last Menstrual Period *',
+                                  onTap: () async {
+                                    final pickedDate = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(2020),
+                                      lastDate: DateTime.now(),
+                                    );
+                                    if (pickedDate != null) {
+                                      setState(() {
+                                        _formData['lastMenstrualPeriod'] =
+                                            DateFormat('yyyy-MM-dd').format(pickedDate);
+                                      });
+                                    }
+                                  },
+                                  value: _formData['lastMenstrualPeriod']!,
+                                ),
+                                const SizedBox(height: 16),
+                                _buildTextField(
+                                  label: 'Menstrual Cycle Length (days) *',
+                                  initialValue: _formData['cycleLength']!,
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    _formData['cycleLength'] = value;
+                                  },
+                                  validator: (value) {
+                                    final cycleLength = int.tryParse(value ?? '') ?? 0;
+                                    if (cycleLength < 21 || cycleLength > 35) {
+                                      return 'Enter a value between 21 and 35';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+
+                              if (_selectedMethod == 'current-week')
+                                _buildWeekSelector(),
+
+                              const SizedBox(height: 24),
+
+                              // Buttons
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: _isLoading
+                                          ? null
+                                          : () {
+                                              setState(() {
+                                                _selectedMethod = null;
+                                              });
+                                            },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.grey[200],
+                                        foregroundColor: Colors.grey[800],
+                                        padding: const EdgeInsets.symmetric(vertical: 16),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Back',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: _isLoading ||
+                                              (_selectedMethod == 'due-date' && _formData['dueDate']!.isEmpty) ||
+                                              (_selectedMethod == 'lmp' &&
+                                                  (_formData['lastMenstrualPeriod']!.isEmpty ||
+                                                      _formData['cycleLength']!.isEmpty)) ||
+                                              (_selectedMethod == 'current-week' && _formData['currentWeek']!.isEmpty)
+                                          ? null
+                                          : _handleSubmit,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.transparent,
+                                        shadowColor: Colors.transparent,
+                                        padding: const EdgeInsets.symmetric(vertical: 16),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: const LinearGradient(
+                                            colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                                          ),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: _isLoading
+                                            ? const SizedBox(
+                                                width: 24,
+                                                height: 24,
+                                                child: CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                  strokeWidth: 2,
+                                                ),
+                                              )
+                                            : Text(
+                                                'Calculate My Week',
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  'Let\'s personalize your beautiful journey',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white.withOpacity(0.95),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    height: 1.3,
+
+                // Close button
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.grey),
+                    onPressed: widget.onClose,
                   ),
                 ),
               ],
             ),
           ),
-          GestureDetector(
-            onTap: widget.onClose,
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.25),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.3),
-                  width: 1,
+        ),
+
+        // Response popup
+        if (_showResponse)
+          Container(
+            color: Colors.black.withOpacity(0.5),
+            child: Center(
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 400),
+                margin: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFF59297), Color(0xFF7DA8E6)],
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-              ),
-              child: const Icon(
-                Icons.close,
-                color: Colors.white,
-                size: 22,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Decorative image
+                    Padding(
+                      padding: const EdgeInsets.only(top: 24),
+                      child: ClipOval(
+                        child: Image.network(
+                          'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            width: 100,
+                            height: 100,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.error, color: Colors.red),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Header
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Text(
+                        'Your Pregnancy Journey',
+                        style: GoogleFonts.poppins(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+
+                    // Response content
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        _responseMessage,
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+
+                    // Okay button
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      child: ElevatedButton(
+                        onPressed: _handleResponseClose,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFFF59297),
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Okay',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFFF59297),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(
+                              Icons.arrow_forward,
+                              color: Color(0xFFF59297),
+                              size: 20,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 
-  Widget _buildEnhancedTabBar() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      child: Container(
-        decoration: BoxDecoration(
-          color: lightPrimary,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: primaryColor.withOpacity(0.1), width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: primaryColor.withOpacity(0.1),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(6),
-        child: Row(
-          children: [
-            _buildEnhancedTab('due_date', 'Due Date', Icons.event, primaryColor),
-            _buildEnhancedTab('last_period', 'Last Period', Icons.calendar_month, secondaryColor),
-            _buildEnhancedTab('current_week', 'Current Week', Icons.timeline, primaryColor),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEnhancedTab(String tabId, String title, IconData icon, Color tabColor) {
-    final isSelected = selectedTab == tabId;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() {
-          selectedTab = tabId;
-          selectedDate = null;
-          selectedWeek = null;
-        }),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeInOut,
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-          decoration: BoxDecoration(
-            gradient: isSelected ? LinearGradient(
-              colors: [tabColor, tabColor.withOpacity(0.8)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ) : null,
-            color: isSelected ? null : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: isSelected ? [
-              BoxShadow(
-                color: tabColor.withOpacity(0.4),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ] : null,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 24,
-                color: isSelected ? Colors.white : tabColor.withOpacity(0.7),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  color: isSelected ? Colors.white : tabColor.withOpacity(0.8),
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTabContent() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.white, lightPrimary.withOpacity(0.3)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (selectedTab == 'due_date') _buildDueDateContent(),
-            if (selectedTab == 'last_period') _buildLastPeriodContent(),
-            if (selectedTab == 'current_week') _buildCurrentWeekContent(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDueDateContent() {
-    return _buildEnhancedDateInputSection(
-      title: 'Expected Due Date',
-      subtitle: 'When is your baby expected to arrive?',
-      description: 'Select the date your healthcare provider gave you as your expected delivery date.',
-      icon: Icons.baby_changing_station,
-      color: primaryColor,
-      onTap: () => _selectDate(context, 'due_date'),
-    );
-  }
-
-  Widget _buildLastPeriodContent() {
-    return _buildEnhancedDateInputSection(
-      title: 'Last Menstrual Period',
-      subtitle: 'First day of your last period',
-      description: 'This helps us calculate your pregnancy timeline and due date accurately.',
-      icon: Icons.calendar_today,
-      color: secondaryColor,
-      onTap: () => _selectDate(context, 'last_period'),
-    );
-  }
-
-  Widget _buildEnhancedDateInputSection({
-    required String title,
-    required String subtitle,
-    required String description,
+  Widget _buildMethodButton({
+    required String id,
     required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
+    required String title,
+    required String description,
+    required LinearGradient gradient,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 12),
-        Row(
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedMethod = id;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey[300]!, width: 2),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [color, color.withOpacity(0.7)],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                gradient: gradient,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: Colors.white, size: 24),
             ),
@@ -351,18 +706,16 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
                   Text(
                     title,
                     style: GoogleFonts.poppins(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
                   ),
-                  const SizedBox(height: 4),
                   Text(
-                    subtitle,
+                    description,
                     style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: color,
+                      fontSize: 14,
+                      color: Colors.grey[600],
                     ),
                   ),
                 ],
@@ -370,482 +723,157 @@ class _PregnancyInfoPopupState extends State<PregnancyInfoPopup> with TickerProv
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        Text(
-          description,
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            color: Colors.grey[600],
-            height: 1.5,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        const SizedBox(height: 24),
-        GestureDetector(
-          onTap: onTap,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: selectedDate != null ? LinearGradient(
-                colors: [color.withOpacity(0.1), Colors.white],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ) : null,
-              color: selectedDate != null ? null : lightPrimary,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: selectedDate != null ? color.withOpacity(0.4) : Colors.grey[300]!,
-                width: 2,
-              ),
-              boxShadow: selectedDate != null ? [
-                BoxShadow(
-                  color: color.withOpacity(0.2),
-                  blurRadius: 15,
-                  offset: const Offset(0, 6),
-                ),
-              ] : [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    gradient: selectedDate != null ? LinearGradient(
-                      colors: [color, color.withOpacity(0.8)],
-                    ) : null,
-                    color: selectedDate != null ? null : Colors.grey[300],
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(
-                    Icons.calendar_today,
-                    color: selectedDate != null ? Colors.white : Colors.grey[500],
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        selectedDate != null 
-                            ? _formatDate(selectedDate!)
-                            : 'Tap to select date',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: selectedDate != null ? Colors.black87 : Colors.grey[500],
-                        ),
-                      ),
-                      if (selectedDate != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          _getDateDescription(),
-                          style: GoogleFonts.poppins(
-                            fontSize: 13,
-                            color: color,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 18,
-                  color: selectedDate != null ? color : Colors.grey[400],
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-      ],
+      ),
     );
   }
 
-  Widget _buildCurrentWeekContent() {
+  Widget _buildDateField({
+    required String label,
+    required VoidCallback onTap,
+    required String value,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [primaryColor, secondaryColor],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: primaryColor.withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: const Icon(Icons.timeline, color: Colors.white, size: 24),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Current Week',
-                    style: GoogleFonts.poppins(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'How many weeks pregnant are you?',
-                    style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: primaryColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
         Text(
-          'Select your current week of pregnancy for personalized information.',
+          label,
           style: GoogleFonts.poppins(
             fontSize: 14,
-            color: Colors.grey[600],
-            height: 1.5,
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
           ),
         ),
-        const SizedBox(height: 24),
-        Container(
-          height: 220,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [lightPrimary, lightSecondary],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey[300]!),
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
             ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: primaryColor.withOpacity(0.2), width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: primaryColor.withOpacity(0.1),
-                blurRadius: 15,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: 42,
-            itemBuilder: (context, index) {
-              final week = index + 1;
-              final isSelected = selectedWeek == week;
-              return GestureDetector(
-                onTap: () => setState(() => selectedWeek = week),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  margin: const EdgeInsets.symmetric(vertical: 3),
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                  decoration: BoxDecoration(
-                    gradient: isSelected ? LinearGradient(
-                      colors: [primaryColor, secondaryColor],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ) : null,
-                    color: isSelected ? null : Colors.white.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: isSelected ? [
-                      BoxShadow(
-                        color: primaryColor.withOpacity(0.4),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ] : [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 5,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: isSelected ? Colors.white.withOpacity(0.3) : primaryColor.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(12),
-                          border: isSelected ? Border.all(
-                            color: Colors.white.withOpacity(0.5),
-                            width: 2,
-                          ) : null,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$week',
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: isSelected ? Colors.white : primaryColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          'Week $week',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            color: isSelected ? Colors.white : Colors.black87,
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      if (isSelected)
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.check,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        ),
-                    ],
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    value.isEmpty ? 'Select date' : value,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      color: value.isEmpty ? Colors.grey[500] : Colors.black87,
+                    ),
                   ),
                 ),
-              );
-            },
+                const Icon(Icons.calendar_today, color: Colors.grey),
+              ],
+            ),
           ),
         ),
-        const SizedBox(height: 20),
       ],
     );
   }
 
-  Widget _buildEnhancedActionButtons() {
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.white, lightPrimary.withOpacity(0.5)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+  Widget _buildTextField({
+    required String label,
+    required String initialValue,
+    TextInputType? keyboardType,
+    required Function(String) onChanged,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
         ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
+        const SizedBox(height: 8),
+        TextFormField(
+          initialValue: initialValue,
+          keyboardType: keyboardType,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFF59297), width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          ),
+          onChanged: onChanged,
+          validator: validator,
+          style: GoogleFonts.poppins(fontSize: 16),
         ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: widget.onClose,
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                side: BorderSide(color: Colors.grey[400]!, width: 2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
+      ],
+    );
+  }
+
+  Widget _buildWeekSelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Current Pregnancy Week *',
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          value: _formData['currentWeek']!.isEmpty ? null : _formData['currentWeek'],
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFF59297), width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          ),
+          hint: Text(
+            'Select week',
+            style: GoogleFonts.poppins(color: Colors.grey[500]),
+          ),
+          items: List.generate(40, (index) => index + 1).map((week) {
+            final trimester = week <= 13
+                ? '(1st Trimester)'
+                : week <= 27
+                    ? '(2nd Trimester)'
+                    : '(3rd Trimester)';
+            return DropdownMenuItem<String>(
+              value: week.toString(),
               child: Text(
-                'Cancel',
-                style: GoogleFonts.poppins(
-                  color: Colors.grey[600],
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                'Week $week $trimester',
+                style: GoogleFonts.poppins(fontSize: 16),
               ),
-            ),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            flex: 2,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: _canContinue() ? const LinearGradient(
-                  colors: [primaryColor, secondaryColor],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ) : null,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: _canContinue() ? [
-                  BoxShadow(
-                    color: primaryColor.withOpacity(0.4),
-                    blurRadius: 15,
-                    offset: const Offset(0, 6),
-                  ),
-                ] : null,
-              ),
-              child: ElevatedButton(
-                onPressed: _canContinue() ? _handleContinue : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _canContinue() ? Colors.transparent : Colors.grey[300],
-                  foregroundColor: _canContinue() ? Colors.white : Colors.grey[500],
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  elevation: 0,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Continue',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(
-                      Icons.arrow_forward,
-                      size: 20,
-                      color: _canContinue() ? Colors.white : Colors.grey[500],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              _formData['currentWeek'] = value ?? '';
+            });
+          },
+          validator: (value) => value == null ? 'Please select a week' : null,
+        ),
+      ],
     );
-  }
-
-  String _formatDate(DateTime date) {
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
-  }
-
-  String _getDateDescription() {
-    if (selectedDate == null) return '';
-    final now = DateTime.now();
-    final difference = selectedDate!.difference(now).inDays;
-    
-    if (selectedTab == 'due_date') {
-      if (difference > 0) {
-        return '$difference days remaining';
-      } else {
-        return '${difference.abs()} days overdue';
-      }
-    } else {
-      final daysSince = now.difference(selectedDate!).inDays;
-      return '$daysSince days ago';
-    }
-  }
-
-  bool _canContinue() {
-    switch (selectedTab) {
-      case 'due_date':
-      case 'last_period':
-        return selectedDate != null;
-      case 'current_week':
-        return selectedWeek != null;
-      default:
-        return false;
-    }
-  }
-
-  void _handleContinue() {
-    Map<String, dynamic> pregnancyData = {
-      'calculationType': selectedTab,
-    };
-
-    switch (selectedTab) {
-      case 'due_date':
-        pregnancyData['dueDate'] = selectedDate;
-        pregnancyData['currentWeek'] = _calculateWeekFromDueDate(selectedDate!);
-        break;
-      case 'last_period':
-        pregnancyData['lastPeriodDate'] = selectedDate;
-        pregnancyData['currentWeek'] = _calculateWeekFromLastPeriod(selectedDate!);
-        pregnancyData['dueDate'] = _calculateDueDateFromLastPeriod(selectedDate!);
-        break;
-      case 'current_week':
-        pregnancyData['currentWeek'] = selectedWeek;
-        pregnancyData['dueDate'] = _calculateDueDateFromCurrentWeek(selectedWeek!);
-        break;
-    }
-
-    widget.onComplete(pregnancyData);
-  }
-
-  int _calculateWeekFromDueDate(DateTime dueDate) {
-    final now = DateTime.now();
-    final daysSinceLMP = 280 - dueDate.difference(now).inDays;
-    return (daysSinceLMP / 7).floor();
-  }
-
-  int _calculateWeekFromLastPeriod(DateTime lastPeriod) {
-    final now = DateTime.now();
-    final daysSinceLMP = now.difference(lastPeriod).inDays;
-    return (daysSinceLMP / 7).floor();
-  }
-
-  DateTime _calculateDueDateFromLastPeriod(DateTime lastPeriod) {
-    return lastPeriod.add(const Duration(days: 280));
-  }
-
-  DateTime _calculateDueDateFromCurrentWeek(int currentWeek) {
-    final now = DateTime.now();
-    final remainingWeeks = 40 - currentWeek;
-    return now.add(Duration(days: remainingWeeks * 7));
-  }
-
-  Future<void> _selectDate(BuildContext context, String type) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime.now().subtract(const Duration(days: 300)),
-      lastDate: DateTime.now().add(const Duration(days: 300)),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: primaryColor,
-              secondary: secondaryColor,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
   }
 }
